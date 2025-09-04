@@ -1,9 +1,22 @@
-import { Users } from "lucide-react";
+import { Users, CheckCircle2, XCircle } from "lucide-react";
 import { Card } from "../ui/card";
 
-export function CampusFacilities() {
+type FacilityType = {
+  name: string;
+  available: boolean;
+};
+
+export function CampusFacilities({
+  college,
+}: {
+  college: { campusFacilities?: FacilityType[] };
+}) {
+  if (!college?.campusFacilities || college.campusFacilities.length === 0) {
+    return null; // hide section if no data
+  }
+
   return (
-    <div className="">
+    <div>
       {/* Campus Facilities */}
       <section className="mb-16">
         <div className="mb-8">
@@ -21,25 +34,22 @@ export function CampusFacilities() {
         <Card className="border border-slate-200 shadow-sm">
           <div className="py-8 px-4">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {[
-                "Library",
-                "Hostels",
-                "Sports Complex",
-                "Laboratories",
-                "Auditorium",
-                "Medical Center",
-                "Cafeteria",
-                "Wi-Fi Campus",
-                "Computer Center",
-                "Gym",
-                "Swimming Pool",
-                "Research Centers",
-              ].map((facility, index) => (
+              {college.campusFacilities.map((facility, index) => (
                 <div
                   key={index}
-                  className="text-center py-3 px-4 bg-slate-50 rounded-lg border border-slate-100"
+                  className="flex flex-col items-center justify-center gap-2 py-4 px-4 bg-slate-50 rounded-lg border border-slate-100"
                 >
-                  <span className="text-slate-700">{facility}</span>
+                  {facility.available ? (
+                    <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                  ) : (
+                    <XCircle className="h-5 w-5 text-red-500" />
+                  )}
+                  <span className="text-slate-700 font-medium">
+                    {facility.name}
+                  </span>
+                  <span className="text-xs text-slate-500">
+                    {facility.available ? "Available" : "Not Available"}
+                  </span>
                 </div>
               ))}
             </div>

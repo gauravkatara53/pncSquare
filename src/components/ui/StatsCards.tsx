@@ -1,3 +1,4 @@
+import React from "react";
 import { TrendingUp, Users, Building2, DollarSign } from "lucide-react";
 import { Card } from "../ui/card";
 
@@ -48,12 +49,67 @@ export function StatCard({
   );
 }
 
-export function StatsCards() {
+// export function StatsCards() {
+//   return (
+//     <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+//       <StatCard
+//         title="Total Offers"
+//         value="450+"
+//         subtitle="Across all branches"
+//         icon={<Users className="w-5 h-5 text-white" />}
+//         trend="+8% YoY"
+//         bgGradient="bg-gradient-to-br from-blue-500 to-indigo-600"
+//       />
+//       <StatCard
+//         title="Highest Package"
+//         value="₹123 LPA"
+//         subtitle="CSE"
+//         icon={<DollarSign className="w-5 h-5 text-white" />}
+//         bgGradient="bg-gradient-to-br from-emerald-500 to-green-600"
+//       />
+//       <StatCard
+//         title="Average Package"
+//         value="₹12.63 LPA"
+//         subtitle="Overall (B.Tech)"
+//         icon={<TrendingUp className="w-5 h-5 text-white" />}
+//         bgGradient="bg-gradient-to-br from-amber-500 to-yellow-600"
+//       />
+//       <StatCard
+//         title="Recruiters"
+//         value="120+"
+//         subtitle="2024 season"
+//         icon={<Building2 className="w-5 h-5 text-white" />}
+//         bgGradient="bg-gradient-to-br from-fuchsia-500 to-pink-600"
+//       />
+//     </div>
+//   );
+// }
+interface StatData {
+  totalOffers: string;
+  highestPackage: string;
+  averagePackage: string;
+  recruiters: string;
+}
+
+interface StatsCardsProps {
+  data: StatData[];
+}
+
+export function StatsCards({ data }: StatsCardsProps) {
+  // Assuming only one object in data array for overall stats
+  const stats = data[0];
+
+  if (!stats) {
+    return (
+      <p className="text-center text-gray-500">No stats data available.</p>
+    );
+  }
+
   return (
     <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
       <StatCard
         title="Total Offers"
-        value="450+"
+        value={`${stats.totalOffers ?? "-"}+`}
         subtitle="Across all branches"
         icon={<Users className="w-5 h-5 text-white" />}
         trend="+8% YoY"
@@ -61,22 +117,26 @@ export function StatsCards() {
       />
       <StatCard
         title="Highest Package"
-        value="₹123 LPA"
-        subtitle="CSE"
+        value={stats.highestPackage ? `₹${stats.highestPackage} LPA` : "-"}
+        subtitle="Top offer"
         icon={<DollarSign className="w-5 h-5 text-white" />}
         bgGradient="bg-gradient-to-br from-emerald-500 to-green-600"
       />
       <StatCard
         title="Average Package"
-        value="₹12.63 LPA"
+        value={
+          stats.averagePackage
+            ? `₹${Number(stats.averagePackage).toFixed(2)} LPA`
+            : "-"
+        }
         subtitle="Overall (B.Tech)"
         icon={<TrendingUp className="w-5 h-5 text-white" />}
         bgGradient="bg-gradient-to-br from-amber-500 to-yellow-600"
       />
       <StatCard
         title="Recruiters"
-        value="120+"
-        subtitle="2024 season"
+        value={`${stats.recruiters ?? "-"}+`}
+        subtitle={`${new Date().getFullYear()} season`}
         icon={<Building2 className="w-5 h-5 text-white" />}
         bgGradient="bg-gradient-to-br from-fuchsia-500 to-pink-600"
       />

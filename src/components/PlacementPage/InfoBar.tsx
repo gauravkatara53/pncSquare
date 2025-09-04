@@ -9,16 +9,15 @@ import {
   Table,
   IndianRupee,
   Briefcase,
-
 } from "lucide-react";
 
 const navItems = [
   { label: "How to Reach", icon: MapPin, target: "address" },
+  { label: "Cutoff", icon: Table, target: "cutoff" },
   { label: "Ranking", icon: LineChart, target: "ranking" },
+  { label: "facilities", icon: Info, target: "facilities" },
   { label: "Admission", icon: Landmark, target: "admission" },
   { label: "Courses", icon: BookOpen, target: "courses" },
-  { label: "Seats", icon: Info, target: "facilities" },
-  { label: "Cutoff", icon: Table, target: "cutoff" },
   { label: "Fees", icon: IndianRupee, target: "fees" },
   { label: "Placements", icon: Briefcase, target: "placements" },
 ];

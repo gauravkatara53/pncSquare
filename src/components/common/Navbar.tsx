@@ -28,12 +28,10 @@ export function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">CP</span>
+              <span className="text-white font-bold text-lg">p&c</span>
             </div>
             <div className="flex flex-col">
-              <div className="font-bold text-slate-900 text-lg">
-                CollegePravesh
-              </div>
+              <div className="font-bold text-slate-900 text-lg">P&C Square</div>
               <div className="text-xs text-gray-500">
                 Find Your Dream College
               </div>
@@ -85,7 +83,7 @@ export function Header() {
           {/* Desktop Nav */}
           <nav className="hidden md:flex space-x-6 py-3 overflow-x-auto">
             {navItems.map((item) => {
-              const isActive = pathname.startsWith(item.href);
+              const isActive = pathname?.startsWith(item.href) ?? false;
               return (
                 <Link
                   key={item.id}
@@ -106,7 +104,7 @@ export function Header() {
           {mobileMenuOpen && (
             <nav className="md:hidden flex flex-col space-y-2 py-3">
               {navItems.map((item) => {
-                const isActive = pathname.startsWith(item.href);
+                const isActive = pathname?.startsWith(item.href) ?? false;
                 return (
                   <Link
                     key={item.id}

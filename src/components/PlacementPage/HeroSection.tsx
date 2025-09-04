@@ -2,7 +2,34 @@ import { GraduationCap, Award, Wallet, IndianRupee } from "lucide-react";
 import { Badge } from "../ui/badge";
 import Image from "next/image";
 
-export default function CollegeHeader() {
+interface CollegeHeaderProps {
+  college: {
+    name: string;
+    bio?: string;
+    fees: number;
+    avgSalary: number;
+    nirf: number;
+    highestPackage: number;
+    placementRate: number;
+    image_url: string;
+  };
+}
+
+// Helper to format amount with dynamic units
+function formatAmount(amount: number): string {
+  if (amount < 100000) {
+    // Less than 1 Lakh, show full number with commas
+    return `₹${amount.toLocaleString()}`;
+  } else if (amount >= 100000 && amount < 10000000) {
+    // Between 1 Lakh and less than 1 Crore, show in Lakhs
+    return `₹${(amount / 100000).toFixed(2).replace(/\.00$/, "")} L`;
+  } else {
+    // 1 Crore or more, show in Crores
+    return `₹${(amount / 10000000).toFixed(2).replace(/\.00$/, "")} Cr`;
+  }
+}
+
+export default function CollegeHeader({ college }: CollegeHeaderProps) {
   return (
     <div className="relative overflow-hidden bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900">
       {/* Background Pattern */}
@@ -21,35 +48,40 @@ export default function CollegeHeader() {
             </div>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-              NIT JAMSHEDPUR
+              {college.name}
               <span className="block text-yellow-400">Statistics 2025</span>
             </h1>
 
-            <p className="text-xl hidden sm:block text-blue-100 mb-8 leading-relaxed">
-              Exceptional placement outcomes with record-breaking packages and
-              industry partnerships across diverse sectors.
-            </p>
+            {college.bio && (
+              <p className="text-xl hidden sm:block text-blue-100 mb-8 leading-relaxed">
+                {college.bio}
+              </p>
+            )}
 
             <div className="grid grid-cols-3 gap-3">
               {/* Fees */}
-              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-3 bg-white/10 rounded-lg p-4 backdrop-blur-sm text-center sm:text-left">
+              <div className="whitespace-nowrap flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-3 bg-white/10 rounded-lg p-4 backdrop-blur-sm text-center sm:text-left">
                 <div className="p-2 bg-yellow-400/20 rounded-lg">
                   <IndianRupee className="w-6 h-6 text-yellow-400" />
                 </div>
                 <div>
                   <div className="text-sm text-blue-200">Fees</div>
-                  <div className="font-semibold text-lg">1.39 L</div>
+                  <div className="font-semibold text-md sm:text-lg">
+                    {formatAmount(college.fees)}
+                  </div>
                 </div>
               </div>
 
               {/* Avg Package */}
-              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-3 bg-white/10 rounded-lg p-4 backdrop-blur-sm text-center sm:text-left">
+              <div className="whitespace-nowrap flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-3 bg-white/10 rounded-lg p-4 backdrop-blur-sm text-center sm:text-left">
                 <div className="p-2 bg-green-400/20 rounded-lg">
                   <Wallet className="w-6 h-6 text-green-400" />
                 </div>
                 <div>
                   <div className="text-sm text-blue-200">Avg offer</div>
-                  <div className="font-semibold text-lg">13 L</div>
+                  <div className="font-semibold text-md sm:text-lg">
+                    {formatAmount(college.avgSalary)}
+                  </div>
                 </div>
               </div>
 
@@ -60,7 +92,9 @@ export default function CollegeHeader() {
                 </div>
                 <div>
                   <div className="text-sm text-blue-200">NIRF</div>
-                  <div className="font-semibold text-lg">101-150</div>
+                  <div className="font-semibold text-md sm:text-lg">
+                    {college.nirf}
+                  </div>
                 </div>
               </div>
             </div>
@@ -69,19 +103,23 @@ export default function CollegeHeader() {
           <div className="relative">
             <div className="relative z-10 bg-white/10 backdrop-blur-lg rounded-2xl p-4 sm:p-6 border border-white/20">
               <Image
-                src="https://avenuemail.in/wp-content/uploads/2023/11/20231102_195315.jpg"
-                alt="IIT Bhubaneswar Campus"
+                src={college.image_url}
+                alt={`${college.name} Campus`}
                 width={400}
                 height={256}
                 className="w-full h-64 object-cover rounded-xl"
               />
               <div className="mt-4 grid grid-cols-2 gap-4">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-white">₹1.25Cr</div>
+                  <div className="sm:text-3xl text-xl font-bold text-white">
+                    {formatAmount(college.highestPackage)}
+                  </div>
                   <div className="text-sm text-blue-200">Highest Package</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-white">97.2%</div>
+                  <div className="sm:text-3xl text-xl font-bold text-white">
+                    {college.placementRate}%
+                  </div>
                   <div className="text-sm text-blue-200">Placement Rate</div>
                 </div>
               </div>
