@@ -10,23 +10,21 @@ import { Admission } from "@/components/PlacementPage/Admission";
 import { Courses } from "@/components/PlacementPage/Courses";
 import { Cutoffs } from "@/components/PlacementPage/Cutoffs";
 import { FeeStructure } from "@/components/PlacementPage/FeeStructure";
-import type { FeeType, WaiverType } from "@/types/feeStructure"; // Adjust import path
+import type { FeeType, WaiverType } from "@/types/feeStructure";
 import { PlacementPage } from "@/components/PlacementPage/placementStatics";
 import { Footer } from "@/components/common/footer";
 import type { Ranking } from "@/types/ranking";
-import { apiService } from "@/ApiService/apiService"; // Adjust import path
+import { apiService } from "@/ApiService/apiService";
 import ScrollToTop from "@/components/ScrollToTop";
 
 interface PageProps {
-  params: Promise<{
+  params: {
     slug: string;
-  }>;
+  };
 }
 
-// Await params per Next.js 13 dynamic routing rules
-export default async function CollegePage({ params }: PageProps) {
-  const resolvedParams = await params;
-  const { slug } = resolvedParams;
+export default function CollegePage({ params }: PageProps) {
+  const { slug } = params;
 
   interface CollegeHeaderType {
     name: string;
@@ -69,13 +67,14 @@ export default async function CollegePage({ params }: PageProps) {
     };
   }
 
-  const collegeResponse = await apiService.get<CollegeResponse>(
-    `/college/${slug}`
+  // ❌ Can't use await in non-async function
+  // ✅ Use React.use instead (Next.js server component)
+  const collegeResponse = React.use(
+    apiService.get<CollegeResponse>(`/college/${slug}`)
   );
 
   const college = collegeResponse.data;
 
-  // Prepare the object for CollegeHeader
   const collegeHeaderData: CollegeHeaderType = {
     name: college.name,
     bio: college.bio,

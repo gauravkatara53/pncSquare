@@ -42,7 +42,7 @@ export default function NewsMainPage() {
         } else {
           setError("Failed to load news articles.");
         }
-      } catch (err) {
+      } catch {
         setError("Error fetching news articles.");
       } finally {
         setLoading(false);
