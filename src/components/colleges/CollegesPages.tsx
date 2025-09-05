@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { Card } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -11,7 +11,7 @@ import { Footer } from "../common/footer";
 import { Search, MapPin, Filter, X } from "lucide-react";
 import Image from "next/image";
 import { apiService } from "../../ApiService/apiService";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 type College = {
   _id: number;
@@ -32,16 +32,19 @@ type College = {
 export default function CollegesMainPage() {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
+  // UI state for showing filters modal on mobile
   const [showFilters, setShowFilters] = useState(false);
 
+  // Local state for UI form controls reflecting URL params
   const [filters, setFilters] = useState({
     state: [] as string[],
-    minFees: "",
-    maxFees: "",
     stream: [] as string[],
     instituteType: [] as string[],
     tag: [] as string[],
+    minFees: "",
+    maxFees: "",
     minPlacementRate: "",
     sortBy: "",
     order: "",
@@ -49,49 +52,70 @@ export default function CollegesMainPage() {
   });
 
   const [page, setPage] = useState(1);
-  const [perPage] = useState(9);
-  const [totalColleges, setTotalColleges] = useState(0);
+  const perPage = 9;
+
   const [colleges, setColleges] = useState<College[]>([]);
+  const [totalColleges, setTotalColleges] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  // Get current filter params for API/URL
-  const buildFilterQueryParams = useCallback(() => {
-    const params: Record<string, string> = {};
-    if (filters.state.length) params.state = filters.state.join(",");
-    if (filters.stream.length) params.stream = filters.stream.join(","); // ✅ fixed lowercase
-    if (filters.instituteType.length)
-      params.instituteType = filters.instituteType.join(",");
-    if (filters.tag.length) params.tag = filters.tag.join(",");
-    if (filters.minFees) params.minFees = String(filters.minFees);
-    if (filters.maxFees) params.maxFees = String(filters.maxFees);
-    if (filters.minPlacementRate)
-      params.minPlacementRate = String(filters.minPlacementRate);
-    if (filters.sortBy) params.sortBy = filters.sortBy;
-    if (filters.order) params.order = filters.order;
-    if (filters.searchTerm) params.searchTerm = filters.searchTerm;
-    params.page = String(page);
-    params.limit = String(perPage);
-    return params;
-  }, [filters, page, perPage]);
+  // Utility: parse canonic filters from URLSearchParams
+  function parseFiltersFromParams(params: URLSearchParams) {
+    return {
+      state: params.get("state")?.split(",").filter(Boolean) || [],
+      stream: params.get("stream")?.split(",").filter(Boolean) || [],
+      instituteType:
+        params.get("instituteType")?.split(",").filter(Boolean) || [],
+      tag: params.get("tag")?.split(",").filter(Boolean) || [],
+      minFees: params.get("minFees") || "",
+      maxFees: params.get("maxFees") || "",
+      minPlacementRate: params.get("minPlacementRate") || "",
+      sortBy: params.get("sortBy") || "",
+      order: params.get("order") || "",
+      searchTerm: params.get("searchTerm") || "",
+    };
+  }
 
-  // Update URL whenever filters/page change
-  const syncUrlWithFilters = useCallback(() => {
-    const params = buildFilterQueryParams();
-    const queryString = new URLSearchParams(params).toString();
-    router.replace(`${pathname}?${queryString}`, { scroll: false });
-  }, [buildFilterQueryParams, pathname, router]);
+  // Utility: parse current page from URLSearchParams
+  function parsePageFromParams(params: URLSearchParams) {
+    const p = parseInt(params.get("page") ?? "1", 10);
+    return isNaN(p) || p < 1 ? 1 : p;
+  }
 
-  // Fetch college data using current filters/page
-  const fetchColleges = useCallback(async () => {
+  // Whenever URL query parameters change, parse them and update filter state + page,
+  // then fetch data using the exact URL query parameters.
+  useEffect(() => {
+    if (!searchParams) return;
+
+    const params = new URLSearchParams(searchParams.toString());
+
+    // Parse filter values from URL
+    const parsedFilters = parseFiltersFromParams(params);
+    setFilters(parsedFilters);
+
+    // Parse page number
+    const parsedPage = parsePageFromParams(params);
+    setPage(parsedPage);
+
+    // Fetch colleges with exact URL query params
+    fetchColleges(params);
+  }, [searchParams]); // Whenever URL changes, this effect runs
+
+  // Fetch colleges API call using given URLSearchParams directly
+  const fetchColleges = async (params: URLSearchParams) => {
     setLoading(true);
     try {
-      const params = buildFilterQueryParams();
+      // Convert URLSearchParams to key-value object for API call
+      const apiParams: Record<string, string> = {};
+      params.forEach((value, key) => {
+        apiParams[key] = value;
+      });
+
       const response = await apiService.get<{
         statusCode: number;
         data: { colleges: College[]; totalCount: number };
         message: string;
         success: boolean;
-      }>("/college/all", params);
+      }>("/college/all", apiParams);
 
       setColleges(response.data.colleges);
       setTotalColleges(response.data.totalCount);
@@ -100,44 +124,81 @@ export default function CollegesMainPage() {
     } finally {
       setLoading(false);
     }
-  }, [buildFilterQueryParams]);
+  };
 
-  // Update URL + fetch data when filters/page change
-  useEffect(() => {
-    syncUrlWithFilters();
-    fetchColleges();
-  }, [filters, page, syncUrlWithFilters, fetchColleges]);
+  // Update URL by pushing new query params - this triggers the above useEffect,
+  // which syncs filter state and fetches data from backend according to URL.
+  // So this is the ONLY place we update the URL params on filter/page change.
+  const updateUrlWithFilters = (
+    newFilters: typeof filters,
+    newPage: number
+  ) => {
+    const params = new URLSearchParams();
 
-  // Filter checkbox toggler
+    if (newFilters.state.length)
+      params.set("state", newFilters.state.join(","));
+    if (newFilters.stream.length)
+      params.set("stream", newFilters.stream.join(","));
+    if (newFilters.instituteType.length)
+      params.set("instituteType", newFilters.instituteType.join(","));
+    if (newFilters.tag.length) params.set("tag", newFilters.tag.join(","));
+    if (newFilters.minFees) params.set("minFees", newFilters.minFees);
+    if (newFilters.maxFees) params.set("maxFees", newFilters.maxFees);
+    if (newFilters.minPlacementRate)
+      params.set("minPlacementRate", newFilters.minPlacementRate);
+    if (newFilters.sortBy) params.set("sortBy", newFilters.sortBy);
+    if (newFilters.order) params.set("order", newFilters.order);
+    if (newFilters.searchTerm) params.set("searchTerm", newFilters.searchTerm);
+
+    params.set("page", newPage.toString());
+    params.set("limit", perPage.toString());
+
+    // Replace URL without scrolling - user can share/bookmark this URL with applied filters and page
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
+  // Handlers: On filter toggles or input changes,
+  // we build a new filter object, reset page to 1, then update URL with new filters.
   function toggleFilter(category: keyof typeof filters, value: string) {
-    setPage(1);
-    setFilters((prev) => {
-      const currentValues = prev[category];
-      if (Array.isArray(currentValues)) {
-        return currentValues.includes(value)
-          ? { ...prev, [category]: currentValues.filter((v) => v !== value) }
-          : { ...prev, [category]: [...currentValues, value] };
-      }
-      return prev;
-    });
+    // Copy current filters and toggle the category value (array field)
+    let updatedValues: string[] = [];
+    if (
+      category === "state" ||
+      category === "stream" ||
+      category === "instituteType" ||
+      category === "tag"
+    ) {
+      const current = filters[category] as string[];
+      updatedValues = current.includes(value)
+        ? current.filter((v) => v !== value)
+        : [...current, value];
+    }
+
+    const newFilters = {
+      ...filters,
+      [category]: updatedValues,
+    };
+
+    updateUrlWithFilters(newFilters, 1); // reset page to 1 on filter change
   }
 
-  // Input handler
-  function handleInputChange(
-    category: "minFees" | "maxFees" | "minPlacementRate" | "sortBy" | "order",
-    value: string
-  ) {
-    setPage(1);
-    setFilters((prev) => ({ ...prev, [category]: value }));
+  function handleInputChange(category: keyof typeof filters, value: string) {
+    const newFilters = {
+      ...filters,
+      [category]: value,
+    };
+
+    updateUrlWithFilters(newFilters, 1); // reset page to 1 on filter/input change
   }
 
-  // Pagination logic
-  const totalPages = Math.max(1, Math.ceil(totalColleges / perPage));
+  // Pagination handler updates page number only in URL
   function changePage(newPage: number) {
-    if (newPage >= 1 && newPage <= totalPages && newPage !== page) {
-      setPage(newPage);
+    if (newPage !== page) {
+      updateUrlWithFilters(filters, newPage);
     }
   }
+
+  const totalPages = Math.max(1, Math.ceil(totalColleges / perPage));
 
   return (
     <div className="min-h-screen bg-white">
@@ -160,13 +221,9 @@ export default function CollegesMainPage() {
                 <Input
                   placeholder="Search colleges..."
                   value={filters.searchTerm}
-                  onChange={(e) => {
-                    setPage(1);
-                    setFilters((prev) => ({
-                      ...prev,
-                      searchTerm: e.target.value,
-                    }));
-                  }}
+                  onChange={(e) =>
+                    handleInputChange("searchTerm", e.target.value)
+                  }
                   className="pl-10 border-0 focus:ring-0 text-base md:text-lg"
                 />
               </div>
@@ -257,79 +314,25 @@ export default function CollegesMainPage() {
   );
 }
 
-// --- Pagination UI: Page numbers + arrows ---
-function PaginationUI({
-  currentPage,
-  totalPages,
-  onPageChange,
-}: {
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-}) {
-  let start = Math.max(1, currentPage - 2);
-  const end = Math.min(totalPages, start + 4);
-  if (end - start < 4) start = Math.max(1, end - 4);
+type FiltersType = {
+  state: string[];
+  stream: string[];
+  instituteType: string[];
+  tag: string[];
+  minFees: string;
+  maxFees: string;
+  minPlacementRate: string;
+  searchTerm: string;
+};
 
-  const pageNumbers = [];
-  for (let i = start; i <= end; i++) pageNumbers.push(i);
-
-  return (
-    <div className="flex justify-center items-center gap-2 mt-10">
-      <Button
-        variant="ghost"
-        size="sm"
-        disabled={currentPage === 1}
-        onClick={() => onPageChange(currentPage - 1)}
-      >
-        {"<"}
-      </Button>
-      {pageNumbers.map((num) => (
-        <Button
-          key={num}
-          variant={num === currentPage ? "default" : "ghost"}
-          size="sm"
-          className={num === currentPage ? "font-bold border-slate-900" : ""}
-          onClick={() => onPageChange(num)}
-        >
-          {num}
-        </Button>
-      ))}
-      <Button
-        variant="ghost"
-        size="sm"
-        disabled={currentPage === totalPages}
-        onClick={() => onPageChange(currentPage + 1)}
-      >
-        {">"}
-      </Button>
-    </div>
-  );
-}
-
-// --- Filters component ---
 type FiltersProps = {
-  filters: {
-    state: string[];
-    minFees: string;
-    maxFees: string;
-    stream: string[];
-    instituteType: string[];
-    tag: string[];
-    minPlacementRate: string;
-  };
-  toggleFilter: (
-    category: keyof FiltersProps["filters"],
-    value: string
-  ) => void;
-  handleInputChange: (
-    category: "minFees" | "maxFees" | "minPlacementRate",
-    value: string
-  ) => void;
+  filters: FiltersType;
+  toggleFilter: (category: keyof FiltersType, value: string) => void;
+  handleInputChange: (category: keyof FiltersType, value: string) => void;
 };
 
 function Filters({ filters, toggleFilter, handleInputChange }: FiltersProps) {
-  function isChecked(category: keyof FiltersProps["filters"], value: string) {
+  function isChecked(category: keyof typeof filters, value: string) {
     return filters[category].includes(value);
   }
 
@@ -498,7 +501,6 @@ function Filters({ filters, toggleFilter, handleInputChange }: FiltersProps) {
             ))}
           </div>
         </div>
-
         <Separator />
 
         {/* Min Placement Rate */}
@@ -532,7 +534,7 @@ function CollegeCard({ college }: { college: College }) {
       <div>
         <div
           onClick={goToDetails}
-          className="aspect-video w-full overflow-hidden rounded-t-lg"
+          className="aspect-video w-full overflow-hidden rounded-t-lg cursor-pointer"
         >
           <Image
             src={college.image_url}
@@ -554,7 +556,6 @@ function CollegeCard({ college }: { college: College }) {
               </div>
             </div>
           </div>
-          {/* Details Grid */}
           <div className="grid grid-cols-2 gap-3 md:gap-4 mb-5">
             <DetailBox label="Ranking" value={college.nirf} color="slate" />
             <DetailBox
@@ -589,7 +590,6 @@ function CollegeCard({ college }: { college: College }) {
   );
 }
 
-// --- DetailsBox ---
 function DetailBox({
   label,
   value,
@@ -608,6 +608,7 @@ function DetailBox({
     </div>
   );
 }
+
 const formatToIndianUnits = (num: number | null | undefined): string => {
   if (num == null || isNaN(Number(num))) return "N/A";
   if (num >= 10000000) {
@@ -636,6 +637,56 @@ function SkeletonCard() {
         </div>
         <div className="h-8 bg-slate-300 rounded w-1/4"></div>
       </div>
+    </div>
+  );
+}
+
+// --- Pagination UI as in your original code ---
+function PaginationUI({
+  currentPage,
+  totalPages,
+  onPageChange,
+}: {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}) {
+  let start = Math.max(1, currentPage - 2);
+  const end = Math.min(totalPages, start + 4);
+  if (end - start < 4) start = Math.max(1, end - 4);
+
+  const pageNumbers = [];
+  for (let i = start; i <= end; i++) pageNumbers.push(i);
+
+  return (
+    <div className="flex justify-center items-center gap-2 mt-10">
+      <Button
+        variant="ghost"
+        size="sm"
+        disabled={currentPage === 1}
+        onClick={() => onPageChange(currentPage - 1)}
+      >
+        {"<"}
+      </Button>
+      {pageNumbers.map((num) => (
+        <Button
+          key={num}
+          variant={num === currentPage ? "default" : "ghost"}
+          size="sm"
+          className={num === currentPage ? "font-bold border-slate-900" : ""}
+          onClick={() => onPageChange(num)}
+        >
+          {num}
+        </Button>
+      ))}
+      <Button
+        variant="ghost"
+        size="sm"
+        disabled={currentPage === totalPages}
+        onClick={() => onPageChange(currentPage + 1)}
+      >
+        {">"}
+      </Button>
     </div>
   );
 }
