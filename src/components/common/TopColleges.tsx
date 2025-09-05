@@ -1,5 +1,6 @@
 import { colleges } from "@/lib/colleges";
 import CollegeCard from "./CollegeCard";
+import Link from "next/link";
 
 export function TopColleges() {
   return (
@@ -19,15 +20,19 @@ export function TopColleges() {
         {/* Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {colleges.map((college) => (
-            <CollegeCard key={college.name} {...college} />
+            <Link href={college.route} key={college.name}>
+              <CollegeCard {...college} />
+            </Link>
           ))}
         </div>
 
         {/* CTA */}
         <div className="text-center mt-12">
-          <button className="bg-slate-900 hover:bg-slate-800 text-white px-8 py-3 rounded-lg font-medium transition-colors">
-            View All Colleges →
-          </button>
+          <Link href={"/colleges"}>
+            <button className="bg-slate-900 hover:bg-slate-800 text-white px-8 py-3 rounded-lg font-medium transition-colors">
+              View All Colleges →
+            </button>
+          </Link>
         </div>
       </div>
     </section>

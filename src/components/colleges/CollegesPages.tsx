@@ -58,14 +58,14 @@ export default function CollegesMainPage() {
   const buildFilterQueryParams = useCallback(() => {
     const params: Record<string, string> = {};
     if (filters.state.length) params.state = filters.state.join(",");
-    if (filters.stream.length) params.Stream = filters.stream.join(",");
+    if (filters.stream.length) params.stream = filters.stream.join(","); // ✅ fixed lowercase
     if (filters.instituteType.length)
       params.instituteType = filters.instituteType.join(",");
     if (filters.tag.length) params.tag = filters.tag.join(",");
-    if (filters.minFees) params.minFees = filters.minFees;
-    if (filters.maxFees) params.maxFees = filters.maxFees;
+    if (filters.minFees) params.minFees = String(filters.minFees);
+    if (filters.maxFees) params.maxFees = String(filters.maxFees);
     if (filters.minPlacementRate)
-      params.minPlacementRate = filters.minPlacementRate;
+      params.minPlacementRate = String(filters.minPlacementRate);
     if (filters.sortBy) params.sortBy = filters.sortBy;
     if (filters.order) params.order = filters.order;
     if (filters.searchTerm) params.searchTerm = filters.searchTerm;

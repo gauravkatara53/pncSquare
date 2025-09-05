@@ -19,6 +19,7 @@ import { Footer } from "@/components/common/footer";
 import type { Ranking } from "@/types/ranking";
 import { apiService } from "@/ApiService/apiService";
 import ScrollToTop from "@/components/ScrollToTop";
+import CollegeHeroSkeleton from "@/components/colleges/CollegeSkeleton";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -100,7 +101,7 @@ export default function CollegePage({ params }: PageProps) {
   if (loading)
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <p className="text-gray-600 text-lg">Loading college...</p>
+        <CollegeHeroSkeleton />
       </div>
     );
 

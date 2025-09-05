@@ -10,6 +10,7 @@ import { Calendar, Clock, ExternalLink, TrendingUp } from "lucide-react";
 import Image from "next/image";
 import { apiService } from "@/ApiService/apiService";
 import { useRouter } from "next/navigation";
+import CollegeHeroSkeleton from "../colleges/CollegeSkeleton";
 interface NewsArticle {
   _id: string;
   title: string;
@@ -57,7 +58,12 @@ export default function NewsMainPage() {
   const goToDetails = (slug: string) => {
     router.push(`/newsarticle/${slug}`);
   };
-  if (loading) return <div className="text-center py-20">Loading news...</div>;
+  if (loading)
+    return (
+      <div className="text-center py-20">
+        <CollegeHeroSkeleton />
+      </div>
+    );
   if (error)
     return <div className="text-center py-20 text-red-600">{error}</div>;
 

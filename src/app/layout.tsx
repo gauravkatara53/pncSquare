@@ -2,7 +2,7 @@ import "./globals.css";
 import { Header as Navbar } from "@/components/common/Navbar";
 
 export const metadata = {
-  title: "College Finder",
+  title: "P&C square - College & Exam Finder",
   description: "Find your dream IIT, NIT, or other colleges easily.",
 };
 

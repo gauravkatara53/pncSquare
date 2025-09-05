@@ -1,7 +1,7 @@
 import NewsMainPage from "@/components/News/newsPage";
 
 export default function NewsPage() {
-  return (
+  return (  
     <div>
       {" "}
       <NewsMainPage />

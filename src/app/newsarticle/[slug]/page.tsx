@@ -49,6 +49,7 @@ interface NewsArticle {
 
 // import { useParams } from "next/navigation";
 import ScrollToTop from "@/components/ScrollToTop";
+import CollegeHeroSkeleton from "@/components/colleges/CollegeSkeleton";
 
 export default function NewsArticlePage({
   params,
@@ -95,7 +96,7 @@ export default function NewsArticlePage({
   if (loading)
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <p className="text-gray-600 text-lg">Loading article...</p>
+        <CollegeHeroSkeleton />
       </div>
     );
 

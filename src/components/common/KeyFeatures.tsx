@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { GraduationCap, BookOpen, FileText, TrendingUp } from "lucide-react";
+import Link from "next/link";
 import { motion, useAnimation, useInView } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
 import type { LucideIcon } from "lucide-react";
@@ -12,13 +13,15 @@ type Feature = {
   icon: LucideIcon;
   color: string;
   image: string;
+  route: string;
 };
 
 const features = [
   {
     title: "Colleges",
+    route: "/colleges",
     description:
-      "Explore top colleges with detailed reviews, rankings, and placements.",
+      "Explore top colleges with detailed  rankings, and placements.",
     icon: GraduationCap,
     color: "from-indigo-500 to-purple-500",
     image:
@@ -26,8 +29,8 @@ const features = [
   },
   {
     title: "Courses",
-    description:
-      "Find the right courses with complete syllabus and career scope.",
+    route: "/courses",
+    description: "Find the right courses with  career scope.",
     icon: BookOpen,
     color: "from-pink-500 to-rose-500",
     image:
@@ -35,6 +38,7 @@ const features = [
   },
   {
     title: "Exams",
+    route: "/exam",
     description:
       "Stay updated with exam dates, patterns, and preparation tips.",
     icon: FileText,
@@ -44,8 +48,8 @@ const features = [
   },
   {
     title: "Cutoffs",
-    description:
-      "Check cutoff trends across colleges and plan your applications smartly.",
+    route: "/cutoff",
+    description: "Check cutoff trends across colleges and plan smartly.",
     icon: TrendingUp,
     color: "from-yellow-500 to-orange-500",
     image:
@@ -114,49 +118,51 @@ function AnimatedFeatureCard({
   }, [isInView, hasAnimated, controls, idx]);
 
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 50 }}
-      animate={controls}
-      whileHover={{ scale: 1.02 }}
-      className="group relative bg-white rounded-2xl shadow-lg transition-all duration-300 overflow-hidden cursor-pointer"
-    >
-      {/* Animated border */}
-      <span
-        className={`absolute inset-0 rounded-2xl border-2 border-transparent bg-gradient-to-r ${feature.color} p-[2px] 
-        opacity-0 group-hover:opacity-100 transition-all duration-700`}
+    <Link href={feature.route}>
+      <motion.div
+        ref={ref}
+        initial={{ opacity: 0, y: 50 }}
+        animate={controls}
+        whileHover={{ scale: 1.02 }}
+        className="group relative bg-white rounded-2xl shadow-lg transition-all duration-300 overflow-hidden cursor-pointer"
       >
+        {/* Animated border */}
         <span
-          className="block h-full w-full rounded-2xl bg-white
+          className={`absolute inset-0 rounded-2xl border-2 border-transparent bg-gradient-to-r ${feature.color} p-[2px] 
+        opacity-0 group-hover:opacity-100 transition-all duration-700`}
+        >
+          <span
+            className="block h-full w-full rounded-2xl bg-white
           [mask-composite:exclude] [mask-image:linear-gradient(0deg,black,transparent)] 
           animate-draw-border"
-        ></span>
-      </span>
+          ></span>
+        </span>
 
-      {/* Top Image */}
-      <div className="relative h-40 w-full z-10">
-        <Image
-          src={feature.image}
-          alt={feature.title}
-          fill
-          className="object-cover"
-        />
-      </div>
-
-      {/* Content */}
-      <div className="p-6 pt-2 text-center relative z-10">
-        <div
-          className={`w-14 h-14 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center text-white mx-auto -mt-10 shadow-sm`}
-        >
-          <feature.icon size={28} />
+        {/* Top Image */}
+        <div className="relative h-40 w-full z-10">
+          <Image
+            src={feature.image}
+            alt={feature.title}
+            fill
+            className="object-cover"
+          />
         </div>
-        <h3 className="text-xl font-semibold text-gray-800 mt-4 mb-2">
-          {feature.title}
-        </h3>
-        <p className="text-gray-600 text-sm leading-relaxed">
-          {feature.description}
-        </p>
-      </div>
-    </motion.div>
+
+        {/* Content */}
+        <div className="p-6 pt-2 text-center relative z-10">
+          <div
+            className={`w-14 h-14 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center text-white mx-auto -mt-10 shadow-sm`}
+          >
+            <feature.icon size={28} />
+          </div>
+          <h3 className="text-xl font-semibold text-gray-800 mt-4 mb-2">
+            {feature.title}
+          </h3>
+          <p className="text-gray-600 text-sm leading-relaxed">
+            {feature.description}
+          </p>
+        </div>
+      </motion.div>
+    </Link>
   );
 }
