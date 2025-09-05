@@ -5,11 +5,13 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const navItems = [
     { name: "Colleges", id: "colleges", href: "/colleges" },
@@ -19,6 +21,16 @@ export function Header() {
     { name: "Cutoffs", id: "cutoff", href: "/cutoff" },
     { name: "News", id: "news", href: "/news" },
   ];
+
+  // Form submit handler for search
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      const params = new URLSearchParams();
+      params.append("searchTerm", searchTerm.trim());
+      router.push(`/colleges?${params.toString()}`);
+    }
+  };
 
   return (
     <header className="bg-white border-b border-gray-500 top-0 z-50 shadow-sm">
@@ -39,15 +51,23 @@ export function Header() {
           </Link>
 
           {/* Search Bar */}
-          <div className="flex-1 max-w-2xl mx-8 hidden md:block">
+          <form
+            onSubmit={handleSearch}
+            className="flex-1 max-w-2xl mx-8 hidden md:block"
+            role="search"
+            aria-label="Search colleges"
+          >
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <Input
                 placeholder="Search College, Course, Exam..."
                 className="pl-10 pr-4 py-2 w-full bg-gray-50 border-gray-300 focus:border-blue-500"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                aria-label="Search Colleges"
               />
             </div>
-          </div>
+          </form>
 
           {/* Desktop Buttons */}
           <div className="hidden md:flex items-center gap-4">
