@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "http://localhost:1083/api/:path*",
+        destination: "https://pnc-backend.onrender.com/api/:path*",
       },
     ];
   },
