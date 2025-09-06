@@ -103,7 +103,7 @@ export function FilteredCollegeSearchResults({
       </div>
 
       <Card className="border border-slate-200 shadow-sm">
-        <div className="p-6">
+        <div className="sm:px-6 px-2 py-6">
           {/* Search Bar */}
           <div className="mb-6">
             <div className="relative max-w-md">
