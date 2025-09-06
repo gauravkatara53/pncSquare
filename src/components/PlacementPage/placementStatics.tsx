@@ -1,10 +1,11 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
+// import Image from "next/image";
 import { StatsCards } from "../ui/StatsCards";
-import { TopRecruiters } from "../ui/TopRecruiters";
+// import { TopRecruiters } from "../ui/TopRecruiters";
 import { Card } from "../ui/card";
 import { apiService } from "../../ApiService/apiService";
+import CardSkeletonGrid from "../ui/cardSkelton";
 
 interface College {
   slug?: string;
@@ -185,7 +186,10 @@ export function PlacementPage({ college }: { college: College }) {
         </div>
 
         {loading ? (
-          <p className="text-center">Loading placements...</p>
+          <div className="text-center">
+            <p className="mb-0 text-gray-600"></p>
+            <CardSkeletonGrid />
+          </div>
         ) : placementStats ? (
           <StatsCards
             data={[
@@ -421,7 +425,7 @@ export function PlacementPage({ college }: { college: College }) {
       </section>
 
       {/* Charts Section */}
-      <section className="mb-16">
+      {/* <section className="mb-16">
         <div className="text-center mb-12">
           <h2 className="text-2xl font-semibold text-slate-900 mb-4">
             Placement Analytics
@@ -446,10 +450,10 @@ export function PlacementPage({ college }: { college: College }) {
             )}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Top Recruiters Section */}
-      <section className="mb-16">
+      {/* <section className="mb-16">
         <div className="text-center mb-12">
           <h2 className="text-2xl font-semibold text-slate-900 mb-4">
             Top Recruiters
@@ -459,7 +463,7 @@ export function PlacementPage({ college }: { college: College }) {
           </p>
         </div>
         <TopRecruiters />
-      </section>
+      </section> */}
     </div>
   );
 }

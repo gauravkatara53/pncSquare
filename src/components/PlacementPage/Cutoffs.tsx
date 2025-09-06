@@ -25,15 +25,15 @@ const subCategoryOptions: SubCategory[] = [
 ];
 const quotaOptions = ["HS", "OS", "AI"];
 const seatTypeOptions = [
-  "SC (PWD)",
-  "ST (PWD)",
+  "SC (PwD)",
+  "ST (PwD)",
   "OPEN",
-  "OBC-NCL (PWD)",
-  "EWS (PWD)",
-  "OPEN (PWD)",
+  "OBC-NCL (PwD)",
+  "EWS (PwD)",
+  "OPEN (PwD)",
   "ST",
   "EWS",
-  "OBC-NCI",
+  "OBC-NCL",
 ];
 
 const skeletonRowsCount = 5;
