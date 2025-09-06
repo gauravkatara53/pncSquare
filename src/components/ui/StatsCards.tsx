@@ -117,29 +117,36 @@ export function StatsCards({ data }: StatsCardsProps) {
       />
       <StatCard
         title="Highest Package"
-        value={stats.highestPackage ? `₹${stats.highestPackage} LPA` : "-"}
+        value={formatPackage(stats.highestPackage)}
         subtitle="Top offer"
         icon={<DollarSign className="w-5 h-5 text-white" />}
         bgGradient="bg-gradient-to-br from-emerald-500 to-green-600"
       />
       <StatCard
         title="Average Package"
-        value={
-          stats.averagePackage
-            ? `₹${Number(stats.averagePackage).toFixed(2)} LPA`
-            : "-"
-        }
+        value={formatPackage(stats.averagePackage)}
         subtitle="Overall (B.Tech)"
         icon={<TrendingUp className="w-5 h-5 text-white" />}
         bgGradient="bg-gradient-to-br from-amber-500 to-yellow-600"
       />
+
       <StatCard
         title="Recruiters"
         value={`${stats.recruiters ?? "-"}+`}
-        subtitle={`${new Date().getFullYear()} season`}
+        subtitle={"include all branches"}
         icon={<Building2 className="w-5 h-5 text-white" />}
         bgGradient="bg-gradient-to-br from-fuchsia-500 to-pink-600"
       />
     </div>
   );
+}
+
+function formatPackage(value?: string): string {
+  if (!value) return "-";
+  const num = Number(value);
+  if (isNaN(num)) return value;
+  if (num >= 100) {
+    return `₹${(num / 100).toFixed(2)} Cr`;
+  }
+  return `₹${num.toFixed(2)} LPA`;
 }

@@ -1,8 +1,476 @@
+// "use client";
+// import React, { useEffect, useState } from "react";
+// // import Image from "next/image";
+// import { StatsCards } from "../ui/StatsCards";
+// // import { TopRecruiters } from "../ui/TopRecruiters";
+// import { Card } from "../ui/card";
+// import { apiService } from "../../ApiService/apiService";
+// import CardSkeletonGrid from "../ui/cardSkelton";
+
+// interface College {
+//   slug?: string;
+//   name?: string;
+//   isPlacementRateAvailable?: boolean;
+//   isMedianPackageAvailable?: boolean;
+//   isHighestPackageAvailable?: boolean;
+//   isAveragePackageAvailable?: boolean;
+// }
+
+// interface College {
+//   slug?: string;
+//   name?: string;
+// }
+
+// export function PlacementPage({ college }: { college: College }) {
+//   const [year, setYear] = useState(2024); // default year
+
+//   const [placementStats, setPlacementStats] = useState<{
+//     totalOffers?: number;
+//     highestPackage?: number;
+//     averagePackage?: number;
+//     recruiters?: number;
+//     graph_url?: string;
+//   } | null>(null);
+
+//   interface PlacementDataItem {
+//     _id: string;
+//     branch: string;
+//     placementPercentage: number;
+//     averagePackageLPA: number;
+//     highestPackageLPA: number;
+//     medianPackageLPA: number | null;
+//   }
+
+//   const [placementData, setPlacementData] = useState<PlacementDataItem[]>([]);
+//   const [loading, setLoading] = useState(false);
+
+//   const years = [2024, 2023, 2022]; // example years
+//   const isPlacementRateAvailable = college.isPlacementRateAvailable;
+//   const isMedianPackageAvailable = college.isMedianPackageAvailable;
+//   const isHighestPackageAvailable = college.isHighestPackageAvailable;
+//   const isAveragePackageAvailable = college.isAveragePackageAvailable;
+
+//   useEffect(() => {
+//     async function fetchPlacementData() {
+//       setLoading(true);
+//       try {
+//         const slug = college?.slug;
+//         console.log(
+//           "Fetching placement data for slug:",
+//           slug,
+//           "and year:",
+//           year
+//         );
+
+//         // Fetch detailed branch-wise placement data, relying on backend filtering
+//         const url = `/placement/list?slug=${encodeURIComponent(
+//           slug ?? ""
+//         )}&year=${year}`;
+//         const response = await apiService.get(url);
+//         setPlacementData(
+//           (response as { data?: PlacementDataItem[] }).data || []
+//         );
+
+//         // Fetch overall stats as before
+//         if (slug) {
+//           const statsResponse = await apiService.get<{
+//             data: {
+//               year: number;
+//               totalOffers: number;
+//               highestPackage: number;
+//               averagePackage: number;
+//               recruiters: number;
+//               graph_url: string;
+//             }[];
+//           }>(`/placement/get/${slug}/stats`);
+
+//           if (statsResponse.data) {
+//             const yearStats = statsResponse.data.find(
+//               (stat) => stat.year === year
+//             );
+//             if (yearStats) {
+//               setPlacementStats({
+//                 totalOffers: yearStats.totalOffers,
+//                 highestPackage: yearStats.highestPackage,
+//                 averagePackage: yearStats.averagePackage,
+//                 recruiters: yearStats.recruiters,
+//                 graph_url: yearStats.graph_url,
+//               });
+//             } else {
+//               setPlacementStats(null);
+//             }
+//           } else {
+//             setPlacementStats(null);
+//           }
+//         }
+//       } catch (error) {
+//         setPlacementData([]);
+//         setPlacementStats(null);
+//         console.error("Error fetching placement data or stats:", error);
+//       } finally {
+//         setLoading(false);
+//       }
+//     }
+//     if (college?.slug) {
+//       fetchPlacementData();
+//     }
+//   }, [college?.slug, year]);
+
+//   // Calculate overall stats from placementData for display
+//   const overallPlacement = placementData.length
+//     ? (
+//         placementData.reduce((acc, cur) => acc + cur.placementPercentage, 0) /
+//         placementData.length
+//       ).toFixed(2)
+//     : "-";
+
+//   const overallAvgPackage = placementData.length
+//     ? (
+//         placementData.reduce((acc, cur) => acc + cur.averagePackageLPA, 0) /
+//         placementData.length
+//       ).toFixed(2)
+//     : "-";
+
+//   const overallHighestPackage = placementData.length
+//     ? Math.max(...placementData.map((d) => d.highestPackageLPA))
+//     : "-";
+
+//   const overallMedianPackage =
+//     placementData.length > 0
+//       ? (() => {
+//           const medians = placementData
+//             .map((d) => d.medianPackageLPA)
+//             .filter((v): v is number => v !== null && v !== undefined)
+//             .sort((a, b) => a - b);
+//           if (medians.length === 0) return null;
+//           const mid = Math.floor(medians.length / 2);
+//           if (medians.length % 2 === 0) {
+//             return ((medians[mid - 1] + medians[mid]) / 2).toFixed(2);
+//           } else {
+//             return medians[mid].toFixed(2);
+//           }
+//         })()
+//       : null;
+
+//   return (
+//     <div className="min-h-screen bg-white">
+//       {/* Year Selection Dropdown */}
+//       <section className="mb-8 text-center">
+//         <label htmlFor="year-select" className="mr-4 font-semibold">
+//           Select Year:
+//         </label>
+//         <select
+//           id="year-select"
+//           value={year}
+//           onChange={(e) => setYear(Number(e.target.value))}
+//           className="border border-gray-300 rounded px-3 py-1"
+//         >
+//           {years.map((yr) => (
+//             <option key={yr} value={yr}>
+//               {yr}
+//             </option>
+//           ))}
+//         </select>
+//       </section>
+
+//       {/* Placement Statistics - Overall stats cards */}
+//       <section className="mb-16">
+//         <div className="text-center mb-12">
+//           <h2 className="text-2xl font-semibold text-slate-900 mb-4">
+//             Placement Statistics
+//           </h2>
+//           <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+//             Comprehensive overview of placement achievements across all
+//             engineering disciplines
+//           </p>
+//         </div>
+
+//         {loading ? (
+//           <div className="text-center">
+//             <p className="mb-0 text-gray-600"></p>
+//             <CardSkeletonGrid />
+//           </div>
+//         ) : placementStats ? (
+//           <StatsCards
+//             data={[
+//               {
+//                 totalOffers:
+//                   placementStats.totalOffers !== undefined
+//                     ? placementStats.totalOffers.toString()
+//                     : "-",
+//                 highestPackage:
+//                   placementStats.highestPackage !== undefined
+//                     ? placementStats.highestPackage.toString()
+//                     : "-",
+//                 averagePackage:
+//                   placementStats.averagePackage !== undefined
+//                     ? placementStats.averagePackage.toString()
+//                     : "-",
+//                 recruiters:
+//                   placementStats.recruiters !== undefined
+//                     ? placementStats.recruiters.toString()
+//                     : "-",
+//               },
+//             ]}
+//           />
+//         ) : (
+//           <p className="text-center">No placement stats available.</p>
+//         )}
+//       </section>
+
+//       <section className="mb-16">
+//         <div className="text-center mb-12">
+//           <h2 className="text-2xl font-semibold text-slate-900 mb-4">
+//             {college?.name} Placement {year}
+//           </h2>
+//           <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+//             Detailed branch-wise placement data and package information
+//           </p>
+//         </div>
+//         <div className="grid gap-8">
+//           {/* Placement Statistics by Branch */}
+//           {isPlacementRateAvailable && (
+//             <Card className="border border-slate-200 shadow-sm">
+//               <div className="p-4 sm:p-8">
+//                 <h3 className="text-lg font-semibold text-slate-900 mb-6">
+//                   Placement Statistics by Branch
+//                 </h3>
+//                 <div className="space-y-4 ">
+//                   {placementData
+//                     .sort(
+//                       (a, b) => b.placementPercentage - a.placementPercentage
+//                     )
+//                     .map((item) => (
+//                       <div
+//                         key={item._id}
+//                         className="flex justify-between items-center py-2 border-b border-slate-100 last:border-b-0"
+//                       >
+//                         <span className="text-slate-700 text-sm">
+//                           {item.branch}
+//                         </span>
+//                         <span
+//                           className={`font-medium ${
+//                             item.placementPercentage === 100
+//                               ? "text-emerald-700"
+//                               : "text-slate-900"
+//                           }`}
+//                         >
+//                           {Number(item.placementPercentage ?? 0).toFixed(2)}%
+//                         </span>
+//                       </div>
+//                     ))}
+//                   {/* Overall Row */}
+//                   <div className="flex justify-between items-center py-3 bg-slate-50 px-4 rounded-lg border border-slate-200 mt-4">
+//                     <span className="font-medium text-slate-900">
+//                       Overall (B.Tech)
+//                     </span>
+//                     <span className="font-semibold text-blue-700">
+//                       {overallPlacement}%
+//                     </span>
+//                   </div>
+//                 </div>
+//               </div>
+//             </Card>
+//           )}
+
+//           {/* Median Package (Branch-wise) */}
+//           {isMedianPackageAvailable && (
+//             <Card className="border border-slate-200 shadow-sm mb-8">
+//               <div className="p-4 sm:p-8">
+//                 <h3 className="text-lg font-semibold text-slate-900 mb-6">
+//                   Median Package (Branch-wise)
+//                 </h3>
+//                 <div className="overflow-x-auto">
+//                   <table className="w-full border-collapse text-sm">
+//                     <thead>
+//                       <tr className="bg-slate-100">
+//                         <th className="border px-4 py-2 text-left">Branch</th>
+//                         <th className="border px-4 py-2 text-left">
+//                           Median CTC (in LPA)
+//                         </th>
+//                       </tr>
+//                     </thead>
+//                     <tbody>
+//                       {placementData
+//                         .sort(
+//                           (a, b) =>
+//                             (b.medianPackageLPA || 0) -
+//                             (a.medianPackageLPA || 0)
+//                         )
+//                         .map((item) => (
+//                           <tr key={item._id} className="hover:bg-slate-50">
+//                             <td className="border px-4 py-2 break-words max-w-[70%]">
+//                               {item.branch}
+//                             </td>
+//                             <td className="border px-4 py-2">
+//                               {item.medianPackageLPA !== null &&
+//                               item.medianPackageLPA !== undefined
+//                                 ? `₹${Number(item.medianPackageLPA).toFixed(2)}`
+//                                 : "N/A"}
+//                             </td>
+//                           </tr>
+//                         ))}
+//                       <tr className="bg-slate-50 font-semibold text-green-700">
+//                         <td className="border px-4 py-2 text-slate-900">
+//                           Overall (B.Tech)
+//                         </td>
+//                         <td className="border px-4 py-2">
+//                           {overallMedianPackage !== null
+//                             ? `₹${overallMedianPackage}`
+//                             : "N/A"}
+//                         </td>
+//                       </tr>
+//                     </tbody>
+//                   </table>
+//                 </div>
+//               </div>
+//             </Card>
+//           )}
+
+//           {/* Highest Package */}
+//           {isHighestPackageAvailable && (
+//             <Card className="border border-slate-200 shadow-sm mb-8">
+//               <div className="p-4 sm:p-8">
+//                 <h3 className="text-lg font-semibold text-slate-900 mb-6">
+//                   Highest Package (Branch-wise)
+//                 </h3>
+//                 <div className="overflow-x-auto">
+//                   <table className="w-full border-collapse text-sm">
+//                     <thead>
+//                       <tr className="bg-slate-100">
+//                         <th className="border px-4 py-2 text-left">Branch</th>
+//                         <th className="border px-4 py-2 text-left">
+//                           Max CTC (in LPA)
+//                         </th>
+//                       </tr>
+//                     </thead>
+//                     <tbody>
+//                       {placementData
+//                         .sort(
+//                           (a, b) => b.highestPackageLPA - a.highestPackageLPA
+//                         )
+//                         .map((item) => (
+//                           <tr key={item._id} className="hover:bg-slate-50">
+//                             <td className="border px-4 py-2 break-words max-w-[70%]">
+//                               {item.branch}
+//                             </td>
+//                             <td className="border px-4 py-2">
+//                               ₹{Number(item.highestPackageLPA ?? 0).toFixed(2)}
+//                             </td>
+//                           </tr>
+//                         ))}
+//                       <tr className="bg-slate-50 font-semibold text-green-700">
+//                         <td className="border px-4 py-2 text-slate-900">
+//                           Overall (B.Tech)
+//                         </td>
+//                         <td className="border px-4 py-2">
+//                           ₹{overallHighestPackage}
+//                         </td>
+//                       </tr>
+//                     </tbody>
+//                   </table>
+//                 </div>
+//               </div>
+//             </Card>
+//           )}
+
+//           {/* Average Package */}
+//           {isAveragePackageAvailable && (
+//             <Card className="border border-slate-200 shadow-sm">
+//               <div className="p-4 sm:p-8">
+//                 <h3 className="text-lg font-semibold text-slate-900 mb-6">
+//                   Average Package (Branch-wise)
+//                 </h3>
+//                 <div className="overflow-x-auto">
+//                   <table className="w-full border-collapse text-sm">
+//                     <thead>
+//                       <tr className="bg-slate-100">
+//                         <th className="border px-4 py-2 text-left">Branch</th>
+//                         <th className="border px-4 py-2 text-left">
+//                           Avg CTC (in LPA)
+//                         </th>
+//                       </tr>
+//                     </thead>
+//                     <tbody>
+//                       {placementData
+//                         .sort(
+//                           (a, b) =>
+//                             (Number(b.averagePackageLPA) || 0) -
+//                             (Number(a.averagePackageLPA) || 0)
+//                         )
+//                         .map((item) => (
+//                           <tr key={item._id} className="hover:bg-slate-50">
+//                             <td className="border px-4 py-2 break-words max-w-[70%]">
+//                               {item.branch}
+//                             </td>
+//                             <td className="border px-4 py-2">
+//                               ₹{Number(item.averagePackageLPA ?? 0).toFixed(2)}
+//                             </td>
+//                           </tr>
+//                         ))}
+
+//                       <tr className="bg-slate-50 font-semibold">
+//                         <td className="border px-4 py-2">Overall (B.Tech)</td>
+//                         <td className="border px-4 py-2">
+//                           ₹{overallAvgPackage}
+//                         </td>
+//                       </tr>
+//                     </tbody>
+//                   </table>
+//                 </div>
+//               </div>
+//             </Card>
+//           )}
+//         </div>
+//       </section>
+
+//       {/* Charts Section */}
+//       {/* <section className="mb-16">
+//         <div className="text-center mb-12">
+//           <h2 className="text-2xl font-semibold text-slate-900 mb-4">
+//             Placement Analytics
+//           </h2>
+//           <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+//             Detailed breakdown of placement statistics by branch and package
+//             distribution
+//           </p>
+//           <div className="justify-center">
+//             {placementStats?.graph_url ? (
+//               <Image
+//                 src={placementStats.graph_url}
+//                 alt="Placement Graphs"
+//                 width={800}
+//                 height={400}
+//                 className="max-w-full h-auto rounded shadow pb-8"
+//               />
+//             ) : (
+//               <p className="text-center text-slate-500 pb-8">
+//                 No placement graph available.
+//               </p>
+//             )}
+//           </div>
+//         </div>
+//       </section> */}
+
+//       {/* Top Recruiters Section */}
+//       {/* <section className="mb-16">
+//         <div className="text-center mb-12">
+//           <h2 className="text-2xl font-semibold text-slate-900 mb-4">
+//             Top Recruiters
+//           </h2>
+//           <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+//             Leading companies that hire our graduates
+//           </p>
+//         </div>
+//         <TopRecruiters />
+//       </section> */}
+//     </div>
+//   );
+// }
+
 "use client";
 import React, { useEffect, useState } from "react";
-// import Image from "next/image";
 import { StatsCards } from "../ui/StatsCards";
-// import { TopRecruiters } from "../ui/TopRecruiters";
 import { Card } from "../ui/card";
 import { apiService } from "../../ApiService/apiService";
 import CardSkeletonGrid from "../ui/cardSkelton";
@@ -16,14 +484,17 @@ interface College {
   isAveragePackageAvailable?: boolean;
 }
 
-interface College {
-  slug?: string;
-  name?: string;
+interface PlacementDataItem {
+  _id: string;
+  branch: string;
+  placementPercentage: number;
+  averagePackageLPA: number;
+  highestPackageLPA: number;
+  medianPackageLPA: number | null;
 }
 
 export function PlacementPage({ college }: { college: College }) {
   const [year, setYear] = useState(2024); // default year
-
   const [placementStats, setPlacementStats] = useState<{
     totalOffers?: number;
     highestPackage?: number;
@@ -31,15 +502,6 @@ export function PlacementPage({ college }: { college: College }) {
     recruiters?: number;
     graph_url?: string;
   } | null>(null);
-
-  interface PlacementDataItem {
-    _id: string;
-    branch: string;
-    placementPercentage: number;
-    averagePackageLPA: number;
-    highestPackageLPA: number;
-    medianPackageLPA: number | null;
-  }
 
   const [placementData, setPlacementData] = useState<PlacementDataItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -55,14 +517,7 @@ export function PlacementPage({ college }: { college: College }) {
       setLoading(true);
       try {
         const slug = college?.slug;
-        console.log(
-          "Fetching placement data for slug:",
-          slug,
-          "and year:",
-          year
-        );
-
-        // Fetch detailed branch-wise placement data, relying on backend filtering
+        // Fetch detailed branch-wise placement data
         const url = `/placement/list?slug=${encodeURIComponent(
           slug ?? ""
         )}&year=${year}`;
@@ -116,36 +571,47 @@ export function PlacementPage({ college }: { college: College }) {
     }
   }, [college?.slug, year]);
 
-  // Calculate overall stats from placementData for display
-  const overallPlacement = placementData.length
+  // Filter out branches with ALL zero/null/undefined values for stats
+  const validData = placementData.filter(
+    (item) =>
+      (item.placementPercentage ?? 0) > 0 ||
+      (item.averagePackageLPA ?? 0) > 0 ||
+      (item.highestPackageLPA ?? 0) > 0 ||
+      (item.medianPackageLPA ?? 0) > 0
+  );
+
+  // Calculate overall stats using only validData
+  const overallPlacement = validData.length
     ? (
-        placementData.reduce((acc, cur) => acc + cur.placementPercentage, 0) /
-        placementData.length
+        validData.reduce((acc, cur) => acc + cur.placementPercentage, 0) /
+        validData.length
       ).toFixed(2)
     : "-";
 
-  const overallAvgPackage = placementData.length
+  const overallAvgPackage = validData.length
     ? (
-        placementData.reduce((acc, cur) => acc + cur.averagePackageLPA, 0) /
-        placementData.length
+        validData.reduce((acc, cur) => acc + cur.averagePackageLPA, 0) /
+        validData.length
       ).toFixed(2)
     : "-";
 
-  const overallHighestPackage = placementData.length
-    ? Math.max(...placementData.map((d) => d.highestPackageLPA))
+  const overallHighestPackage = validData.length
+    ? Math.max(...validData.map((d) => d.highestPackageLPA))
     : "-";
 
   const overallMedianPackage =
-    placementData.length > 0
+    validData.length > 0
       ? (() => {
-          const medians = placementData
+          const medians = validData
             .map((d) => d.medianPackageLPA)
-            .filter((v): v is number => v !== null && v !== undefined)
-            .sort((a, b) => a - b);
+            .filter((v): v is number => v !== null && v !== undefined && v > 0);
           if (medians.length === 0) return null;
+          medians.sort((a, b) => a - b);
           const mid = Math.floor(medians.length / 2);
           if (medians.length % 2 === 0) {
-            return ((medians[mid - 1] + medians[mid]) / 2).toFixed(2);
+            const left = medians[mid - 1];
+            const right = medians[mid];
+            return ((left + right) / 2).toFixed(2);
           } else {
             return medians[mid].toFixed(2);
           }
@@ -187,7 +653,6 @@ export function PlacementPage({ college }: { college: College }) {
 
         {loading ? (
           <div className="text-center">
-            <p className="mb-0 text-gray-600"></p>
             <CardSkeletonGrid />
           </div>
         ) : placementStats ? (
@@ -229,14 +694,14 @@ export function PlacementPage({ college }: { college: College }) {
         </div>
         <div className="grid gap-8">
           {/* Placement Statistics by Branch */}
-          {isPlacementRateAvailable && (
+          {isPlacementRateAvailable && validData.length > 0 && (
             <Card className="border border-slate-200 shadow-sm">
               <div className="p-4 sm:p-8">
                 <h3 className="text-lg font-semibold text-slate-900 mb-6">
                   Placement Statistics by Branch
                 </h3>
                 <div className="space-y-4 ">
-                  {placementData
+                  {validData
                     .sort(
                       (a, b) => b.placementPercentage - a.placementPercentage
                     )
@@ -274,7 +739,7 @@ export function PlacementPage({ college }: { college: College }) {
           )}
 
           {/* Median Package (Branch-wise) */}
-          {isMedianPackageAvailable && (
+          {isMedianPackageAvailable && validData.length > 0 && (
             <Card className="border border-slate-200 shadow-sm mb-8">
               <div className="p-4 sm:p-8">
                 <h3 className="text-lg font-semibold text-slate-900 mb-6">
@@ -291,11 +756,12 @@ export function PlacementPage({ college }: { college: College }) {
                       </tr>
                     </thead>
                     <tbody>
-                      {placementData
+                      {validData
+                        .filter((item) => (item.medianPackageLPA ?? 0) > 0)
                         .sort(
                           (a, b) =>
-                            (b.medianPackageLPA || 0) -
-                            (a.medianPackageLPA || 0)
+                            (b.medianPackageLPA ?? 0) -
+                            (a.medianPackageLPA ?? 0)
                         )
                         .map((item) => (
                           <tr key={item._id} className="hover:bg-slate-50">
@@ -303,10 +769,7 @@ export function PlacementPage({ college }: { college: College }) {
                               {item.branch}
                             </td>
                             <td className="border px-4 py-2">
-                              {item.medianPackageLPA !== null &&
-                              item.medianPackageLPA !== undefined
-                                ? `₹${Number(item.medianPackageLPA).toFixed(2)}`
-                                : "N/A"}
+                              ₹{Number(item.medianPackageLPA).toFixed(2)}
                             </td>
                           </tr>
                         ))}
@@ -328,7 +791,7 @@ export function PlacementPage({ college }: { college: College }) {
           )}
 
           {/* Highest Package */}
-          {isHighestPackageAvailable && (
+          {isHighestPackageAvailable && validData.length > 0 && (
             <Card className="border border-slate-200 shadow-sm mb-8">
               <div className="p-4 sm:p-8">
                 <h3 className="text-lg font-semibold text-slate-900 mb-6">
@@ -345,7 +808,8 @@ export function PlacementPage({ college }: { college: College }) {
                       </tr>
                     </thead>
                     <tbody>
-                      {placementData
+                      {validData
+                        .filter((item) => (item.highestPackageLPA ?? 0) > 0)
                         .sort(
                           (a, b) => b.highestPackageLPA - a.highestPackageLPA
                         )
@@ -375,7 +839,7 @@ export function PlacementPage({ college }: { college: College }) {
           )}
 
           {/* Average Package */}
-          {isAveragePackageAvailable && (
+          {isAveragePackageAvailable && validData.length > 0 && (
             <Card className="border border-slate-200 shadow-sm">
               <div className="p-4 sm:p-8">
                 <h3 className="text-lg font-semibold text-slate-900 mb-6">
@@ -392,11 +856,12 @@ export function PlacementPage({ college }: { college: College }) {
                       </tr>
                     </thead>
                     <tbody>
-                      {placementData
+                      {validData
+                        .filter((item) => (item.averagePackageLPA ?? 0) > 0)
                         .sort(
                           (a, b) =>
-                            (Number(b.averagePackageLPA) || 0) -
-                            (Number(a.averagePackageLPA) || 0)
+                            (b.averagePackageLPA ?? 0) -
+                            (a.averagePackageLPA ?? 0)
                         )
                         .map((item) => (
                           <tr key={item._id} className="hover:bg-slate-50">
@@ -423,47 +888,6 @@ export function PlacementPage({ college }: { college: College }) {
           )}
         </div>
       </section>
-
-      {/* Charts Section */}
-      {/* <section className="mb-16">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl font-semibold text-slate-900 mb-4">
-            Placement Analytics
-          </h2>
-          <p className="text-lg text-slate-600 max-w-3xl mx-auto">
-            Detailed breakdown of placement statistics by branch and package
-            distribution
-          </p>
-          <div className="justify-center">
-            {placementStats?.graph_url ? (
-              <Image
-                src={placementStats.graph_url}
-                alt="Placement Graphs"
-                width={800}
-                height={400}
-                className="max-w-full h-auto rounded shadow pb-8"
-              />
-            ) : (
-              <p className="text-center text-slate-500 pb-8">
-                No placement graph available.
-              </p>
-            )}
-          </div>
-        </div>
-      </section> */}
-
-      {/* Top Recruiters Section */}
-      {/* <section className="mb-16">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl font-semibold text-slate-900 mb-4">
-            Top Recruiters
-          </h2>
-          <p className="text-lg text-slate-600 max-w-3xl mx-auto">
-            Leading companies that hire our graduates
-          </p>
-        </div>
-        <TopRecruiters />
-      </section> */}
     </div>
   );
 }
