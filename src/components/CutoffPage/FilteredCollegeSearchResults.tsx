@@ -16,11 +16,12 @@ interface FilteredCollegeSearchResultsProps {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   filteredColleges: Array<{
-    id: number;
+    id: string;
     name: string;
     location: string;
     ranking: string;
     branches: Array<{
+      id: string;
       name: string;
       general: number | null;
       obc: number | null;
@@ -35,8 +36,9 @@ interface FilteredCollegeSearchResultsProps {
   };
   selectedYear: string;
   selectedCategory: string;
-  expandedColleges: Record<number, boolean>;
-  toggleCollegeExpansion: (collegeId: number) => void;
+  expandedColleges: Record<string, boolean>;
+  toggleCollegeExpansion: (collegeId: string) => void;
+  allFiltersSelected?: boolean;
 }
 
 export function FilteredCollegeSearchResults({
@@ -49,8 +51,17 @@ export function FilteredCollegeSearchResults({
   selectedCategory,
   expandedColleges,
   toggleCollegeExpansion,
+  allFiltersSelected,
 }: FilteredCollegeSearchResultsProps) {
   if (!showFilteredResults) return null;
+
+  if (allFiltersSelected === false) {
+    return (
+      <div className="text-center py-12 text-slate-600">
+        Please select all filters to view cutoff results.
+      </div>
+    );
+  }
 
   return (
     <section className="mb-16 ">
@@ -141,8 +152,8 @@ export function FilteredCollegeSearchResults({
                             </tr>
                           </thead>
                           <tbody>
-                            {college.branches.map((branch, index: number) => (
-                              <tr key={index} className="hover:bg-slate-50">
+                            {college.branches.map((branch) => (
+                              <tr key={branch.id} className="hover:bg-slate-50">
                                 <td className="border px-4 py-2 break-words max-w-[70%] font-medium text-slate-900">
                                   {branch.name}
                                 </td>

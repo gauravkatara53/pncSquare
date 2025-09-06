@@ -13,7 +13,7 @@ export function ExamInfoCards({ selectedExam }: ExamInfoCardsProps) {
         <Card className="border border-slate-200 shadow-sm p-6">
           <h3 className="font-semibold text-slate-900 mb-4">Exam Pattern</h3>
           <div className="space-y-2 text-sm text-slate-600">
-            {selectedExam === "jee-advanced" && (
+            {selectedExam === "JEE-Advanced" && (
               <>
                 <p>• Duration: 6 hours (3 hours each paper)</p>
                 <p>• Total Questions: 54</p>
@@ -21,7 +21,7 @@ export function ExamInfoCards({ selectedExam }: ExamInfoCardsProps) {
                 <p>• Mode: Computer Based Test (CBT)</p>
               </>
             )}
-            {selectedExam === "jee-main" && (
+            {selectedExam === "JEE-Main" && (
               <>
                 <p>• Duration: 3 hours</p>
                 <p>• Total Questions: 90</p>
@@ -29,7 +29,7 @@ export function ExamInfoCards({ selectedExam }: ExamInfoCardsProps) {
                 <p>• Mode: Computer Based Test (CBT)</p>
               </>
             )}
-            {selectedExam === "neet" && (
+            {selectedExam === "NEET" && (
               <>
                 <p>• Duration: 3 hours 20 minutes</p>
                 <p>• Total Questions: 200</p>
@@ -43,7 +43,7 @@ export function ExamInfoCards({ selectedExam }: ExamInfoCardsProps) {
         <Card className="border border-slate-200 shadow-sm p-6">
           <h3 className="font-semibold text-slate-900 mb-4">Key Dates 2024</h3>
           <div className="space-y-2 text-sm text-slate-600">
-            {selectedExam === "jee-advanced" && (
+            {selectedExam === "JEE-Advanced" && (
               <>
                 <p>• Registration: April 30 - May 9</p>
                 <p>• Exam Date: May 26, 2024</p>
@@ -51,7 +51,7 @@ export function ExamInfoCards({ selectedExam }: ExamInfoCardsProps) {
                 <p>• Counselling: June 10 onwards</p>
               </>
             )}
-            {selectedExam === "jee-main" && (
+            {selectedExam === "JEE-Main" && (
               <>
                 <p>• Session 1: Jan 24-31, 2024</p>
                 <p>• Session 2: April 4-15, 2024</p>
@@ -59,7 +59,7 @@ export function ExamInfoCards({ selectedExam }: ExamInfoCardsProps) {
                 <p>• Counselling: June onwards</p>
               </>
             )}
-            {selectedExam === "neet" && (
+            {selectedExam === "NEET" && (
               <>
                 <p>• Registration: Feb 9 - Mar 9</p>
                 <p>• Exam Date: May 5, 2024</p>
@@ -73,7 +73,7 @@ export function ExamInfoCards({ selectedExam }: ExamInfoCardsProps) {
         <Card className="border border-slate-200 shadow-sm p-6">
           <h3 className="font-semibold text-slate-900 mb-4">Statistics</h3>
           <div className="space-y-2 text-sm text-slate-600">
-            {selectedExam === "jee-advanced" && (
+            {selectedExam === "JEE-Advanced" && (
               <>
                 <p>• Total Applicants: ~2.5 lakh</p>
                 <p>• Total Seats: ~16,000</p>
@@ -81,7 +81,7 @@ export function ExamInfoCards({ selectedExam }: ExamInfoCardsProps) {
                 <p>• Conducting Body: IIT Madras</p>
               </>
             )}
-            {selectedExam === "jee-main" && (
+            {selectedExam === "JEE-Main" && (
               <>
                 <p>• Total Applicants: ~12 lakh</p>
                 <p>• Total Seats: ~1.5 lakh</p>
@@ -89,7 +89,7 @@ export function ExamInfoCards({ selectedExam }: ExamInfoCardsProps) {
                 <p>• Conducting Body: NTA</p>
               </>
             )}
-            {selectedExam === "neet" && (
+            {selectedExam === "NEET" && (
               <>
                 <p>• Total Applicants: ~20 lakh</p>
                 <p>• Total Seats: ~1.08 lakh</p>

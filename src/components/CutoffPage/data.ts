@@ -28,7 +28,7 @@ export const neetTrends = [
 ];
 
 export const examData = {
-  "jee-advanced": {
+  "JEE-Advanced": {
     name: "JEE Advanced",
     icon: GraduationCap,
     description: "All India Rank based cutoffs for IIT admissions",
@@ -43,7 +43,7 @@ export const examData = {
       change: { general: -2.3, obc: -1.9, sc: -2.8, st: -2.9 },
     },
   },
-  "jee-main": {
+  "JEE-Main": {
     name: "JEE Main",
     icon: BookOpen,
     description: "Percentile based cutoffs for NIT, IIIT admissions",
@@ -58,7 +58,7 @@ export const examData = {
       change: { general: 1.5, obc: 4.0, sc: 7.5, st: 8.5 },
     },
   },
-  neet: {
+  NEET: {
     name: "NEET",
     icon: Stethoscope,
     description: "Score based cutoffs for medical college admissions",

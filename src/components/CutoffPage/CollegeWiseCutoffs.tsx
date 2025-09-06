@@ -35,7 +35,7 @@ export function CollegeWiseCutoffs({ selectedExam }: CollegeWiseCutoffsProps) {
       <Card className="border border-slate-200 shadow-sm">
         <div className="p-8">
           <div className="overflow-x-auto">
-            {selectedExam === "jee-advanced" && (
+            {selectedExam === "JEE-Advanced" && (
               <Table>
                 <TableHeader>
                   <TableRow className="border-slate-200">
@@ -86,7 +86,7 @@ export function CollegeWiseCutoffs({ selectedExam }: CollegeWiseCutoffsProps) {
               </Table>
             )}
 
-            {selectedExam === "jee-main" && (
+            {selectedExam === "JEE-Main" && (
               <Table>
                 <TableHeader>
                   <TableRow className="border-slate-200">
@@ -137,7 +137,7 @@ export function CollegeWiseCutoffs({ selectedExam }: CollegeWiseCutoffsProps) {
               </Table>
             )}
 
-            {selectedExam === "neet" && (
+            {selectedExam === "NEET" && (
               <Table>
                 <TableHeader>
                   <TableRow className="border-slate-200">
