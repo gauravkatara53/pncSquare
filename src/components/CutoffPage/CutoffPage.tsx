@@ -12,7 +12,7 @@ import { examData } from "@/components/CutoffPage/data";
 import { apiService } from "@/ApiService/apiService";
 
 export default function CutoffPage() {
-  const [selectedExam, setSelectedExam] = useState("");
+  const [selectedExam, setSelectedExam] = useState("JEE-Advanced");
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedQuota, setSelectedQuota] = useState("");
@@ -120,11 +120,7 @@ export default function CutoffPage() {
   interface FilteredCollegeBranch {
     id: string;
     name: string;
-    general: number;
-    obc: number | null;
-    sc: number | null;
-    st: number | null;
-    seats: number;
+    opening: number;
     closing: number;
     course: string;
     seatType: string;
@@ -139,15 +135,20 @@ export default function CutoffPage() {
     name: string;
     location: string;
     ranking: string;
+    course: string;
     branches: FilteredCollegeBranch[];
   }
 
   const filteredColleges = cutoffData
-    .filter(
-      (item) =>
-        item.slug.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.branch.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+    .filter((item) => {
+      const normalizedQuery = searchQuery.toLowerCase().replace(/[-\s]/g, "");
+      const normalizedSlug = item.slug.toLowerCase().replace(/[-\s]/g, "");
+      const normalizedBranch = item.branch.toLowerCase().replace(/[-\s]/g, "");
+      return (
+        normalizedSlug.includes(normalizedQuery) ||
+        normalizedBranch.includes(normalizedQuery)
+      );
+    })
     .reduce((acc: FilteredCollege[], curr) => {
       const existing = acc.find((c) => c.slug === curr.slug);
 
@@ -155,11 +156,7 @@ export default function CutoffPage() {
         existing.branches.push({
           id: curr._id,
           name: curr.branch,
-          general: curr.openingRank,
-          obc: null,
-          sc: null,
-          st: null,
-          seats: 0,
+          opening: curr.openingRank,
           closing: curr.closingRank,
           course: curr.course,
           seatType: curr.seatType,
@@ -171,20 +168,16 @@ export default function CutoffPage() {
         acc.push({
           id: curr._id,
           slug: curr.slug,
-          name: curr.slug
-            .replace(/-/g, " ")
-            .replace(/\b\w/g, (c) => c.toUpperCase()),
+          // Display college name in uppercase with spaces replacing dashes
+          name: curr.slug.replace(/-/g, " ").toUpperCase(),
           location: "",
           ranking: "N/A",
+          course: curr.course,
           branches: [
             {
               id: curr._id,
               name: curr.branch,
-              general: curr.openingRank,
-              obc: null,
-              sc: null,
-              st: null,
-              seats: 0,
+              opening: curr.openingRank,
               closing: curr.closingRank,
               course: curr.course,
               seatType: curr.seatType,
