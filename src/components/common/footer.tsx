@@ -46,12 +46,10 @@ export function Footer() {
           <div className="lg:col-span-1">
             <div className="flex items-center gap-2 mb-4 sm:mb-6">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">CP</span>
+                <span className="text-white font-bold text-lg">P&C</span>
               </div>
               <div>
-                <div className="font-bold text-white text-lg">
-                  CollegePravesh
-                </div>
+                <div className="font-bold text-white text-lg">P&C Square</div>
                 <div className="text-xs text-gray-400">
                   Find Your Dream College
                 </div>
@@ -61,21 +59,21 @@ export function Footer() {
             <p className="text-gray-300 text-sm mb-4 sm:mb-6 leading-relaxed">
               India&apos;s most trusted platform for college admissions,
               rankings, and reviews. Helping students make informed decisions
-              about their future since 2015.
+              about their future since 2024.
             </p>
 
             <div className="space-y-2 sm:space-y-3 text-sm text-gray-300">
               <div className="flex items-center gap-2 sm:gap-3">
                 <Phone className="w-4 h-4 text-yellow-400" />
-                <span>1800-572-9877</span>
+                <span>6200284909</span>
               </div>
               <div className="flex items-center gap-2 sm:gap-3">
                 <Mail className="w-4 h-4 text-yellow-400" />
-                <span>info@collegepravesh.com</span>
+                <span>info@p&csquare.com</span>
               </div>
               <div className="flex items-center gap-2 sm:gap-3">
                 <MapPin className="w-4 h-4 text-yellow-400" />
-                <span>New Delhi, India</span>
+                <span>Noida, India</span>
               </div>
             </div>
           </div>
@@ -178,7 +176,7 @@ export function Footer() {
             </div>
 
             <div className="text-gray-400 text-sm text-center sm:text-right mt-2 sm:mt-0">
-              <p>© 2025 CollegePravesh. All rights reserved.</p>
+              <p>© 2025 P&C Square. All rights reserved.</p>
               <p className="mt-1">Made with ❤️ for students across India</p>
             </div>
           </div>
