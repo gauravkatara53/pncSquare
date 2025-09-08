@@ -12,6 +12,7 @@ import { Search, MapPin, Filter, X } from "lucide-react";
 import Image from "next/image";
 import { apiService } from "../../ApiService/apiService";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 type College = {
   _id: number;
@@ -532,18 +533,17 @@ function CollegeCard({ college }: { college: College }) {
   return (
     <Card className="border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
       <div>
-        <div
-          onClick={goToDetails}
-          className="aspect-video w-full overflow-hidden rounded-t-lg cursor-pointer"
-        >
-          <Image
-            src={college.image_url}
-            alt={college.name}
-            width={800}
-            height={600}
-            className="w-full h-full object-cover"
-          />
-        </div>
+        <Link href={`/college/${college.slug}`}>
+          <div className="aspect-video w-full overflow-hidden rounded-t-lg cursor-pointer">
+            <Image
+              src={college.image_url}
+              alt={college.name}
+              width={800}
+              height={600}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </Link>
         <div className="p-4 md:p-6">
           <div className="flex items-start justify-between mb-4">
             <div>

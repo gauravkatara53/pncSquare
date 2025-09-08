@@ -15,10 +15,10 @@ type CutoffDataRow = {
   course: string; // e.g. "5 Years, Bachelor and Master of Technology (Dual Degree)" or "4 Years, Bachelor of Technology"
 };
 
-type Year = "2025" | "2024" | "2023" | "2022";
+type Year = "2025" | "2024";
 type SubCategory = "Gender-Neutral" | "Female-only (including Supernumerary)";
 
-const yearOptions: Year[] = ["2025", "2024", "2023", "2022"];
+const yearOptions: Year[] = ["2025", "2024"];
 const subCategoryOptions: SubCategory[] = [
   "Gender-Neutral",
   "Female-only (including Supernumerary)",
@@ -52,6 +52,9 @@ export function Cutoffs({ college }: { college: string }) {
   const [rows, setRows] = useState<CutoffDataRow[]>([]);
   const [rounds, setRounds] = useState<string[]>([]);
 
+  // Determine if college is IIT by checking if slug starts with "iit-" (case-insensitive)
+  const isIIT = college?.toLowerCase().startsWith("iit-") ?? false;
+
   // Responsive detection
   useEffect(() => {
     function handleResize() {
@@ -62,20 +65,43 @@ export function Cutoffs({ college }: { college: string }) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Automatically set quota to "AI" for IITs and reset quotas for others whenever college or year changes
+  useEffect(() => {
+    if (isIIT) {
+      setQuota("AI");
+    } else {
+      setQuota("");
+    }
+    // Reset other filters and data on college or year change
+    setSubCategory("");
+    setSeatType("");
+    setRows([]);
+    setRounds([]);
+    setRound("");
+  }, [college, year, isIIT]);
+
   // Fetch cutoff data when filters change
   useEffect(() => {
-    if (!college || !year || !subCategory || !quota || !seatType) {
+    if (!college || !year || !subCategory || !seatType) {
       setRows([]);
       setRounds([]);
       setRound(""); // important reset here
       return;
     }
+    // For non-IIT quota must be selected
+    if (!isIIT && !quota) {
+      setRows([]);
+      setRounds([]);
+      setRound("");
+      return;
+    }
+
     setLoading(true);
     apiService
       .get<{ data: CutoffDataRow[] }>("/cutoff/all", {
         slug: college,
         year,
-        quota,
+        quota: isIIT ? "AI" : quota,
         seatType,
         subCategory,
       })
@@ -93,7 +119,7 @@ export function Cutoffs({ college }: { college: string }) {
         setRounds([]);
         setRound("");
       });
-  }, [college, year, subCategory, quota, seatType]);
+  }, [college, year, subCategory, quota, seatType, isIIT]);
 
   // Show skeleton animation on round switch only if data is loaded
   useEffect(() => {
@@ -144,7 +170,6 @@ export function Cutoffs({ college }: { college: string }) {
               onChange={(e) => {
                 setYear(e.target.value);
                 setSubCategory("");
-                setQuota("");
                 setSeatType("");
                 setRows([]);
                 setRounds([]);
@@ -174,6 +199,7 @@ export function Cutoffs({ college }: { college: string }) {
                 setRounds([]);
                 setRound("");
               }}
+              disabled={!year}
             >
               <option value="">Select</option>
               {subCategoryOptions.map((sub) => (
@@ -184,30 +210,32 @@ export function Cutoffs({ college }: { college: string }) {
             </select>
           </div>
 
-          {/* Quota */}
-          <div className="flex-1">
-            <label className="block mb-2 font-semibold text-slate-700 text-left">
-              Quota
-            </label>
-            <select
-              className="w-full rounded border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-              value={quota}
-              onChange={(e) => {
-                setQuota(e.target.value);
-                setRows([]);
-                setRounds([]);
-                setRound("");
-              }}
-              disabled={!year}
-            >
-              <option value="">Select Quota</option>
-              {quotaOptions.map((q) => (
-                <option key={q} value={q}>
-                  {q}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Quota — hidden if IIT */}
+          {!isIIT && (
+            <div className="flex-1">
+              <label className="block mb-2 font-semibold text-slate-700 text-left">
+                Quota
+              </label>
+              <select
+                className="w-full rounded border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                value={quota}
+                onChange={(e) => {
+                  setQuota(e.target.value);
+                  setRows([]);
+                  setRounds([]);
+                  setRound("");
+                }}
+                disabled={!year}
+              >
+                <option value="">Select Quota</option>
+                {quotaOptions.map((q) => (
+                  <option key={q} value={q}>
+                    {q}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Seat Type */}
           <div className="flex-1">
@@ -237,49 +265,53 @@ export function Cutoffs({ college }: { college: string }) {
       </div>
 
       {/* Rounds Navigation */}
-      {year && subCategory && quota && seatType && rounds.length > 0 && (
-        <div className="w-full md:max-w-8xl ">
-          {isMobile ? (
-            <div className="bg-white rounded-lg p-4 shadow border border-slate-200 mb-4">
-              <label className="mb-2 block font-semibold text-slate-700 text-center">
-                Data Round
-              </label>
-              <select
-                className="w-full rounded border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                value={round}
-                onChange={(e) => setRound(e.target.value)}
-              >
-                {rounds.map((r) => (
-                  <option key={r} value={r}>
-                    {r}
-                  </option>
-                ))}
-              </select>
-            </div>
-          ) : (
-            <div className="flex bg-slate-100 rounded-lg mb-4 border border-slate-200">
-              {rounds.map((r) => (
-                <button
-                  key={r}
-                  className={[
-                    "flex-1 py-4 px-4 text-md font-medium transition",
-                    round === r
-                      ? "bg-white text-slate-900 border-blue-500 border-b-4"
-                      : "hover:bg-blue-50 text-slate-700",
-                  ].join(" ")}
-                  style={{ borderRight: "1px solid #e5e7eb", minWidth: 0 }}
-                  onClick={() => setRound(r)}
+      {year &&
+        subCategory &&
+        (isIIT || quota) &&
+        seatType &&
+        rounds.length > 0 && (
+          <div className="w-full md:max-w-8xl ">
+            {isMobile ? (
+              <div className="bg-white rounded-lg p-4 shadow border border-slate-200 mb-4">
+                <label className="mb-2 block font-semibold text-slate-700 text-center">
+                  Data Round
+                </label>
+                <select
+                  className="w-full rounded border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  value={round}
+                  onChange={(e) => setRound(e.target.value)}
                 >
-                  {r}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+                  {rounds.map((r) => (
+                    <option key={r} value={r}>
+                      {r}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : (
+              <div className="flex bg-slate-100 rounded-lg mb-4 border border-slate-200">
+                {rounds.map((r) => (
+                  <button
+                    key={r}
+                    className={[
+                      "flex-1 py-4 px-4 text-md font-medium transition",
+                      round === r
+                        ? "bg-white text-slate-900 border-blue-500 border-b-4"
+                        : "hover:bg-blue-50 text-slate-700",
+                    ].join(" ")}
+                    style={{ borderRight: "1px solid #e5e7eb", minWidth: 0 }}
+                    onClick={() => setRound(r)}
+                  >
+                    {r}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
       {/* Data Table with animation on round change */}
-      {year && subCategory && quota && seatType && (
+      {year && subCategory && (isIIT || quota) && seatType && (
         <div className="overflow-x-hidden mt-4 bg-white rounded-lg shadow-md border border-slate-200 px-0 py-6 w-full">
           {loading || tableLoading ? (
             // Skeleton table with wave animation
