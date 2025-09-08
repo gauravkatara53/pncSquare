@@ -34,7 +34,6 @@ interface FilteredCollegeSearchResultsProps {
   }>;
   currentExam: {
     name: string;
-    formatValue: (value: number) => string;
   };
   selectedYear: string;
   selectedCategory: string;
@@ -192,7 +191,7 @@ export function FilteredCollegeSearchResults({
 
                                     <td className="border px-4 py-2 text-center font-medium text-gray-700">
                                       {branch.opening !== null ? (
-                                        currentExam.formatValue(branch.opening)
+                                        branch.opening
                                       ) : (
                                         <span className="text-slate-400">
                                           -
@@ -201,7 +200,7 @@ export function FilteredCollegeSearchResults({
                                     </td>
                                     <td className="border px-4 py-2 text-center font-medium text-gray-700">
                                       {branch.closing !== null ? (
-                                        currentExam.formatValue(branch.closing)
+                                        branch.closing
                                       ) : (
                                         <span className="text-slate-400">
                                           -

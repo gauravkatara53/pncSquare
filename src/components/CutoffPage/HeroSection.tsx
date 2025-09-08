@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -45,6 +46,53 @@ export function HeroSection({
   onApplyFilters,
   allFiltersSelected,
 }: HeroSectionProps) {
+  // Base rounds for all exams except 2024 year (which hides Round 6)
+  const baseRounds = [
+    { value: "Round-1", label: "Round 1" },
+    { value: "Round-2", label: "Round 2" },
+    { value: "Round-3", label: "Round 3" },
+    { value: "Round-4", label: "Round 4" },
+    { value: "Round-5", label: "Round 5" },
+  ];
+
+  // When year is not 2024, Round 6 is shown
+  const roundsWithRound6 = [
+    ...baseRounds,
+    { value: "Round-6", label: "Round 6" },
+  ];
+
+  // Additional CSAB rounds for JEE Main
+  const csabRounds = [
+    { value: "CSAB-1", label: "CSAB 1" },
+    { value: "CSAB-2", label: "CSAB 2" },
+    { value: "CSAB-3", label: "CSAB 3" },
+  ];
+
+  // Determine rounds to display based on selectedYear and selectedExam
+  let roundsToDisplay: { value: string; label: string }[] = [];
+
+  if (selectedYear === "2024") {
+    // For 2024, never show Round 6
+    roundsToDisplay = [...baseRounds];
+  } else {
+    roundsToDisplay = [...roundsWithRound6];
+  }
+
+  // If exam is JEE Main, add CSAB rounds additionally
+  if (selectedExam === "JEE-Main") {
+    roundsToDisplay = [...roundsToDisplay, ...csabRounds];
+  }
+
+  // For JEE Advanced, force quota to 'AI' (All India) and disable quota selector
+  const isJeeAdvanced = selectedExam === "JEE-Advanced";
+
+  // Handle quota change internally for JEE Advanced to enforce AI
+  React.useEffect(() => {
+    if (isJeeAdvanced && selectedQuota !== "AI") {
+      onQuotaChange("AI");
+    }
+  }, [isJeeAdvanced, selectedQuota, onQuotaChange]);
+
   return (
     <section className="bg-gradient-to-br from-slate-50 to-indigo-50 py-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -113,21 +161,28 @@ export function HeroSection({
                   </SelectContent>
                 </Select>
               </div>
+
+              {/* Quota always visible, disabled if JEE Advanced */}
               <div>
                 <label className="text-sm font-medium text-slate-700 mb-2 block">
                   Quota
                 </label>
-                <Select value={selectedQuota} onValueChange={onQuotaChange}>
+                <Select
+                  value={selectedQuota}
+                  onValueChange={onQuotaChange}
+                  disabled={isJeeAdvanced}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select Quota" />
                   </SelectTrigger>
                   <SelectContent className="bg-white">
                     <SelectItem value="AI">All India</SelectItem>
-                    <SelectItem value="HS">Home State </SelectItem>
-                    <SelectItem value="OS">Other State </SelectItem>
+                    <SelectItem value="HS">Home State</SelectItem>
+                    <SelectItem value="OS">Other State</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
+
               <div>
                 <label className="text-sm font-medium text-slate-700 mb-2 block">
                   category
@@ -149,6 +204,7 @@ export function HeroSection({
                   </SelectContent>
                 </Select>
               </div>
+
               <div>
                 <label className="text-sm font-medium text-slate-700 mb-2 block">
                   Seat Type
@@ -164,7 +220,6 @@ export function HeroSection({
                     <SelectItem value="OPEN">Open</SelectItem>
                     <SelectItem value="SC (PwD)">SC (PwD)</SelectItem>
                     <SelectItem value="ST (PwD)">ST (PwD)</SelectItem>
-
                     <SelectItem value="OBC-NCL (PwD)">OBC-NCL (PwD)</SelectItem>
                     <SelectItem value="EWS (PwD)">EWS (PwD)</SelectItem>
                     <SelectItem value="OPEN (PwD)">OPEN (PwD)</SelectItem>
@@ -185,12 +240,11 @@ export function HeroSection({
                     <SelectValue placeholder="Select Round" />
                   </SelectTrigger>
                   <SelectContent className="bg-white">
-                    <SelectItem value="Round-1">Round 1</SelectItem>
-                    <SelectItem value="Round-2">Round 2</SelectItem>
-                    <SelectItem value="Round-3">Round 3</SelectItem>
-                    <SelectItem value="Round-4">Round 4</SelectItem>
-                    <SelectItem value="Round-5">Round 5</SelectItem>
-                    <SelectItem value="Round-6">Round 6</SelectItem>
+                    {roundsToDisplay.map((round) => (
+                      <SelectItem key={round.value} value={round.value}>
+                        {round.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
