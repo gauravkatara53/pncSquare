@@ -32,7 +32,8 @@ export async function generateMetadata({
   try {
     const response = await apiService.get<CollegeResponse>(`/college/${slug}`);
     const college = response?.data;
-
+    console.log("params slug:", slug);
+    console.log("Fetched college data for metadata:", college);
     if (!slug) {
       return {
         title: "College Not Found | Placements & Cutoffs",
