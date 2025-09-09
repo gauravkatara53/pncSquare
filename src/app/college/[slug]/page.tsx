@@ -33,7 +33,7 @@ export async function generateMetadata({
     const response = await apiService.get<CollegeResponse>(`/college/${slug}`);
     const college = response?.data;
 
-    if (!college) {
+    if (!slug) {
       return {
         title: "College Not Found | Placements & Cutoffs",
         description: "Requested college data not found.",
@@ -41,7 +41,7 @@ export async function generateMetadata({
     }
 
     return {
-      title: `${college.name} – Placements, Cutoff, Fees & Courses`,
+      title: `${college.name} –  Admission, Cutoff, Fees, Courses & Placements 2025 | PNC Square`,
       description:
         college.bio ||
         `Explore ${college.name} - Admission, Cutoff, Fees, Courses & Placements 2025 | PNC Square`,
