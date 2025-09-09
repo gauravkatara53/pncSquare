@@ -33,6 +33,7 @@ export async function generateMetadata({
     const college = response?.data;
 
     if (!college) {
+      console.error("College data not found for slug:", slug);
       return {
         title: "College Not Found | Placements & Cutoffs",
         description: "Requested college data not found.",
@@ -59,7 +60,9 @@ export async function generateMetadata({
         ],
       },
     };
-  } catch {
+  } catch (error) {
+    // Detailed error log
+    console.error("Error in generateMetadata for slug:", slug, error);
     return {
       title: "Error | College Information",
       description: "There was an error fetching college details.",
