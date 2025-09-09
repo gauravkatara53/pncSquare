@@ -32,14 +32,13 @@ export async function generateMetadata({
   try {
     const response = await apiService.get<CollegeResponse>(`/college/${slug}`);
     const college = response?.data;
-    console.log("params slug:", slug);
-    console.log("Fetched college data for metadata:", college);
-    if (!slug) {
-      return {
-        title: "College Not Found | Placements & Cutoffs",
-        description: "Requested college data not found.",
-      };
-    }
+
+    // if (!college) {
+    //   return {
+    //     title: "College Not Found | Placements & Cutoffs",
+    //     description: "Requested college data not found.",
+    //   };
+    // }
 
     return {
       title: `${college.name} –  Admission, Cutoff, Fees, Courses & Placements 2025 | PNC Square`,
