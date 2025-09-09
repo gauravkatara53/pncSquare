@@ -2,10 +2,11 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 
 // Set your main API URL. Use environment variable for flexibility.
-const BASE_URL =
-  typeof window === "undefined"
-    ? "http://localhost:3000/api/v1" // SSR/Node side
-    : "/api/v1"; // Browser side
+// const BASE_URL =
+//   typeof window === "undefined"
+//     ? "http://localhost:3000/api/v1" // SSR/Node side
+//     : "/api/v1"; // Browser side
+const BASE_URL = "/api/v1"; // Browser side
 
 // process.env.NEXT_PUBLIC_API_URL ||
 
