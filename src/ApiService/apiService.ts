@@ -6,7 +6,11 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 //   typeof window === "undefined"
 //     ? "http://localhost:3000/api/v1" // SSR/Node side
 //     : "/api/v1"; // Browser side
-const BASE_URL = "/api/v1"; // Browser side
+const isServer = typeof window === "undefined";
+
+const BASE_URL = isServer
+  ? process.env.API_INTERNAL_URL || "https://pnc-backend.onrender.com/api/v1" // server side uses full URL
+  : "/api/v1"; // client side uses relative URL to utilize Next.js rewrite
 
 // process.env.NEXT_PUBLIC_API_URL ||
 
