@@ -46,19 +46,27 @@ export async function generateMetadata({
       return {
         title: "Article Not Found | PNC Square",
         description: "The requested news article could not be found.",
+        alternates: {
+          canonical: "https://pnc-square.vercel.app/newsarticle", // fallback canonical
+        },
       };
     }
+
+    const canonicalUrl = `https://pnc-square.vercel.app/newsarticle/${slug}`;
 
     return {
       title: article.title,
       description:
         article.summary?.slice(0, 160) || "News article from PNC Square",
+      alternates: {
+        canonical: canonicalUrl,
+      },
       openGraph: {
         title: article.title,
         description: article.summary,
         type: "article",
         publishedTime: article.publishDate,
-        url: `https://pnc-square.vercel.app/newsarticle/${slug}`,
+        url: canonicalUrl,
         images: [
           {
             url: article.coverImage,
@@ -82,6 +90,9 @@ export async function generateMetadata({
     return {
       title: "Error | News Article",
       description: "There was an error fetching the news article details.",
+      alternates: {
+        canonical: "https://pnc-square.vercel.app/newsarticle",
+      },
     };
   }
 }
