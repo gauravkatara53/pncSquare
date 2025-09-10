@@ -58,7 +58,7 @@ export async function generateMetadata({
         description: article.summary,
         type: "article",
         publishedTime: article.publishDate,
-        url: `https://your-domain.com/newsarticle/${slug}`,
+        url: `https://pnc-square.vercel.app/newsarticle/${slug}`,
         images: [
           {
             url: article.coverImage,
