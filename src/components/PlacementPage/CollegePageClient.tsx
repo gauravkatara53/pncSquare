@@ -65,8 +65,6 @@ interface CollegeResponse {
 }
 
 export default function CollegePageClient({ slug }: Props) {
-  console.log("Rendering CollegePage for slug:", slug);
-
   const [college, setCollege] = useState<CollegeResponse["data"] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
