@@ -28,6 +28,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
 
+  const baseUrl = `https://www.pncsquare.in/college/${slug}`; // Replace with your actual domain URL
+
   try {
     const response = await apiService.get<CollegeResponse>(`/college/${slug}`);
     const college = response?.data;
@@ -37,6 +39,9 @@ export async function generateMetadata({
       return {
         title: "College Not Found | Placements & Cutoffs",
         description: "Requested college data not found.",
+        alternates: {
+          canonical: `${baseUrl}/${slug}`, // still add canonical even if no data, for SEO consistency
+        },
       };
     }
 
@@ -59,13 +64,18 @@ export async function generateMetadata({
           },
         ],
       },
+      alternates: {
+        canonical: `${baseUrl}/${slug}`, // Add canonical URL for this college page
+      },
     };
   } catch (error) {
-    // Detailed error log
     console.error("Error in generateMetadata for slug:", slug, error);
     return {
       title: "Error | College Information",
       description: "There was an error fetching college details.",
+      alternates: {
+        canonical: `${baseUrl}/${slug}`, // still add canonical URL even on error
+      },
     };
   }
 }
