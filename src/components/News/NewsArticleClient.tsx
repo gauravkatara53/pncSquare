@@ -132,7 +132,9 @@ export default function NewsArticleClient({ slug }: Props) {
   const renderSections = () =>
     article.sections.map((section) => (
       <section key={section._id} className="mb-8">
-        <h2 className="text-2xl font-semibold mb-4">{section.heading}</h2>
+        <h2 className="sm:text-2xl text-xl font-semibold mb-4">
+          {section.heading}
+        </h2>
         {section.paragraphs.map((para, idx) => (
           <p
             key={idx}
@@ -226,12 +228,12 @@ export default function NewsArticleClient({ slug }: Props) {
             </div>
 
             {/* Title */}
-            <h1 className="text-4xl font-bold text-slate-900 mb-6 leading-tight">
+            <h1 className="sm:text-4xl text-2xl font-bold text-slate-900 mb-6 leading-tight">
               {article.title}
             </h1>
 
             {/* Summary */}
-            <p className="text-xl text-slate-600 mb-8 leading-relaxed">
+            <p className="sm:text-xl text-lg text-slate-600 mb-8 leading-relaxed">
               {article.summary}
             </p>
 

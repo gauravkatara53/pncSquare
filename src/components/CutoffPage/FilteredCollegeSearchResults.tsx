@@ -134,23 +134,25 @@ export function FilteredCollegeSearchResults({
                     className="w-full p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between hover:bg-slate-50 transition-colors gap-1 cursor-pointer"
                     onClick={() => toggleCollegeExpansion(college.id)}
                   >
-                    <div className="flex-1 text-left">
-                      <h3 className="text-lg sm:text-xl font-semibold text-slate-900 break-words">
-                        {college.name}
-                      </h3>
-                      <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-1">
-                        <span className="text-sm text-slate-600 break-words">
-                          {college.location}
-                        </span>
+                    <div className="flex items-center gap-4 w-full">
+                      <div className="flex-1 text-left">
+                        <h3 className=" text-md sm:text-xl font-semibold text-slate-900 break-words">
+                          {college.name}
+                        </h3>
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-1">
+                          <span className="text-sm text-slate-600 break-words">
+                            {college.location}
+                          </span>
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="flex items-center gap-2 pt-2 sm:pt-0">
-                      {expandedColleges[college.id] ? (
-                        <ChevronDown className="h-5 w-5 text-slate-600" />
-                      ) : (
-                        <ChevronRight className="h-5 w-5 text-slate-600" />
-                      )}
+                      <div className="flex items-center gap-2 pt-2 sm:pt-0">
+                        {expandedColleges[college.id] ? (
+                          <ChevronDown className="h-5 w-5 text-slate-600" />
+                        ) : (
+                          <ChevronRight className="h-5 w-5 text-slate-600" />
+                        )}
+                      </div>
                     </div>
                   </CollapsibleTrigger>
 
