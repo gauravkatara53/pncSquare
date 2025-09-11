@@ -10,7 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Filter } from "lucide-react";
 import { examData } from "./data";
 
 interface HeroSectionProps {
@@ -26,8 +25,9 @@ interface HeroSectionProps {
   onQuotaChange: (quota: string) => void;
   onRoundChange: (round: string) => void;
   onSubCategoryChange: (subCategory: string) => void;
-  onApplyFilters: () => void;
+  clearFilters: () => void;
   allFiltersSelected: boolean;
+  loading: boolean;
 }
 
 export function HeroSection({
@@ -43,8 +43,8 @@ export function HeroSection({
   onQuotaChange,
   onRoundChange,
   onSubCategoryChange,
-  onApplyFilters,
-  allFiltersSelected,
+  clearFilters,
+  loading,
 }: HeroSectionProps) {
   // Base rounds for all exams except 2024 year (which hides Round 6)
   const baseRounds = [
@@ -70,7 +70,6 @@ export function HeroSection({
 
   // Determine rounds to display based on selectedYear and selectedExam
   let roundsToDisplay: { value: string; label: string }[] = [];
-
   if (selectedYear === "2024") {
     // For 2024, never show Round 6
     roundsToDisplay = [...baseRounds];
@@ -251,16 +250,11 @@ export function HeroSection({
 
               <div className="flex items-end">
                 <Button
-                  disabled={!allFiltersSelected}
-                  className={`w-full ${
-                    allFiltersSelected
-                      ? "bg-slate-900 hover:bg-slate-800"
-                      : "bg-gray-300 cursor-not-allowed"
-                  }`}
-                  onClick={onApplyFilters}
+                  onClick={clearFilters}
+                  className="w-full bg-gray-600 hover:bg-gray-400"
+                  disabled={loading}
                 >
-                  <Filter className="h-4 w-4 mr-2" />
-                  Apply Filters
+                  {loading ? "Loading..." : "Clear Filters"}
                 </Button>
               </div>
             </div>

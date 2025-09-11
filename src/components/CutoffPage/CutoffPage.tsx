@@ -1,7 +1,6 @@
-// src/components/CutoffPage/CutoffPage.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 
 import { HeroSection } from "@/components/CutoffPage/HeroSection";
@@ -84,6 +83,7 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
     Record<string, boolean>
   >({});
   const [cutoffData, setCutoffData] = useState<CutoffItem[]>([]);
+  const [loading, setLoading] = useState(false);
 
   // When changing filters, update URL query params (client side navigation)
   useEffect(() => {
@@ -107,7 +107,7 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
   ]);
 
   // Helper to check if all filters are selected
-  const areAllFiltersSelected = React.useCallback(
+  const areAllFiltersSelected = useCallback(
     (): boolean =>
       selectedExam.trim() !== "" &&
       selectedYear.trim() !== "" &&
@@ -130,8 +130,10 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
     if (!areAllFiltersSelected()) {
       setCutoffData([]);
       setShowFilteredResults(false);
+      setLoading(false);
       return;
     }
+    setLoading(true);
     apiService
       .get<{
         statusCode: number;
@@ -149,10 +151,17 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
       .then((response) => {
         setCutoffData(response.success ? response.data : []);
         setShowFilteredResults(true);
+        setLoading(false);
+        // Scroll slightly down after data is loaded to show results
+        setTimeout(() => {
+          const scrollTopAmount = window.innerWidth <= 768 ? 1200 : 400; // 768px breakpoint for mobile
+          window.scrollBy({ top: scrollTopAmount, behavior: "smooth" });
+        }, 100);
       })
       .catch(() => {
         setCutoffData([]);
         setShowFilteredResults(true);
+        setLoading(false);
       });
   }, [
     selectedExam,
@@ -224,6 +233,18 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
     }));
   };
 
+  // Reset all filters except exam
+  const clearFiltersExceptExam = () => {
+    setSelectedYear("");
+    setSelectedCategory("");
+    setSelectedQuota("");
+    setSelectedRound("");
+    setSelectedSubCategory("");
+    setSearchQuery("");
+    setCutoffData([]);
+    setShowFilteredResults(false);
+  };
+
   // --- Render ---
   return (
     <div className="min-h-screen bg-white">
@@ -240,8 +261,9 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
         onQuotaChange={setSelectedQuota}
         onRoundChange={setSelectedRound}
         onSubCategoryChange={setSelectedSubCategory}
-        onApplyFilters={() => {}}
+        clearFilters={clearFiltersExceptExam}
         allFiltersSelected={areAllFiltersSelected()}
+        loading={loading}
       />
       <div className="max-w-7xl mx-auto px-0 sm:px-6 lg:px-8 py-12">
         {currentExam && (
