@@ -1,45 +1,49 @@
-import React, { Suspense } from "react";
-import CollegeHeroSkeleton from "@/components/colleges/CollegeSkeleton";
+import { Metadata } from "next";
 import CutoffPage from "@/components/CutoffPage/CutoffPage";
-import type { Metadata } from "next";
 
-// export async function generateMetadata({
-//   searchParams,
-// }: {
-//   searchParams?: Record<string, string | string[] | undefined>;
-// }): Promise<Metadata> {
-//   const getFirst = (v: string | string[] | undefined) =>
-//     Array.isArray(v) ? v[0] : v;
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}): Promise<Metadata> {
+  const params = searchParams ? await searchParams : {};
 
-//   const examType = getFirst(searchParams?.examType) ?? "College Exam Cutoffs";
-//   const year = getFirst(searchParams?.year);
-//   const seatType = getFirst(searchParams?.seatType);
-//   const quota = getFirst(searchParams?.quota);
-//   const round = getFirst(searchParams?.round);
-//   const subCategory = getFirst(searchParams?.subCategory);
+  const getFirst = (v: string | string[] | undefined) =>
+    Array.isArray(v) ? v[0] : v;
 
-//   let title = `${examType}${year ? ` ${year}` : ""}`;
-//   if (seatType) title += ` ${seatType}`;
-//   if (quota) title += ` ${quota}`;
-//   if (round) title += ` Round ${round}`;
-//   if (subCategory) title += ` ${subCategory}`;
-//   title += " Cutoff Details";
+  const examType = getFirst(params.examType) ?? "College Exam Cutoffs";
+  const year = getFirst(params.year);
+  const seatType = getFirst(params.seatType);
+  const quota = getFirst(params.quota);
+  const round = getFirst(params.round);
+  const subCategory = getFirst(params.subCategory);
 
-//   let description = `Explore cutoff information for ${examType}`;
-//   if (year) description += ` in ${year}`;
-//   if (seatType) description += `, category ${seatType}`;
-//   if (quota) description += `, quota ${quota}`;
-//   if (round) description += `, round ${round}`;
-//   if (subCategory) description += `, subcategory ${subCategory}`;
-//   description += ". See trends, college-wise cutoffs, and more.";
+  let title = `${examType}${year ? ` ${year}` : ""}`;
+  if (seatType) title += ` ${seatType}`;
+  if (quota) title += ` ${quota}`;
+  if (round) title += ` Round ${round}`;
+  if (subCategory) title += ` ${subCategory}`;
+  title += " Cutoff Details";
 
-//   return { title, description };
-// }
+  let description = `Explore cutoff information for ${examType}`;
+  if (year) description += ` in ${year}`;
+  if (seatType) description += `, category ${seatType}`;
+  if (quota) description += `, quota ${quota}`;
+  if (round) description += `, round ${round}`;
+  if (subCategory) description += `, subcategory ${subCategory}`;
+  description += ". See trends, college-wise cutoffs, and more.";
 
-export default function Page() {
-  return (
-    <Suspense fallback={<CollegeHeroSkeleton />}>
-      <CutoffPage />
-    </Suspense>
-  );
+  return {
+    title,
+    description,
+  };
+}
+
+export default async function Page({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = searchParams ? await searchParams : {};
+  return <CutoffPage urlParams={params} />;
 }

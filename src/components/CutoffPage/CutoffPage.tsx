@@ -1,8 +1,8 @@
+// src/components/CutoffPage/CutoffPage.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import Head from "next/head";
+import { useRouter } from "next/navigation";
 
 import { HeroSection } from "@/components/CutoffPage/HeroSection";
 import { CurrentYearStats } from "@/components/CutoffPage/CurrentYearStats";
@@ -51,28 +51,31 @@ interface FilteredCollege {
   branches: FilteredCollegeBranch[];
 }
 
-export default function CutoffPage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+interface CutoffPageProps {
+  urlParams: Record<string, string | string[] | undefined>;
+}
 
-  // On first mount, read state from query params (for copy/paste/refresh/SEO/links)
-  const [selectedExam, setSelectedExam] = useState(
-    () => searchParams?.get("examType") ?? "JEE-Advanced"
+export default function CutoffPage({ urlParams }: CutoffPageProps) {
+  const router = useRouter();
+
+  // Initialize states from urlParams props instead of useSearchParams
+  const [selectedExam, setSelectedExam] = useState(() =>
+    typeof urlParams.examType === "string" ? urlParams.examType : "JEE-Advanced"
   );
-  const [selectedYear, setSelectedYear] = useState(
-    () => searchParams?.get("year") ?? ""
+  const [selectedYear, setSelectedYear] = useState(() =>
+    typeof urlParams.year === "string" ? urlParams.year : ""
   );
-  const [selectedCategory, setSelectedCategory] = useState(
-    () => searchParams?.get("seatType") ?? ""
+  const [selectedCategory, setSelectedCategory] = useState(() =>
+    typeof urlParams.seatType === "string" ? urlParams.seatType : ""
   );
-  const [selectedQuota, setSelectedQuota] = useState(
-    () => searchParams?.get("quota") ?? ""
+  const [selectedQuota, setSelectedQuota] = useState(() =>
+    typeof urlParams.quota === "string" ? urlParams.quota : ""
   );
-  const [selectedRound, setSelectedRound] = useState(
-    () => searchParams?.get("round") ?? ""
+  const [selectedRound, setSelectedRound] = useState(() =>
+    typeof urlParams.round === "string" ? urlParams.round : ""
   );
-  const [selectedSubCategory, setSelectedSubCategory] = useState(
-    () => searchParams?.get("subCategory") ?? ""
+  const [selectedSubCategory, setSelectedSubCategory] = useState(() =>
+    typeof urlParams.subCategory === "string" ? urlParams.subCategory : ""
   );
 
   const [showFilteredResults, setShowFilteredResults] = useState(false);
@@ -82,7 +85,7 @@ export default function CutoffPage() {
   >({});
   const [cutoffData, setCutoffData] = useState<CutoffItem[]>([]);
 
-  // When changing filters, update URL and SEO via <Head>
+  // When changing filters, update URL query params (client side navigation)
   useEffect(() => {
     const params = new URLSearchParams();
     if (selectedExam) params.set("examType", selectedExam);
@@ -91,7 +94,7 @@ export default function CutoffPage() {
     if (selectedQuota) params.set("quota", selectedQuota);
     if (selectedRound) params.set("round", selectedRound);
     if (selectedSubCategory) params.set("subCategory", selectedSubCategory);
-    // Replace only query string, does not reload, preserves filters
+    // Update URL without page reload
     router.replace(`/cutoff?${params.toString()}`);
   }, [
     selectedExam,
@@ -103,31 +106,7 @@ export default function CutoffPage() {
     router,
   ]);
 
-  // SEO helpers (computed every render for <Head>)
-  const makeTitle = () => {
-    if (!selectedExam) return "College Exam Cutoffs";
-    let t = `${selectedExam}`;
-    if (selectedYear) t += ` ${selectedYear}`;
-    if (selectedCategory) t += ` ${selectedCategory}`;
-    if (selectedQuota) t += ` ${selectedQuota}`;
-    if (selectedRound) t += ` Round ${selectedRound}`;
-    if (selectedSubCategory) t += ` ${selectedSubCategory}`;
-    t += " Cutoff Details";
-    return t.trim();
-  };
-
-  const makeDescription = () => {
-    let d = `Explore cutoff information for ${selectedExam || "top exams"}`;
-    if (selectedYear) d += ` in ${selectedYear}`;
-    if (selectedCategory) d += `, category ${selectedCategory}`;
-    if (selectedQuota) d += `, quota ${selectedQuota}`;
-    if (selectedRound) d += `, round ${selectedRound}`;
-    if (selectedSubCategory) d += `, subcategory ${selectedSubCategory}`;
-    d += ". See trends, college-wise cutoffs, and more.";
-    return d;
-  };
-
-  // True if all selected
+  // Helper to check if all filters are selected
   const areAllFiltersSelected = React.useCallback(
     (): boolean =>
       selectedExam.trim() !== "" &&
@@ -146,7 +125,7 @@ export default function CutoffPage() {
     ]
   );
 
-  // Data fetch (auto-fetch on filter change)
+  // Fetch cutoff data when all filters selected
   useEffect(() => {
     if (!areAllFiltersSelected()) {
       setCutoffData([]);
@@ -185,7 +164,7 @@ export default function CutoffPage() {
     areAllFiltersSelected,
   ]);
 
-  // Data grouping for colleges
+  // Group cutoff data by college slug
   const filteredColleges = cutoffData
     .filter((item) => {
       const normalizedQuery = searchQuery.toLowerCase().replace(/[-\s]/g, "");
@@ -229,7 +208,7 @@ export default function CutoffPage() {
       return acc;
     }, []);
 
-  // Valid exams for dropdowns
+  // Get exam data for dropdown
   const allowedExams = Object.keys(examData) as Array<keyof typeof examData>;
   const currentExam = allowedExams.includes(
     selectedExam as keyof typeof examData
@@ -237,7 +216,7 @@ export default function CutoffPage() {
     ? examData[selectedExam as keyof typeof examData]
     : null;
 
-  // Expand/collapse college card logic
+  // Toggle college expansion state
   const toggleCollegeExpansion = (collegeSlug: string) => {
     setExpandedColleges((prev) => ({
       ...prev,
@@ -247,58 +226,52 @@ export default function CutoffPage() {
 
   // --- Render ---
   return (
-    <>
-      <Head>
-        <title>{makeTitle()}</title>
-        <meta name="description" content={makeDescription()} />
-      </Head>
-      <div className="min-h-screen bg-white">
-        <HeroSection
-          selectedExam={selectedExam}
-          selectedYear={selectedYear}
-          selectedCategory={selectedCategory}
-          selectedQuota={selectedQuota}
-          selectedRound={selectedRound}
-          selectedSubCategory={selectedSubCategory}
-          onExamChange={setSelectedExam}
-          onYearChange={setSelectedYear}
-          onCategoryChange={setSelectedCategory}
-          onQuotaChange={setSelectedQuota}
-          onRoundChange={setSelectedRound}
-          onSubCategoryChange={setSelectedSubCategory}
-          onApplyFilters={() => {}}
-          allFiltersSelected={areAllFiltersSelected()}
-        />
-        <div className="max-w-7xl mx-auto px-0 sm:px-6 lg:px-8 py-12">
-          {currentExam && (
-            <FilteredCollegeSearchResults
-              showFilteredResults={showFilteredResults}
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              filteredColleges={filteredColleges}
+    <div className="min-h-screen bg-white">
+      <HeroSection
+        selectedExam={selectedExam}
+        selectedYear={selectedYear}
+        selectedCategory={selectedCategory}
+        selectedQuota={selectedQuota}
+        selectedRound={selectedRound}
+        selectedSubCategory={selectedSubCategory}
+        onExamChange={setSelectedExam}
+        onYearChange={setSelectedYear}
+        onCategoryChange={setSelectedCategory}
+        onQuotaChange={setSelectedQuota}
+        onRoundChange={setSelectedRound}
+        onSubCategoryChange={setSelectedSubCategory}
+        onApplyFilters={() => {}}
+        allFiltersSelected={areAllFiltersSelected()}
+      />
+      <div className="max-w-7xl mx-auto px-0 sm:px-6 lg:px-8 py-12">
+        {currentExam && (
+          <FilteredCollegeSearchResults
+            showFilteredResults={showFilteredResults}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            filteredColleges={filteredColleges}
+            currentExam={currentExam}
+            selectedYear={selectedYear}
+            selectedCategory={selectedCategory}
+            expandedColleges={expandedColleges}
+            toggleCollegeExpansion={toggleCollegeExpansion}
+            allFiltersSelected={areAllFiltersSelected()}
+          />
+        )}
+      </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {currentExam && (
+          <>
+            <CurrentYearStats
               currentExam={currentExam}
               selectedYear={selectedYear}
-              selectedCategory={selectedCategory}
-              expandedColleges={expandedColleges}
-              toggleCollegeExpansion={toggleCollegeExpansion}
-              allFiltersSelected={areAllFiltersSelected()}
             />
-          )}
-        </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          {currentExam && (
-            <>
-              <CurrentYearStats
-                currentExam={currentExam}
-                selectedYear={selectedYear}
-              />
-              <TrendsChart currentExam={currentExam} />
-              <CollegeWiseCutoffs selectedExam={selectedExam} />
-              <ExamInfoCards selectedExam={selectedExam} />
-            </>
-          )}
-        </div>
+            <TrendsChart currentExam={currentExam} />
+            <CollegeWiseCutoffs selectedExam={selectedExam} />
+            <ExamInfoCards selectedExam={selectedExam} />
+          </>
+        )}
       </div>
-    </>
+    </div>
   );
 }
