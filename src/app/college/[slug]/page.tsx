@@ -28,7 +28,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
 
-  const baseUrl = `https://www.pncsquare.in/college/${slug}`; // Replace with your actual domain URL
+  const baseUrl = `https://www.pncsquare.in/college`; // Replace with your actual domain URL
 
   try {
     const response = await apiService.get<CollegeResponse>(`/college/${slug}`);
