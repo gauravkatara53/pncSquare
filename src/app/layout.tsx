@@ -6,9 +6,9 @@ export const metadata: Metadata = {
   title: "P&C square - College & Exam Finder",
   description: "Find your dream IIT, NIT, or other colleges easily.",
   icons: {
-    icon: "/favicon.png", // Default favicon
-    shortcut: "/favicon.png",
-    apple: "/apple-touch-icon.png", // Optional for Apple devices
+    icon: "/mortarboard_1904520.ico", // Default favicon
+    shortcut: "/mortarboard_1904520.ico",
+    apple: "/mortarboard_1904520.ico", // Optional for Apple devices
   },
 };
 
