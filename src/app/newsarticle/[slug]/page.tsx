@@ -47,12 +47,12 @@ export async function generateMetadata({
         title: "Article Not Found | PNC Square",
         description: "The requested news article could not be found.",
         alternates: {
-          canonical: "https://pnc-square.vercel.app/newsarticle", // fallback canonical
+          canonical: "https://pncsquare.in/newsarticle", // fallback canonical
         },
       };
     }
 
-    const canonicalUrl = `https://pnc-square.vercel.app/newsarticle/${slug}`;
+    const canonicalUrl = `https://pncsquare.in/newsarticle/${slug}`;
 
     return {
       title: article.title,

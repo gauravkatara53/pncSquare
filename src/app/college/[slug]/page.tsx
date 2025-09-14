@@ -28,19 +28,19 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
 
-  const baseUrl = `https://www.pncsquare.in/college`; // Replace with your actual domain URL
+  const baseUrl = `https://pncsquare.in/college`;
 
   try {
     const response = await apiService.get<CollegeResponse>(`/college/${slug}`);
     const college = response?.data;
 
     if (!college) {
-      console.error("College data not found for slug:", slug);
       return {
         title: "College Not Found | Placements & Cutoffs",
         description: "Requested college data not found.",
+        keywords: ["college", "placements", "cutoff", "admissions", "fees"],
         alternates: {
-          canonical: `${baseUrl}/${slug}`, // still add canonical even if no data, for SEO consistency
+          canonical: `${baseUrl}/${slug}`,
         },
       };
     }
@@ -50,6 +50,23 @@ export async function generateMetadata({
       description:
         college.bio ||
         `Explore ${college.name} - Admission, Cutoff, Fees, Courses & Placements 2025 | PNC Square`,
+      keywords: [
+        college.name,
+        `${college.name} placements`,
+        `${college.name} cutoff`,
+        `${college.name} admission`,
+        `${college.name} fees`,
+        `${college.name} courses`,
+        "PNC Square",
+        "college placements India",
+        "admission process",
+        "JEE Advanced",
+        "placement statistics",
+        "engineering courses",
+        "tuition fees",
+        "college rankings",
+        "financial aid",
+      ],
       openGraph: {
         title: `${college.name} – Placements, Cutoff, Fees & Courses`,
         description:
@@ -65,7 +82,7 @@ export async function generateMetadata({
         ],
       },
       alternates: {
-        canonical: `${baseUrl}/${slug}`, // Add canonical URL for this college page
+        canonical: `${baseUrl}/${slug}`,
       },
     };
   } catch (error) {
@@ -73,8 +90,9 @@ export async function generateMetadata({
     return {
       title: "Error | College Information",
       description: "There was an error fetching college details.",
+      keywords: ["college error", "college info not found", "PNC Square"],
       alternates: {
-        canonical: `${baseUrl}/${slug}`, // still add canonical URL even on error
+        canonical: `${baseUrl}/${slug}`,
       },
     };
   }

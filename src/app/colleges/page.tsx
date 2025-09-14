@@ -8,7 +8,7 @@ import { generateTitleAndDescription } from "@/utils/seoCollegeText";
 type SearchParamsType = { [key: string]: string | undefined };
 
 export async function generateMetadata(props: unknown) {
-  const baseUrl = "https://www.pncsquare.in/colleges"; // Set your actual domain here
+  const baseUrl = "https://pncsquare.in/colleges"; // Set your actual domain here
 
   // existing code to parse searchParams ...
   let resolvedSearchParams: SearchParamsType = {};
