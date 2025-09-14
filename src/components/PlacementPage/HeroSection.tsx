@@ -107,7 +107,7 @@ export default function CollegeHeader({ college }: CollegeHeaderProps) {
                 alt={`${college.name} Campus`}
                 width={400}
                 height={256}
-                className="w-full h-64 object-cover rounded-xl"
+                className="w-full h-64 object-cover rounded-xl "
               />
               <div className="mt-4 grid grid-cols-2 gap-4">
                 <div className="text-center">

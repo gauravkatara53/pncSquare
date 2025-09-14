@@ -116,20 +116,28 @@ export function PlacementPage({ college }: { college: College }) {
   // Calculate overall stats using only validData
   const overallPlacement = validData.length
     ? (
-        validData.reduce((acc, cur) => acc + cur.placementPercentage, 0) /
-        validData.length
+        validData
+          .filter((d) => (d.placementPercentage ?? 0) > 0)
+          .reduce((acc, cur) => acc + cur.placementPercentage, 0) /
+        validData.filter((d) => (d.placementPercentage ?? 0) > 0).length
       ).toFixed(2)
     : "-";
 
   const overallAvgPackage = validData.length
     ? (
-        validData.reduce((acc, cur) => acc + cur.averagePackageLPA, 0) /
-        validData.length
+        validData
+          .filter((d) => (d.averagePackageLPA ?? 0) > 0)
+          .reduce((acc, cur) => acc + cur.averagePackageLPA, 0) /
+        validData.filter((d) => (d.averagePackageLPA ?? 0) > 0).length
       ).toFixed(2)
     : "-";
 
   const overallHighestPackage = validData.length
-    ? Math.max(...validData.map((d) => d.highestPackageLPA))
+    ? Math.max(
+        ...validData
+          .filter((d) => (d.highestPackageLPA ?? 0) > 0)
+          .map((d) => d.highestPackageLPA)
+      )
     : "-";
 
   const overallMedianPackage =
