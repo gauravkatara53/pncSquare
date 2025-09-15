@@ -41,20 +41,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       { url: `${baseUrl}/colleges`, lastModified: new Date() },
       { url: `${baseUrl}/news`, lastModified: new Date() },
       {
-        url: `${baseUrl}/colleges?tag=IIT&page=1&limit=9`,
-        lastModified: new Date(),
+        url: `${baseUrl}/colleges?tag=IIT&amp;page=1&amp;limit=9`,
+        lastModified: new Date().toISOString(),
       },
       {
-        url: `${baseUrl}/colleges?tag=NIT&page=1&limit=9`,
-        lastModified: new Date(),
+        url: `${baseUrl}/colleges?tag=NIT&amp;page=1&amp;limit=9`,
+        lastModified: new Date().toISOString(),
       },
       {
-        url: `${baseUrl}/colleges?tag=NIT&page=1&limit=9`,
-        lastModified: new Date(),
-      },
-      {
-        url: `${baseUrl}/colleges?tag=IIIT&page=1&limit=9`,
-        lastModified: new Date(),
+        url: `${baseUrl}/colleges?tag=IIIT&amp;page=1&amp;limit=9`,
+        lastModified: new Date().toISOString(),
       },
     ];
 
