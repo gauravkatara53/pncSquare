@@ -40,6 +40,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       { url: baseUrl, lastModified: new Date() },
       { url: `${baseUrl}/colleges`, lastModified: new Date() },
       { url: `${baseUrl}/news`, lastModified: new Date() },
+      {
+        url: `${baseUrl}/colleges?tag=IIT&page=1&limit=9`,
+        lastModified: new Date(),
+      },
+      {
+        url: `${baseUrl}/colleges?tag=NIT&page=1&limit=9`,
+        lastModified: new Date(),
+      },
+      {
+        url: `${baseUrl}/colleges?tag=NIT&page=1&limit=9`,
+        lastModified: new Date(),
+      },
+      {
+        url: `${baseUrl}/colleges?tag=IIIT&page=1&limit=9`,
+        lastModified: new Date(),
+      },
     ];
 
     const collegeSitemapRoutes = collegePaths.map((path) => ({
