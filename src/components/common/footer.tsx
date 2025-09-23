@@ -8,15 +8,15 @@ import {
   Phone,
   MapPin,
 } from "lucide-react";
-
+import Link from "next/link";
 export function Footer() {
   const quickLinks = [
-    { name: "About Us", href: "#" },
-    { name: "Contact", href: "#" },
-    { name: "Privacy Policy", href: "#" },
-    { name: "Terms of Service", href: "#" },
-    { name: "Careers", href: "#" },
-    { name: "Help Center", href: "#" },
+    { name: "About Us", href: "/aboutus" },
+    { name: "Contact", href: "/contact" },
+    { name: "Privacy Policy", href: "/privacy-policy" },
+    { name: "Terms of Service", href: "/terms-of-service" },
+    { name: "Careers", href: "/careers" },
+    { name: "Help Center", href: "/help-center" },
   ];
 
   const examLinks = [
@@ -85,14 +85,16 @@ export function Footer() {
             </h3>
             <ul className="space-y-2 sm:space-y-3">
               {quickLinks.map((link, index) => (
-                <li key={index}>
-                  <a
-                    href={link.href}
-                    className="text-gray-300 hover:text-yellow-400 transition-colors text-sm"
-                  >
-                    {link.name}
-                  </a>
-                </li>
+                <Link key={index} href={link.href}>
+                  <li>
+                    <a
+                      href={link.href}
+                      className="text-gray-300 hover:text-yellow-400 transition-colors text-sm"
+                    >
+                      {link.name}
+                    </a>
+                  </li>
+                </Link>
               ))}
             </ul>
           </div>
