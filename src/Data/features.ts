@@ -18,7 +18,7 @@ export const features: Feature[] = [
     icon: GraduationCap,
     color: "from-indigo-500 to-purple-500",
     image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4WVQBWuCpD4qOTs7hkpxXichM73aJLq1J4A&s",
+      "https://ik.imagekit.io/ak2ol9uti/PNC-MANUL/college.png?updatedAt=1758657541926",
   },
   {
     title: "Courses",
@@ -27,7 +27,7 @@ export const features: Feature[] = [
     icon: BookOpen,
     color: "from-pink-500 to-rose-500",
     image:
-      "https://as2.ftcdn.net/jpg/01/95/96/13/1000_F_195961367_NNLBno8lv2hkt73tX4IRqo3P0u7EloUy.jpg",
+      "https://ik.imagekit.io/ak2ol9uti/PNC-MANUL/courses.png?updatedAt=1758657517295",
   },
   {
     title: "Exams",
@@ -37,7 +37,7 @@ export const features: Feature[] = [
     icon: FileText,
     color: "from-green-500 to-emerald-500",
     image:
-      "https://static.vecteezy.com/system/resources/previews/002/184/109/non_2x/students-write-a-test-exam-in-a-beautiful-classroom-vector.jpg",
+      "https://ik.imagekit.io/ak2ol9uti/PNC-MANUL/exam.png?updatedAt=1758657446928",
   },
   {
     title: "Cutoffs",
@@ -46,6 +46,6 @@ export const features: Feature[] = [
     icon: TrendingUp,
     color: "from-yellow-500 to-orange-500",
     image:
-      "https://thumbs.dreamstime.com/b/student-climbing-stack-books-reaching-open-book-displayed-computer-screen-symbolizing-journey-online-education-362480772.jpg",
+      "https://ik.imagekit.io/ak2ol9uti/PNC-MANUL/cutodd.png?updatedAt=1758658401551",
   },
 ];

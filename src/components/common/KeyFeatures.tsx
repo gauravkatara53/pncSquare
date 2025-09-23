@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { features, type Feature } from "@/Data/features";
 
 export default function KeyFeatures() {
@@ -10,31 +9,19 @@ export default function KeyFeatures() {
     <section className="relative py-20 bg-gradient-to-b">
       <div className="max-w-7xl mx-auto px-2 lg:px-12 text-center">
         {/* Heading */}
-        <motion.h2
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"
-        >
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
           Key Features
-        </motion.h2>
+        </h2>
 
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-gray-600 max-w-2xl mx-auto mb-12"
-        >
+        <p className="text-gray-600 max-w-2xl mx-auto mb-12">
           Everything you need to know about colleges, courses, exams, and
           cutoffs — all in one place.
-        </motion.p>
+        </p>
 
         {/* Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, idx) => (
-            <AnimatedFeatureCard key={idx} feature={feature} />
+            <FeatureCard key={idx} feature={feature} />
           ))}
         </div>
       </div>
@@ -42,26 +29,19 @@ export default function KeyFeatures() {
   );
 }
 
-function AnimatedFeatureCard({ feature }: { feature: Feature }) {
+function FeatureCard({ feature }: { feature: Feature }) {
   return (
     <Link href={feature.route}>
-      <motion.div
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ duration: 0.6 }}
-        viewport={{ once: true }}
-        whileHover={{ scale: 1.02 }}
-        className="group relative bg-white rounded-2xl shadow-lg transition-all duration-300 overflow-hidden cursor-pointer"
+      <div
+        className={`group relative bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer transition-all duration-300`}
       >
-        {/* Animated border */}
+        {/* Border */}
         <span
-          className={`absolute inset-0 rounded-2xl border-2 border-transparent bg-gradient-to-r ${feature.color} p-[2px] 
-          opacity-0 group-hover:opacity-100 transition-all duration-700`}
+          className={`absolute inset-0 rounded-2xl border-2 border-transparent bg-gradient-to-r ${feature.color} p-[2px] opacity-0 group-hover:opacity-100 transition-all duration-700`}
         >
           <span
             className="block h-full w-full rounded-2xl bg-white
-            [mask-composite:exclude] [mask-image:linear-gradient(0deg,black,transparent)] 
-            animate-draw-border"
+            [mask-composite:exclude] [mask-image:linear-gradient(0deg,black,transparent)]"
           ></span>
         </span>
 
@@ -89,7 +69,7 @@ function AnimatedFeatureCard({ feature }: { feature: Feature }) {
             {feature.description}
           </p>
         </div>
-      </motion.div>
+      </div>
     </Link>
   );
 }

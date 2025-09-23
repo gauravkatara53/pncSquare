@@ -36,11 +36,36 @@ export default function HeroSection() {
     return () => clearInterval(interval);
   }, []);
 
+  // add this helper above your component or inside it
+  const normalize = (v: string) => v.replace(/\s+/g, " ").trim();
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    const params = new URLSearchParams(
-      Object.entries(filters).filter(([, v]) => v)
-    );
+
+    // create a cleaned copy of filters (trim + collapse spaces)
+    const cleanedFilters = Object.fromEntries(
+      Object.entries(filters).map(([k, v]) => [
+        k,
+        typeof v === "string" ? normalize(v) : v,
+      ])
+    ) as typeof filters;
+
+    let params: URLSearchParams;
+
+    if (window.innerWidth < 768) {
+      // Mobile → only consider searchTerm (but normalized)
+      params = new URLSearchParams(
+        Object.entries({ searchTerm: cleanedFilters.searchTerm }).filter(
+          ([, v]) => v
+        )
+      );
+    } else {
+      // Desktop → all filters (only include non-empty)
+      params = new URLSearchParams(
+        Object.entries(cleanedFilters).filter(([, v]) => v)
+      );
+    }
+
     router.push(`/colleges?${params.toString()}`);
   };
 

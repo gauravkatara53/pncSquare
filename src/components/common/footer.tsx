@@ -85,16 +85,14 @@ export function Footer() {
             </h3>
             <ul className="space-y-2 sm:space-y-3">
               {quickLinks.map((link, index) => (
-                <Link key={index} href={link.href}>
-                  <li>
-                    <a
-                      href={link.href}
-                      className="text-gray-300 hover:text-yellow-400 transition-colors text-sm"
-                    >
-                      {link.name}
-                    </a>
-                  </li>
-                </Link>
+                <li key={index}>
+                  <Link
+                    href={link.href}
+                    className="text-gray-300 hover:text-yellow-400 transition-colors text-sm"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
               ))}
             </ul>
           </div>
