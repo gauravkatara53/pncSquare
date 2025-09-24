@@ -12,6 +12,7 @@ export interface ExamData {
   syllabus: string;
   cutoff: string;
   register?: string;
+  extraDates?: string[];
 }
 
 export const examData: ExamData[] = [
