@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Head from "next/head";
 
 import { HeroSection } from "@/components/CutoffPage/HeroSection";
 import { CurrentYearStats } from "@/components/CutoffPage/CurrentYearStats";
@@ -84,6 +85,10 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
   >({});
   const [cutoffData, setCutoffData] = useState<CutoffItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [filtersApplied, setFiltersApplied] = useState(false);
+
+  // Ref for results container to scroll into view after loading
+  const resultsSectionRef = useRef<HTMLDivElement>(null);
 
   // When changing filters, update URL query params (client side navigation)
   useEffect(() => {
@@ -94,7 +99,6 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
     if (selectedQuota) params.set("quota", selectedQuota);
     if (selectedRound) params.set("round", selectedRound);
     if (selectedSubCategory) params.set("subCategory", selectedSubCategory);
-    // Update URL without page reload
     router.replace(`/cutoff?${params.toString()}`);
   }, [
     selectedExam,
@@ -106,7 +110,7 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
     router,
   ]);
 
-  // Helper to check if all filters are selected
+  // Check if all filters are selected
   const areAllFiltersSelected = useCallback(
     (): boolean =>
       selectedExam.trim() !== "" &&
@@ -125,15 +129,47 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
     ]
   );
 
-  // Fetch cutoff data when all filters selected
-  useEffect(() => {
-    if (!areAllFiltersSelected()) {
-      setCutoffData([]);
-      setShowFilteredResults(false);
-      setLoading(false);
-      return;
+  // Check if at least one filter besides exam is selected
+  const isAnyFilterSelected = useCallback((): boolean => {
+    return (
+      selectedYear.trim() !== "" ||
+      selectedCategory.trim() !== "" ||
+      selectedQuota.trim() !== "" ||
+      selectedRound.trim() !== "" ||
+      selectedSubCategory.trim() !== ""
+    );
+  }, [
+    selectedYear,
+    selectedCategory,
+    selectedQuota,
+    selectedRound,
+    selectedSubCategory,
+  ]);
+
+  // Build dynamic page title based on selected filters
+  const buildPageTitle = () => {
+    if (!filtersApplied) {
+      return `Entrance Exam Cutoff Analysis - ${selectedExam}`;
     }
+
+    const parts: string[] = [selectedExam];
+    if (selectedYear) parts.push(`Year: ${selectedYear}`);
+    if (selectedCategory) parts.push(`Seat Type: ${selectedCategory}`);
+    if (selectedQuota) parts.push(`Quota: ${selectedQuota}`);
+    if (selectedRound) parts.push(`Round: ${selectedRound}`);
+    if (selectedSubCategory) parts.push(`Subcategory: ${selectedSubCategory}`);
+
+    return parts.length > 0
+      ? `Cutoff Analysis - ${parts.join(", ")}`
+      : `Entrance Exam Cutoff Analysis - ${selectedExam}`;
+  };
+
+  // Fetch cutoff data on demand when "Apply Filters" is clicked
+  const applyFilters = () => {
+    if (!isAnyFilterSelected()) return; // Do nothing if no filter selected
+
     setLoading(true);
+
     apiService
       .get<{
         statusCode: number;
@@ -142,36 +178,47 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
         success: boolean;
       }>("/cutoff/all", {
         examType: selectedExam,
-        year: Number(selectedYear),
-        seatType: selectedCategory,
-        quota: selectedQuota,
-        round: selectedRound,
-        subCategory: selectedSubCategory,
+        year: selectedYear ? Number(selectedYear) : undefined,
+        seatType: selectedCategory || undefined,
+        quota: selectedQuota || undefined,
+        round: selectedRound || undefined,
+        subCategory: selectedSubCategory || undefined,
       })
       .then((response) => {
         setCutoffData(response.success ? response.data : []);
         setShowFilteredResults(true);
+        setFiltersApplied(true);
         setLoading(false);
-        // Scroll slightly down after data is loaded to show results
-        setTimeout(() => {
-          const scrollTopAmount = window.innerWidth <= 768 ? 1200 : 400; // 768px breakpoint for mobile
-          window.scrollBy({ top: scrollTopAmount, behavior: "smooth" });
-        }, 100);
       })
       .catch(() => {
         setCutoffData([]);
         setShowFilteredResults(true);
+        setFiltersApplied(true);
         setLoading(false);
       });
-  }, [
-    selectedExam,
-    selectedYear,
-    selectedCategory,
-    selectedQuota,
-    selectedRound,
-    selectedSubCategory,
-    areAllFiltersSelected,
-  ]);
+  };
+
+  // Reset all filters except exam and filtering state
+  const clearFiltersExceptExam = () => {
+    setSelectedYear("");
+    setSelectedCategory("");
+    setSelectedQuota("");
+    setSelectedRound("");
+    setSelectedSubCategory("");
+    setSearchQuery("");
+    setCutoffData([]);
+    setShowFilteredResults(false);
+    setFiltersApplied(false);
+  };
+
+  // Scroll to results section when loading finishes and results are shown
+  useEffect(() => {
+    if (!loading && showFilteredResults && filtersApplied) {
+      setTimeout(() => {
+        resultsSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    }
+  }, [loading, showFilteredResults, filtersApplied]);
 
   // Group cutoff data by college slug
   const filteredColleges = cutoffData
@@ -217,7 +264,7 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
       return acc;
     }, []);
 
-  // Get exam data for dropdown
+  // Get exam data
   const allowedExams = Object.keys(examData) as Array<keyof typeof examData>;
   const currentExam = allowedExams.includes(
     selectedExam as keyof typeof examData
@@ -225,7 +272,7 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
     ? examData[selectedExam as keyof typeof examData]
     : null;
 
-  // Toggle college expansion state
+  // Toggle college expansion
   const toggleCollegeExpansion = (collegeSlug: string) => {
     setExpandedColleges((prev) => ({
       ...prev,
@@ -233,67 +280,64 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
     }));
   };
 
-  // Reset all filters except exam
-  const clearFiltersExceptExam = () => {
-    setSelectedYear("");
-    setSelectedCategory("");
-    setSelectedQuota("");
-    setSelectedRound("");
-    setSelectedSubCategory("");
-    setSearchQuery("");
-    setCutoffData([]);
-    setShowFilteredResults(false);
-  };
-
   // --- Render ---
   return (
-    <div className="min-h-screen bg-white">
-      <HeroSection
-        selectedExam={selectedExam}
-        selectedYear={selectedYear}
-        selectedCategory={selectedCategory}
-        selectedQuota={selectedQuota}
-        selectedRound={selectedRound}
-        selectedSubCategory={selectedSubCategory}
-        onExamChange={setSelectedExam}
-        onYearChange={setSelectedYear}
-        onCategoryChange={setSelectedCategory}
-        onQuotaChange={setSelectedQuota}
-        onRoundChange={setSelectedRound}
-        onSubCategoryChange={setSelectedSubCategory}
-        clearFilters={clearFiltersExceptExam}
-        allFiltersSelected={areAllFiltersSelected()}
-        loading={loading}
-      />
-      <div className="max-w-7xl mx-auto px-0 sm:px-6 lg:px-8 py-12">
-        {currentExam && (
-          <FilteredCollegeSearchResults
-            showFilteredResults={showFilteredResults}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            filteredColleges={filteredColleges}
-            currentExam={currentExam}
-            selectedYear={selectedYear}
-            selectedCategory={selectedCategory}
-            expandedColleges={expandedColleges}
-            toggleCollegeExpansion={toggleCollegeExpansion}
-            allFiltersSelected={areAllFiltersSelected()}
-          />
-        )}
-      </div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {currentExam && (
-          <>
-            <CurrentYearStats
+    <>
+      <Head>
+        <title>{buildPageTitle()}</title>
+      </Head>
+      <div className="min-h-screen bg-white">
+        <HeroSection
+          selectedExam={selectedExam}
+          selectedYear={selectedYear}
+          selectedCategory={selectedCategory}
+          selectedQuota={selectedQuota}
+          selectedRound={selectedRound}
+          selectedSubCategory={selectedSubCategory}
+          onExamChange={setSelectedExam}
+          onYearChange={setSelectedYear}
+          onCategoryChange={setSelectedCategory}
+          onQuotaChange={setSelectedQuota}
+          onRoundChange={setSelectedRound}
+          onSubCategoryChange={setSelectedSubCategory}
+          clearFilters={clearFiltersExceptExam}
+          loading={loading}
+          applyFilters={applyFilters}
+          isAnyFilterSelected={isAnyFilterSelected()}
+        />
+        <div
+          ref={resultsSectionRef}
+          className="max-w-7xl mx-auto px-0 sm:px-6 lg:px-8 py-12"
+        >
+          {currentExam && filtersApplied && (
+            <FilteredCollegeSearchResults
+              showFilteredResults={showFilteredResults}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              filteredColleges={filteredColleges}
               currentExam={currentExam}
               selectedYear={selectedYear}
+              selectedCategory={selectedCategory}
+              expandedColleges={expandedColleges}
+              toggleCollegeExpansion={toggleCollegeExpansion}
+              allFiltersSelected={areAllFiltersSelected()}
             />
-            <TrendsChart currentExam={currentExam} />
-            <CollegeWiseCutoffs selectedExam={selectedExam} />
-            <ExamInfoCards selectedExam={selectedExam} />
-          </>
-        )}
+          )}
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          {currentExam && (
+            <>
+              <CurrentYearStats
+                currentExam={currentExam}
+                selectedYear={selectedYear}
+              />
+              <TrendsChart currentExam={currentExam} />
+              <CollegeWiseCutoffs selectedExam={selectedExam} />
+              <ExamInfoCards selectedExam={selectedExam} />
+            </>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

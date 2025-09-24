@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { examData } from "./data";
+import { Loader2, XCircle } from "lucide-react";
 
 interface HeroSectionProps {
   selectedExam: string;
@@ -26,7 +27,8 @@ interface HeroSectionProps {
   onRoundChange: (round: string) => void;
   onSubCategoryChange: (subCategory: string) => void;
   clearFilters: () => void;
-  allFiltersSelected: boolean;
+  applyFilters: () => void;
+  isAnyFilterSelected: boolean;
   loading: boolean;
 }
 
@@ -44,6 +46,8 @@ export function HeroSection({
   onRoundChange,
   onSubCategoryChange,
   clearFilters,
+  applyFilters,
+  isAnyFilterSelected,
   loading,
 }: HeroSectionProps) {
   // Base rounds for all exams except 2024 year (which hides Round 6)
@@ -145,8 +149,9 @@ export function HeroSection({
         {/* Dropdown Filters with placeholders "Select ..." */}
         <div className="max-w-5xl mx-auto">
           <Card className="border border-slate-200 shadow-sm p-6">
-            <div className="grid md:grid-cols-6 gap-4">
-              <div>
+            <div className="flex flex-wrap items-end gap-4">
+              {/* Dropdowns each with fixed width for desktop, full width on mobile */}
+              <div className="w-full sm:w-auto flex-grow min-w-[120px]">
                 <label className="text-sm font-medium text-slate-700 mb-2 block">
                   Academic Year
                 </label>
@@ -161,8 +166,7 @@ export function HeroSection({
                 </Select>
               </div>
 
-              {/* Quota always visible, disabled if JEE Advanced */}
-              <div>
+              <div className="w-full sm:w-auto flex-grow min-w-[120px]">
                 <label className="text-sm font-medium text-slate-700 mb-2 block">
                   Quota
                 </label>
@@ -182,9 +186,9 @@ export function HeroSection({
                 </Select>
               </div>
 
-              <div>
+              <div className="w-full sm:w-auto flex-grow min-w-[150px]">
                 <label className="text-sm font-medium text-slate-700 mb-2 block">
-                  category
+                  Subcategory
                 </label>
                 <Select
                   value={selectedSubCategory}
@@ -204,7 +208,7 @@ export function HeroSection({
                 </Select>
               </div>
 
-              <div>
+              <div className="w-full sm:w-auto flex-grow min-w-[150px]">
                 <label className="text-sm font-medium text-slate-700 mb-2 block">
                   Seat Type
                 </label>
@@ -230,7 +234,7 @@ export function HeroSection({
                 </Select>
               </div>
 
-              <div>
+              <div className="w-full sm:w-auto flex-grow min-w-[120px]">
                 <label className="text-sm font-medium text-slate-700 mb-2 block">
                   Round
                 </label>
@@ -248,13 +252,26 @@ export function HeroSection({
                 </Select>
               </div>
 
-              <div className="flex items-end">
+              {/* Buttons container for desktop inline, mobile stacked */}
+              <div className="flex space-x-4 mt-4 sm:mt-0 sm:ml-auto">
+                <Button
+                  onClick={applyFilters}
+                  className="w-20 bg-slate-900 hover:bg-slate-700 flex items-center justify-center"
+                  disabled={!isAnyFilterSelected || loading}
+                >
+                  {loading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    "Apply"
+                  )}
+                </Button>
+
                 <Button
                   onClick={clearFilters}
-                  className="w-full bg-gray-600 hover:bg-gray-400"
+                  className="w-20 bg-gray-400 hover:bg-gray-700 flex items-center justify-center"
                   disabled={loading}
                 >
-                  {loading ? "Loading..." : "Clear Filters"}
+                  <XCircle className="mr-2 h-4 w-4" />
                 </Button>
               </div>
             </div>
