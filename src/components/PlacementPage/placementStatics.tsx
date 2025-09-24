@@ -4,6 +4,7 @@ import { StatsCards } from "../ui/StatsCards";
 import { Card } from "../ui/card";
 import { apiService } from "../../ApiService/apiService";
 import CardSkeletonGrid from "../ui/cardSkelton";
+import { TopRecruiters } from "./TopRecruiters";
 
 interface College {
   slug?: string;
@@ -444,7 +445,7 @@ export function PlacementPage({ college }: { college: College }) {
           )}
         </div>
       </section>
-      <section className="mb-16">
+      {/* <section className="mb-16">
         <div className="text-center mb-12 flex justify-center">
           {placementStats?.company_url ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -457,9 +458,10 @@ export function PlacementPage({ college }: { college: College }) {
             <p className="text-center text-slate-500 pb-8"></p>
           )}
         </div>
-      </section>
+      </section> */}
 
       {/* Top Recruiters Section */}
+      <TopRecruiters />
     </div>
   );
 }
