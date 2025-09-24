@@ -627,7 +627,7 @@ function CollegeCard({ college }: { college: College }) {
     >
       <Link
         href={`/college/${college.slug}`}
-        className="block focus:outline-none focus:ring-2 focus:ring-slate-900"
+        className="block focus:outline-none "
       >
         <div className="aspect-video w-full overflow-hidden rounded-t-lg cursor-pointer">
           <Image
