@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import CollegeHeader from "@/components/PlacementPage/HeroSection";
 import InfoBar from "@/components/PlacementPage/InfoBar";
 import Overview from "@/components/PlacementPage/overviewSection";
@@ -23,70 +23,147 @@ interface Props {
   slug: string;
 }
 
-interface CollegeResponse {
-  statusCode: number;
-  data: {
+/** keep a clean typed model for the actual college data we expect to use */
+export type CollegeData = {
+  name: string;
+  bio?: string;
+  fees?: number;
+  avgSalary?: number;
+  nirf?: number;
+  highestPackage?: number;
+  placementRate?: number;
+  image_url?: string;
+  address?: string;
+  campusFacilities?: {
     name: string;
-    bio?: string;
-    fees: number;
-    avgSalary: number;
-    nirf: number;
-    highestPackage: number;
-    placementRate: number;
-    image_url: string;
-    address: string;
-    campusFacilities?: {
-      name: string;
-      available: boolean;
-      description?: string;
-      iconUrl?: string;
+    available: boolean;
+    description?: string;
+    iconUrl?: string;
+  }[];
+  coursesOffered?: {
+    programs: {
+      programType: string;
+      courses: string[];
     }[];
-    coursesOffered?: {
-      programs: {
-        programType: string;
-        courses: string[];
-      }[];
-    };
-    instituteFeeStructure?: FeeType[];
-    hostelFeeStructure?: FeeType[];
-    waiver?: WaiverType[];
-    rankings?: Ranking[];
-    admissionCriteria?: {
-      criteriaList: { point: string }[];
-      forMoreDetails?: string;
-      detailsUrl?: string;
-    };
-    slug: string;
-    [key: string]: unknown;
   };
+  instituteFeeStructure?: FeeType[];
+  hostelFeeStructure?: FeeType[];
+  waiver?: WaiverType[];
+  rankings?: Ranking[];
+  admissionCriteria?: {
+    criteriaList: { point: string }[];
+    forMoreDetails?: string;
+    detailsUrl?: string;
+  };
+  slug?: string;
+  [key: string]: unknown;
+};
+
+type CollegeResponse = {
+  statusCode: number;
+  data: CollegeData;
   message: string;
   success: boolean;
-  errors: unknown;
-}
+  errors?: unknown;
+};
 
-export default function CollegePageClient({ slug }: Props) {
-  const [college, setCollege] = useState<CollegeResponse["data"] | null>(null);
-  const [loading, setLoading] = useState(true);
+/**
+ * small reusable hook to fetch college data with cancellation support
+ */
+function useCollege(slug: string | undefined) {
+  const [college, setCollege] = useState<CollegeData | null>(null);
+  const [loading, setLoading] = useState<boolean>(!!slug);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!slug) return;
+    if (!slug) {
+      setCollege(null);
+      setLoading(false);
+      setError("No college specified.");
+      return;
+    }
+
+    const controller = new AbortController();
+    const signal = controller.signal;
 
     setLoading(true);
     setError(null);
 
-    apiService
-      .get<CollegeResponse>(`/college/${slug}`)
-      .then((response) => {
-        if (response && response.data) {
-          setCollege(response.data);
+    (async () => {
+      try {
+        const res = await apiService.get<CollegeResponse>(`/college/${slug}`, {
+          signal,
+        } as unknown as Record<string, unknown>); // some axios setups accept AbortSignal differently; cast if needed
+
+        if (signal.aborted) return;
+
+        if (res?.data?.data) {
+          setCollege(res.data.data as CollegeData);
+          setError(null);
+        } else if (res?.data) {
+          // fallback if API shape differs
+          setCollege(res.data as unknown as CollegeData);
         } else {
+          setCollege(null);
           setError("College not found.");
         }
-      })
-      .catch(() => setError("Error fetching college."))
-      .finally(() => setLoading(false));
+      } catch (err: unknown) {
+        if (
+          typeof err === "object" &&
+          err !== null &&
+          ("name" in err || "message" in err)
+        ) {
+          const errorObj = err as {
+            name?: string;
+            message?: string;
+            response?: { data?: { message?: string } };
+          };
+          if (
+            errorObj.name === "CanceledError" ||
+            errorObj.message === "canceled"
+          ) {
+            // request was cancelled — ignore
+            return;
+          }
+          setError(
+            errorObj.response?.data?.message ||
+              errorObj.message ||
+              "Error fetching college."
+          );
+        } else {
+          setError("Error fetching college.");
+        }
+        setCollege(null);
+      } finally {
+        if (!signal.aborted) setLoading(false);
+      }
+    })();
+
+    return () => {
+      controller.abort();
+    };
   }, [slug]);
+
+  return { college, loading, error };
+}
+
+const CollegePageClient: React.FC<Props> = ({ slug }) => {
+  const { college, loading, error } = useCollege(slug);
+
+  // memoize header payload so children don't re-render unnecessarily
+  const collegeHeaderData = useMemo(
+    () => ({
+      name: college?.name ?? "Unnamed Institute",
+      bio: college?.bio ?? "",
+      fees: college?.fees ?? 0,
+      avgSalary: college?.avgSalary ?? 0,
+      nirf: college?.nirf ?? 0,
+      highestPackage: college?.highestPackage ?? 0,
+      placementRate: college?.placementRate ?? 0,
+      image_url: college?.image_url ?? "",
+    }),
+    [college]
+  );
 
   if (loading)
     return (
@@ -99,21 +176,10 @@ export default function CollegePageClient({ slug }: Props) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <h1 className="text-2xl font-semibold text-gray-700">
-          {error || "College not found"}
+          {error ?? "College not found"}
         </h1>
       </div>
     );
-
-  const collegeHeaderData = {
-    name: college.name,
-    bio: college.bio,
-    fees: college.fees,
-    avgSalary: college.avgSalary,
-    nirf: college.nirf,
-    highestPackage: college.highestPackage,
-    placementRate: college.placementRate,
-    image_url: college.image_url,
-  };
 
   return (
     <div className="bg-white">
@@ -125,26 +191,33 @@ export default function CollegePageClient({ slug }: Props) {
         <section id="overview">
           <Overview college={college} />
         </section>
+
         <section id="address">
           <Address college={college} />
         </section>
+
         <section id="cutoff">
-          <Cutoffs college={college.slug} />
+          <Cutoffs college={college.slug ?? ""} />
         </section>
+
         <section id="ranking">
           <Rankings rankings={college.rankings} />
         </section>
+
         <section id="facilities">
           <CampusFacilities college={college} />
         </section>
+
         <section id="admission">
           <Admission
             college={{ admissionCriteria: college.admissionCriteria }}
           />
         </section>
+
         <section id="courses">
           <Courses courses={{ coursesOffered: college.coursesOffered }} />
         </section>
+
         <section id="fees">
           <FeeStructure
             college={{
@@ -154,6 +227,7 @@ export default function CollegePageClient({ slug }: Props) {
             }}
           />
         </section>
+
         <section id="placements">
           <PlacementPage college={college} />
         </section>
@@ -162,4 +236,6 @@ export default function CollegePageClient({ slug }: Props) {
       <Footer />
     </div>
   );
-}
+};
+
+export default CollegePageClient;

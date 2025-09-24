@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import {
   MapPin,
   LineChart,
@@ -15,7 +16,7 @@ const navItems = [
   { label: "How to Reach", icon: MapPin, target: "address" },
   { label: "Cutoff", icon: Table, target: "cutoff" },
   { label: "Ranking", icon: LineChart, target: "ranking" },
-  { label: "facilities", icon: Info, target: "facilities" },
+  { label: "Facilities", icon: Info, target: "facilities" },
   { label: "Admission", icon: Landmark, target: "admission" },
   { label: "Courses", icon: BookOpen, target: "courses" },
   { label: "Fees", icon: IndianRupee, target: "fees" },
@@ -23,15 +24,58 @@ const navItems = [
 ];
 
 export default function InfoBar() {
-  const handleScroll = (id: string) => {
+  // Centralized scroll function that accounts for fixed header height
+  const scrollToSection = (id: string, smooth = true) => {
+    if (!id) return;
     const section = document.getElementById(id);
-    if (section) {
-      section.scrollIntoView({ behavior: "smooth" });
-    }
+    if (!section) return;
+
+    // measure header height dynamically so section isn't hidden under the fixed bar
+    const header = document.querySelector(".info-bar") as HTMLElement | null;
+    const headerHeight = header ? header.clientHeight : 80; // fallback to 80px
+
+    const top =
+      section.getBoundingClientRect().top + window.pageYOffset - headerHeight;
+
+    window.scrollTo({
+      top,
+      behavior: smooth ? "smooth" : "auto",
+    });
+
+    // update hash without jumping (pushState won't cause a scroll)
+    window.history.pushState(null, "", `#${id}`);
   };
 
+  const handleScroll = (id: string) => {
+    scrollToSection(id, true);
+  };
+
+  // on mount: if there's a hash in the URL, scroll to it (no smooth to avoid janky visual)
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash && hash.startsWith("#")) {
+      const id = hash.slice(1);
+      // small timeout to allow layout to settle if needed (images, etc.)
+      // but keep it small to avoid perceptible delay
+      setTimeout(() => scrollToSection(id, false), 50);
+    }
+
+    // handle browser back/forward navigation
+    const onPopState = () => {
+      const h = window.location.hash;
+      if (h && h.startsWith("#")) {
+        scrollToSection(h.slice(1), false);
+      } else {
+        // if no hash, scroll to top (optional)
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
+
   return (
-    <div className="bg-slate-900 text-white pb-4 pt-3 top-0 z-50">
+    <div className="info-bar bg-slate-900 text-white pb-4 pt-3 top-0 z-50">
       {/* Desktop / Tablet View */}
       <div className="max-w-7xl mx-auto hidden sm:flex justify-center gap-20 flex-wrap">
         {navItems.map(({ label, icon: Icon, target }) => (
