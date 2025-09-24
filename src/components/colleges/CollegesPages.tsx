@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { Card } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -19,7 +19,6 @@ type College = {
   name: string;
   image_url: string;
   location: string;
-  image: string;
   ranking: string;
   placementRate: string;
   avgSalary: number;
@@ -30,20 +29,34 @@ type College = {
   nirf: string;
 };
 
+type FiltersType = {
+  state: string[];
+  stream: string[];
+  instituteType: string[];
+  tag: string[];
+  minFees: string;
+  maxFees: string;
+  minPlacementRate: string;
+  sortBy: string;
+  order: string;
+  searchTerm: string;
+};
+
 export default function CollegesMainPage() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // UI state for showing filters modal on mobile
+  const perPage = 9;
+
+  // UI state for filter modal on mobile
   const [showFilters, setShowFilters] = useState(false);
 
-  // Local state for UI form controls reflecting URL params
-  const [filters, setFilters] = useState({
-    state: [] as string[],
-    stream: [] as string[],
-    instituteType: [] as string[],
-    tag: [] as string[],
+  const [filters, setFilters] = useState<FiltersType>({
+    state: [],
+    stream: [],
+    instituteType: [],
+    tag: [],
     minFees: "",
     maxFees: "",
     minPlacementRate: "",
@@ -53,15 +66,14 @@ export default function CollegesMainPage() {
   });
 
   const [page, setPage] = useState(1);
-  const perPage = 9;
 
   const [colleges, setColleges] = useState<College[]>([]);
   const [totalColleges, setTotalColleges] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  // Utility: parse canonic filters from URLSearchParams
-  function parseFiltersFromParams(params: URLSearchParams) {
-    return {
+  // Parse filters from URL params
+  const parseFiltersFromParams = useCallback(
+    (params: URLSearchParams): FiltersType => ({
       state: params.get("state")?.split(",").filter(Boolean) || [],
       stream: params.get("stream")?.split(",").filter(Boolean) || [],
       instituteType:
@@ -73,39 +85,35 @@ export default function CollegesMainPage() {
       sortBy: params.get("sortBy") || "",
       order: params.get("order") || "",
       searchTerm: params.get("searchTerm") || "",
-    };
-  }
+    }),
+    []
+  );
 
-  // Utility: parse current page from URLSearchParams
-  function parsePageFromParams(params: URLSearchParams) {
-    const p = parseInt(params.get("page") ?? "1", 10);
-    return isNaN(p) || p < 1 ? 1 : p;
-  }
+  // Parse page number with fallback
+  const parsePageFromParams = useCallback((params: URLSearchParams): number => {
+    const p = Number(params.get("page"));
+    return Number.isInteger(p) && p > 0 ? p : 1;
+  }, []);
 
-  // Whenever URL query parameters change, parse them and update filter state + page,
-  // then fetch data using the exact URL query parameters.
+  // Effect: Sync filters and page state to URL search params on URL change
   useEffect(() => {
     if (!searchParams) return;
 
     const params = new URLSearchParams(searchParams.toString());
 
-    // Parse filter values from URL
     const parsedFilters = parseFiltersFromParams(params);
     setFilters(parsedFilters);
 
-    // Parse page number
-    const parsedPage = parsePageFromParams(params);
-    setPage(parsedPage);
+    setPage(parsePageFromParams(params));
 
-    // Fetch colleges with exact URL query params
     fetchColleges(params);
-  }, [searchParams]); // Whenever URL changes, this effect runs
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
-  // Fetch colleges API call using given URLSearchParams directly
+  // Fetch colleges API
   const fetchColleges = async (params: URLSearchParams) => {
     setLoading(true);
     try {
-      // Convert URLSearchParams to key-value object for API call
       const apiParams: Record<string, string> = {};
       params.forEach((value, key) => {
         apiParams[key] = value;
@@ -122,84 +130,112 @@ export default function CollegesMainPage() {
       setTotalColleges(response.data.totalCount);
     } catch (error) {
       console.error("Failed to fetch colleges:", error);
+      setColleges([]);
+      setTotalColleges(0);
     } finally {
       setLoading(false);
     }
   };
 
-  // Update URL by pushing new query params - this triggers the above useEffect,
-  // which syncs filter state and fetches data from backend according to URL.
-  // So this is the ONLY place we update the URL params on filter/page change.
-  const updateUrlWithFilters = (
-    newFilters: typeof filters,
-    newPage: number
-  ) => {
-    const params = new URLSearchParams();
+  // Update URL params (push replace without scrolling)
+  const updateUrlWithFilters = useCallback(
+    (newFilters: FiltersType, newPage: number) => {
+      const params = new URLSearchParams();
 
-    if (newFilters.state.length)
-      params.set("state", newFilters.state.join(","));
-    if (newFilters.stream.length)
-      params.set("stream", newFilters.stream.join(","));
-    if (newFilters.instituteType.length)
-      params.set("instituteType", newFilters.instituteType.join(","));
-    if (newFilters.tag.length) params.set("tag", newFilters.tag.join(","));
-    if (newFilters.minFees) params.set("minFees", newFilters.minFees);
-    if (newFilters.maxFees) params.set("maxFees", newFilters.maxFees);
-    if (newFilters.minPlacementRate)
-      params.set("minPlacementRate", newFilters.minPlacementRate);
-    if (newFilters.sortBy) params.set("sortBy", newFilters.sortBy);
-    if (newFilters.order) params.set("order", newFilters.order);
-    if (newFilters.searchTerm) params.set("searchTerm", newFilters.searchTerm);
+      // Helper to set array params
+      const setArrayParam = (
+        key: keyof FiltersType,
+        arr: readonly string[]
+      ) => {
+        if (arr.length) params.set(key, arr.join(","));
+      };
 
-    params.set("page", newPage.toString());
-    params.set("limit", perPage.toString());
+      setArrayParam("state", newFilters.state);
+      setArrayParam("stream", newFilters.stream);
+      setArrayParam("instituteType", newFilters.instituteType);
+      setArrayParam("tag", newFilters.tag);
 
-    // Replace URL without scrolling - user can share/bookmark this URL with applied filters and page
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+      if (newFilters.minFees) params.set("minFees", newFilters.minFees);
+      if (newFilters.maxFees) params.set("maxFees", newFilters.maxFees);
+      if (newFilters.minPlacementRate)
+        params.set("minPlacementRate", newFilters.minPlacementRate);
+      if (newFilters.sortBy) params.set("sortBy", newFilters.sortBy);
+      if (newFilters.order) params.set("order", newFilters.order);
+      if (newFilters.searchTerm)
+        params.set("searchTerm", newFilters.searchTerm);
+
+      params.set("page", newPage.toString());
+      params.set("limit", perPage.toString());
+
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    },
+    [pathname, router, perPage]
+  );
+
+  // Toggle filters for categories that are arrays
+  const toggleFilter = useCallback(
+    (category: keyof FiltersType, value: string) => {
+      if (!["state", "stream", "instituteType", "tag"].includes(category))
+        return;
+
+      setFilters((prev) => {
+        const current = prev[category] as string[];
+        const updated = current.includes(value)
+          ? current.filter((v) => v !== value)
+          : [...current, value];
+
+        const newFilters = { ...prev, [category]: updated };
+        updateUrlWithFilters(newFilters, 1);
+        return newFilters;
+      });
+    },
+    [updateUrlWithFilters]
+  );
+
+  // Handle input change for string values (minFees, searchTerm etc)
+  const handleInputChange = useCallback(
+    (category: keyof FiltersType, value: string) => {
+      setFilters((prev) => {
+        const newFilters = {
+          ...prev,
+          [category]: category === "searchTerm" ? value.trimStart() : value,
+        };
+
+        // Immediately update URL and fetch on filters other than searchTerm
+        if (category !== "searchTerm") {
+          updateUrlWithFilters(newFilters, 1);
+        }
+
+        return newFilters;
+      });
+    },
+    [updateUrlWithFilters]
+  );
+
+  const handleSearchClick = () => {
+    // Ensure final trimmed value before searching
+    const cleanedFilters = {
+      ...filters,
+      searchTerm: filters.searchTerm.trim(),
+    };
+    updateUrlWithFilters(cleanedFilters, 1);
   };
 
-  // Handlers: On filter toggles or input changes,
-  // we build a new filter object, reset page to 1, then update URL with new filters.
-  function toggleFilter(category: keyof typeof filters, value: string) {
-    // Copy current filters and toggle the category value (array field)
-    let updatedValues: string[] = [];
-    if (
-      category === "state" ||
-      category === "stream" ||
-      category === "instituteType" ||
-      category === "tag"
-    ) {
-      const current = filters[category] as string[];
-      updatedValues = current.includes(value)
-        ? current.filter((v) => v !== value)
-        : [...current, value];
-    }
+  // Change page handler
+  const changePage = useCallback(
+    (newPage: number) => {
+      if (newPage !== page) {
+        updateUrlWithFilters(filters, newPage);
+      }
+    },
+    [filters, page, updateUrlWithFilters]
+  );
 
-    const newFilters = {
-      ...filters,
-      [category]: updatedValues,
-    };
-
-    updateUrlWithFilters(newFilters, 1); // reset page to 1 on filter change
-  }
-
-  function handleInputChange(category: keyof typeof filters, value: string) {
-    const newFilters = {
-      ...filters,
-      [category]: value,
-    };
-
-    updateUrlWithFilters(newFilters, 1); // reset page to 1 on filter/input change
-  }
-
-  // Pagination handler updates page number only in URL
-  function changePage(newPage: number) {
-    if (newPage !== page) {
-      updateUrlWithFilters(filters, newPage);
-    }
-  }
-
-  const totalPages = Math.max(1, Math.ceil(totalColleges / perPage));
+  // Memoized total pages
+  const totalPages = useMemo(
+    () => Math.max(1, Math.ceil(totalColleges / perPage)),
+    [totalColleges, perPage]
+  );
 
   return (
     <div className="min-h-screen bg-white">
@@ -217,7 +253,7 @@ export default function CollegesMainPage() {
           </div>
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row gap-3 md:gap-4 bg-white p-4 rounded-xl shadow-lg border border-slate-200">
-              <div className="flex-1 relative">
+              <div className="flex-1 relative flex items-center">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
                 <Input
                   placeholder="Search colleges..."
@@ -226,7 +262,14 @@ export default function CollegesMainPage() {
                     handleInputChange("searchTerm", e.target.value)
                   }
                   className="pl-10 border-0 focus:ring-0 text-base md:text-lg"
+                  aria-label="Search colleges"
                 />
+                <button
+                  className="ml-2 px-4 py-2 bg-slate-900 text-white rounded-lg text-sm md:text-base hover:bg-slate-800 transition-colors"
+                  onClick={handleSearchClick}
+                >
+                  Search
+                </button>
               </div>
             </div>
           </div>
@@ -234,40 +277,54 @@ export default function CollegesMainPage() {
       </section>
 
       {/* Content */}
-      <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+      <main className="mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar Filters - desktop */}
-          <div className="hidden lg:block w-64 flex-shrink-0">
+          <aside
+            className="hidden lg:block w-64 flex-shrink-0"
+            aria-label="Filters"
+          >
             <Filters
               filters={filters}
               toggleFilter={toggleFilter}
               handleInputChange={handleInputChange}
             />
-          </div>
+          </aside>
 
           {/* Mobile Filters Modal */}
           {showFilters && (
-            <div className="fixed inset-0 z-40 bg-black/50 flex justify-end">
-              <div className="bg-white w-72 p-4 overflow-y-auto shadow-lg">
-                <div className="flex justify-between items-center mb-6">
+            <div
+              className="fixed inset-0 z-40 bg-black/50 flex justify-end"
+              role="dialog"
+              aria-modal="true"
+            >
+              <section
+                className="bg-white w-72 p-4 overflow-y-auto shadow-lg"
+                aria-label="Filter options"
+              >
+                <header className="flex justify-between items-center mb-6">
                   <h3 className="font-semibold text-slate-900">Filters</h3>
-                  <Button variant="ghost" onClick={() => setShowFilters(false)}>
+                  <Button
+                    variant="ghost"
+                    onClick={() => setShowFilters(false)}
+                    aria-label="Close filters"
+                  >
                     <X className="h-5 w-5" />
                   </Button>
-                </div>
+                </header>
                 <Filters
                   filters={filters}
                   toggleFilter={toggleFilter}
                   handleInputChange={handleInputChange}
                 />
-              </div>
+              </section>
             </div>
           )}
 
           {/* Main Content */}
-          <div className="flex-1">
-            {/* Results header */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-3">
+          <section className="flex-1" aria-live="polite">
+            {/* Results Header */}
+            <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-3">
               <div>
                 <h2 className="text-xl md:text-2xl font-semibold text-slate-900 mb-1">
                   Colleges in India
@@ -282,22 +339,27 @@ export default function CollegesMainPage() {
                   size="sm"
                   onClick={() => setShowFilters(true)}
                   className="lg:hidden"
+                  aria-haspopup="dialog"
+                  aria-expanded={showFilters}
                 >
                   <Filter className="h-4 w-4 mr-2" /> Filters
                 </Button>
               </div>
-            </div>
+            </header>
 
             {/* College Cards Grid */}
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+            <section
+              className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8"
+              aria-label="College results"
+            >
               {loading
-                ? Array(perPage)
-                    .fill(0)
-                    .map((_, idx) => <SkeletonCard key={idx} />)
+                ? Array.from({ length: perPage }).map((_, idx) => (
+                    <SkeletonCard key={idx} />
+                  ))
                 : colleges.map((college) => (
                     <CollegeCard key={college._id} college={college} />
                   ))}
-            </div>
+            </section>
 
             {/* Pagination UI */}
             {totalPages > 1 && (
@@ -307,24 +369,13 @@ export default function CollegesMainPage() {
                 onPageChange={changePage}
               />
             )}
-          </div>
+          </section>
         </div>
-      </div>
+      </main>
       <Footer />
     </div>
   );
 }
-
-type FiltersType = {
-  state: string[];
-  stream: string[];
-  instituteType: string[];
-  tag: string[];
-  minFees: string;
-  maxFees: string;
-  minPlacementRate: string;
-  searchTerm: string;
-};
 
 type FiltersProps = {
   filters: FiltersType;
@@ -332,192 +383,235 @@ type FiltersProps = {
   handleInputChange: (category: keyof FiltersType, value: string) => void;
 };
 
+const STATES = [
+  "Andhra-Pradesh",
+  "Arunachal-Pradesh",
+  "Assam",
+  "Bihar",
+  "Chhattisgarh",
+  "Goa",
+  "Gujarat",
+  "Haryana",
+  "Himachal-Pradesh",
+  "Jharkhand",
+  "Karnataka",
+  "Kerala",
+  "Madhya-Pradesh",
+  "Maharashtra",
+  "Manipur",
+  "Meghalaya",
+  "Mizoram",
+  "Nagaland",
+  "Odisha",
+  "Punjab",
+  "Rajasthan",
+  "Sikkim",
+  "Tamil-Nadu",
+  "Telangana",
+  "Tripura",
+  "Uttar-Pradesh",
+  "Uttarakhand",
+  "West-Bengal",
+  "Andaman-and-Nicobar-Islands",
+  "Chandigarh",
+  "Delhi",
+  "Jammu-and-Kashmir",
+  "Ladakh",
+  "Lakshadweep",
+  "Puducherry",
+];
+
+const FILTER_OPTIONS = {
+  feeLimits: [
+    { label: "< ₹1 Lakh", value: "100000" },
+    { label: "< ₹5 Lakh", value: "500000" },
+    { label: "< ₹10 Lakh", value: "1000000" },
+    { label: "< ₹15 Lakh", value: "1500000" },
+  ],
+  streams: ["Engineering", "Medical", "Management"],
+  instituteTypes: ["Private", "Govt", "Deemed"],
+  tags: ["IIT", "NIT", "IIIT", "GFTI", "Private", "State", "AIIMS", "Other"],
+};
+
 function Filters({ filters, toggleFilter, handleInputChange }: FiltersProps) {
-  function isChecked(category: keyof typeof filters, value: string) {
-    return filters[category].includes(value);
-  }
+  const isChecked = useCallback(
+    (category: keyof FiltersType, value: string) =>
+      filters[category].includes(value),
+    [filters]
+  );
 
   return (
-    <Card className="border border-slate-200 shadow-sm">
+    <Card
+      className="border border-slate-200 shadow-sm"
+      role="region"
+      aria-labelledby="filter-heading"
+    >
       <div className="p-6 space-y-8">
         {/* Location */}
-        <div>
-          <h4 className="font-medium text-slate-900 mb-4">Location (State)</h4>
+        <section aria-labelledby="filter-location-heading">
+          <h4
+            id="filter-location-heading"
+            className="font-medium text-slate-900 mb-4"
+          >
+            Location (State)
+          </h4>
           <div className="space-y-3 max-h-40 overflow-y-auto pr-2">
-            {[
-              "Andhra-Pradesh",
-              "Arunachal-Pradesh",
-              "Assam",
-              "Bihar",
-              "Chhattisgarh",
-              "Goa",
-              "Gujarat",
-              "Haryana",
-              "Himachal-Pradesh",
-              "Jharkhand",
-              "Karnataka",
-              "Kerala",
-              "Madhya-Pradesh",
-              "Maharashtra",
-              "Manipur",
-              "Meghalaya",
-              "Mizoram",
-              "Nagaland",
-              "Odisha",
-              "Punjab",
-              "Rajasthan",
-              "Sikkim",
-              "Tamil-Nadu",
-              "Telangana",
-              "Tripura",
-              "Uttar-Pradesh",
-              "Uttarakhand",
-              "West-Bengal",
-              "Andaman-and-Nicobar-Islands",
-              "Chandigarh",
-              "Delhi",
-              "Jammu-and-Kashmir",
-              "Ladakh",
-              "Lakshadweep",
-              "Puducherry",
-            ].map((loc) => (
-              <div key={loc} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`state-${loc.toLowerCase().replace(/\s/g, "")}`}
-                  checked={isChecked("state", loc)}
-                  onCheckedChange={() => toggleFilter("state", loc)}
-                />
-                <label
-                  htmlFor={`state-${loc.toLowerCase().replace(/\s/g, "")}`}
-                  className="text-sm"
-                >
-                  {loc.replace(/-/g, " ")}
-                </label>
-              </div>
-            ))}
+            {STATES.map((loc) => {
+              const id = `state-${loc.toLowerCase().replace(/\s/g, "")}`;
+              return (
+                <div key={loc} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={id}
+                    checked={isChecked("state", loc)}
+                    onCheckedChange={() => toggleFilter("state", loc)}
+                  />
+                  <label htmlFor={id} className="text-sm">
+                    {loc.replace(/-/g, " ")}
+                  </label>
+                </div>
+              );
+            })}
           </div>
-        </div>
+        </section>
         <Separator />
 
         {/* Total Fees */}
-        <div>
-          <h4 className="font-medium text-slate-900 mb-4">Total Fees</h4>
+        <section aria-labelledby="filter-fees-heading">
+          <h4
+            id="filter-fees-heading"
+            className="font-medium text-slate-900 mb-4"
+          >
+            Total Fees
+          </h4>
           <div className="space-y-2">
-            {[
-              { label: "< ₹1 Lakh", value: "100000" },
-              { label: "< ₹5 Lakh", value: "500000" },
-              { label: "< ₹10 Lakh", value: "1000000" },
-              { label: "< ₹15 Lakh", value: "1500000" },
-            ].map((option) => (
-              <div key={option.value} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`maxFees-${option.value}`}
-                  checked={filters.maxFees === option.value}
-                  onCheckedChange={() =>
-                    handleInputChange(
-                      "maxFees",
-                      filters.maxFees === option.value ? "" : option.value
-                    )
-                  }
-                />
-                <label htmlFor={`maxFees-${option.value}`} className="text-sm">
-                  {option.label}
-                </label>
-              </div>
-            ))}
+            {FILTER_OPTIONS.feeLimits.map((option) => {
+              const id = `maxFees-${option.value}`;
+              return (
+                <div key={option.value} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={id}
+                    checked={filters.maxFees === option.value}
+                    onCheckedChange={() =>
+                      handleInputChange(
+                        "maxFees",
+                        filters.maxFees === option.value ? "" : option.value
+                      )
+                    }
+                  />
+                  <label htmlFor={id} className="text-sm">
+                    {option.label}
+                  </label>
+                </div>
+              );
+            })}
           </div>
-        </div>
+        </section>
         <Separator />
 
         {/* Stream */}
-        <div>
-          <h4 className="font-medium text-slate-900 mb-4">Stream</h4>
+        <section aria-labelledby="filter-stream-heading">
+          <h4
+            id="filter-stream-heading"
+            className="font-medium text-slate-900 mb-4"
+          >
+            Stream
+          </h4>
           <div className="space-y-3">
-            {["Engineering", "Medical", "Management"].map((stream) => (
-              <div key={stream} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`stream-${stream.toLowerCase()}`}
-                  checked={isChecked("stream", stream)}
-                  onCheckedChange={() => toggleFilter("stream", stream)}
-                />
-                <label
-                  htmlFor={`stream-${stream.toLowerCase()}`}
-                  className="text-sm"
-                >
-                  {stream}
-                </label>
-              </div>
-            ))}
+            {FILTER_OPTIONS.streams.map((stream) => {
+              const id = `stream-${stream.toLowerCase()}`;
+              return (
+                <div key={stream} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={id}
+                    checked={isChecked("stream", stream)}
+                    onCheckedChange={() => toggleFilter("stream", stream)}
+                  />
+                  <label htmlFor={id} className="text-sm">
+                    {stream}
+                  </label>
+                </div>
+              );
+            })}
           </div>
-        </div>
+        </section>
         <Separator />
 
         {/* Institute Type */}
-        <div>
-          <h4 className="font-medium text-slate-900 mb-4">Institute Type</h4>
+        <section aria-labelledby="filter-institute-heading">
+          <h4
+            id="filter-institute-heading"
+            className="font-medium text-slate-900 mb-4"
+          >
+            Institute Type
+          </h4>
           <div className="space-y-3">
-            {["Private", "Govt", "Deemed"].map((inst) => (
-              <div key={inst} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`instituteType-${inst.toLowerCase()}`}
-                  checked={isChecked("instituteType", inst)}
-                  onCheckedChange={() => toggleFilter("instituteType", inst)}
-                />
-                <label
-                  htmlFor={`instituteType-${inst.toLowerCase()}`}
-                  className="text-sm"
-                >
-                  {inst}
-                </label>
-              </div>
-            ))}
+            {FILTER_OPTIONS.instituteTypes.map((inst) => {
+              const id = `instituteType-${inst.toLowerCase()}`;
+              return (
+                <div key={inst} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={id}
+                    checked={isChecked("instituteType", inst)}
+                    onCheckedChange={() => toggleFilter("instituteType", inst)}
+                  />
+                  <label htmlFor={id} className="text-sm">
+                    {inst}
+                  </label>
+                </div>
+              );
+            })}
           </div>
-        </div>
+        </section>
         <Separator />
 
         {/* Tag */}
-        <div>
-          <h4 className="font-medium text-slate-900 mb-4">Tag</h4>
+        <section aria-labelledby="filter-tag-heading">
+          <h4
+            id="filter-tag-heading"
+            className="font-medium text-slate-900 mb-4"
+          >
+            Tag
+          </h4>
           <div className="space-y-3">
-            {[
-              "IIT",
-              "NIT",
-              "IIIT",
-              "GFTI",
-              "Private",
-              "State",
-              "AIIMS",
-              "Other",
-            ].map((tag) => (
-              <div key={tag} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`tag-${tag.toLowerCase()}`}
-                  checked={isChecked("tag", tag)}
-                  onCheckedChange={() => toggleFilter("tag", tag)}
-                />
-                <label htmlFor={`tag-${tag.toLowerCase()}`} className="text-sm">
-                  {tag}
-                </label>
-              </div>
-            ))}
+            {FILTER_OPTIONS.tags.map((tag) => {
+              const id = `tag-${tag.toLowerCase()}`;
+              return (
+                <div key={tag} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={id}
+                    checked={isChecked("tag", tag)}
+                    onCheckedChange={() => toggleFilter("tag", tag)}
+                  />
+                  <label htmlFor={id} className="text-sm">
+                    {tag}
+                  </label>
+                </div>
+              );
+            })}
           </div>
-        </div>
+        </section>
         <Separator />
 
         {/* Min Placement Rate */}
-        <div>
-          <h4 className="font-medium text-slate-900 mb-4">
+        <section aria-labelledby="filter-placement-heading">
+          <h4
+            id="filter-placement-heading"
+            className="font-medium text-slate-900 mb-4"
+          >
             Minimum Placement Rate (%)
           </h4>
           <Input
             type="number"
+            min={0}
+            max={100}
             placeholder="e.g., 80"
             value={filters.minPlacementRate}
             onChange={(e) =>
               handleInputChange("minPlacementRate", e.target.value)
             }
+            aria-label="Minimum Placement Rate in percent"
           />
-        </div>
+        </section>
       </div>
     </Card>
   );
@@ -525,25 +619,25 @@ function Filters({ filters, toggleFilter, handleInputChange }: FiltersProps) {
 
 // --- College Card ---
 function CollegeCard({ college }: { college: College }) {
-  const router = useRouter();
-  const goToDetails = () => {
-    router.push(`/college/${college.slug}`);
-  };
-
   return (
-    <Card className="border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-      <div>
-        <Link href={`/college/${college.slug}`}>
-          <div className="aspect-video w-full overflow-hidden rounded-t-lg cursor-pointer">
-            <Image
-              src={college.image_url}
-              alt={college.name}
-              width={800}
-              height={600}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        </Link>
+    <Card
+      className="border border-slate-200 shadow-sm hover:shadow-md transition-shadow"
+      tabIndex={0}
+      aria-label={`College: ${college.name}`}
+    >
+      <Link
+        href={`/college/${college.slug}`}
+        className="block focus:outline-none focus:ring-2 focus:ring-slate-900"
+      >
+        <div className="aspect-video w-full overflow-hidden rounded-t-lg cursor-pointer">
+          <Image
+            src={college.image_url}
+            alt={college.name}
+            width={800}
+            height={600}
+            className="w-full h-full object-cover"
+          />
+        </div>
         <div className="p-4 md:p-6">
           <div className="flex items-start justify-between mb-4">
             <div>
@@ -551,8 +645,8 @@ function CollegeCard({ college }: { college: College }) {
                 {college.name}
               </h3>
               <div className="flex items-center gap-1 text-slate-600 text-xs md:text-sm">
-                <MapPin className="h-4 w-4" />
-                {college.location}
+                <MapPin className="h-4 w-4" aria-hidden="true" />
+                <span>{college.location}</span>
               </div>
             </div>
           </div>
@@ -579,13 +673,13 @@ function CollegeCard({ college }: { college: College }) {
             <Button
               size="sm"
               className="bg-slate-900 hover:bg-slate-800"
-              onClick={goToDetails}
+              aria-label={`View details for ${college.name}`}
             >
               View Details
             </Button>
           </div>
         </div>
-      </div>
+      </Link>
     </Card>
   );
 }
@@ -611,12 +705,12 @@ function DetailBox({
 
 const formatToIndianUnits = (num: number | null | undefined): string => {
   if (num == null || isNaN(Number(num))) return "N/A";
-  if (num >= 10000000) {
-    return `${(num / 10000000).toFixed(1).replace(/\.0$/, "")} Cr`;
-  } else if (num >= 100000) {
-    return `${(num / 100000).toFixed(1).replace(/\.0$/, "")} Lakh`;
-  } else if (num >= 1000) {
-    return `${(num / 1000).toFixed(1).replace(/\.0$/, "")} K`;
+  if (num >= 1e7) {
+    return `${(num / 1e7).toFixed(1).replace(/\.0$/, "")} Cr`;
+  } else if (num >= 1e5) {
+    return `${(num / 1e5).toFixed(1).replace(/\.0$/, "")} Lakh`;
+  } else if (num >= 1e3) {
+    return `${(num / 1e3).toFixed(1).replace(/\.0$/, "")} K`;
   }
   return num.toString();
 };
@@ -624,7 +718,10 @@ const formatToIndianUnits = (num: number | null | undefined): string => {
 // --- Loading Skeleton ---
 function SkeletonCard() {
   return (
-    <div className="border border-slate-200 shadow-sm rounded-lg animate-pulse">
+    <div
+      className="border border-slate-200 shadow-sm rounded-lg animate-pulse"
+      aria-hidden="true"
+    >
       <div className="aspect-video bg-slate-200 rounded-t-lg"></div>
       <div className="p-4 md:p-6 space-y-4">
         <div className="h-5 bg-slate-300 rounded w-3/4"></div>
@@ -641,7 +738,7 @@ function SkeletonCard() {
   );
 }
 
-// --- Pagination UI as in your original code ---
+// --- Pagination UI ---
 function PaginationUI({
   currentPage,
   totalPages,
@@ -659,12 +756,16 @@ function PaginationUI({
   for (let i = start; i <= end; i++) pageNumbers.push(i);
 
   return (
-    <div className="flex justify-center items-center gap-2 mt-10">
+    <nav
+      className="flex justify-center items-center gap-2 mt-10"
+      aria-label="Pagination"
+    >
       <Button
         variant="ghost"
         size="sm"
         disabled={currentPage === 1}
         onClick={() => onPageChange(currentPage - 1)}
+        aria-label="Previous page"
       >
         {"<"}
       </Button>
@@ -674,6 +775,7 @@ function PaginationUI({
           variant={num === currentPage ? "default" : "ghost"}
           size="sm"
           className={num === currentPage ? "font-bold border-slate-900" : ""}
+          aria-current={num === currentPage ? "page" : undefined}
           onClick={() => onPageChange(num)}
         >
           {num}
@@ -684,9 +786,10 @@ function PaginationUI({
         size="sm"
         disabled={currentPage === totalPages}
         onClick={() => onPageChange(currentPage + 1)}
+        aria-label="Next page"
       >
         {">"}
       </Button>
-    </div>
+    </nav>
   );
 }
