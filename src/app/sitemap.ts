@@ -71,6 +71,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       { url: baseUrl, lastModified: new Date() },
       { url: `${baseUrl}/colleges`, lastModified: new Date() },
       { url: `${baseUrl}/news`, lastModified: new Date() },
+      { url: `${baseUrl}/aboutus`, lastModified: new Date() },
+      { url: `https://pncsquare.in/privacy-policy`, lastModified: new Date() },
+      { url: `https://pncsquare.in/help-center`, lastModified: new Date() },
     ];
   }
 }
