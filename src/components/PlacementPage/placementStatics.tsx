@@ -25,7 +25,7 @@ interface PlacementDataItem {
 }
 
 export function PlacementPage({ college }: { college: College }) {
-  const [year, setYear] = useState(2024); // default year
+  const [year, setYear] = useState(2025); // default year
   const [placementStats, setPlacementStats] = useState<{
     totalOffers?: number;
     highestPackage?: number;
@@ -38,7 +38,7 @@ export function PlacementPage({ college }: { college: College }) {
   const [placementData, setPlacementData] = useState<PlacementDataItem[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const years = [2024, 2023, 2022]; // example years
+  const years = [2025, 2024, 2023]; // example years
   const isPlacementRateAvailable = college.isPlacementRateAvailable;
   const isMedianPackageAvailable = college.isMedianPackageAvailable;
   const isHighestPackageAvailable = college.isHighestPackageAvailable;
@@ -104,6 +104,7 @@ export function PlacementPage({ college }: { college: College }) {
       fetchPlacementData();
     }
   }, [college?.slug, year]);
+  console.log("placementData:", placementData);
 
   // Filter out branches with ALL zero/null/undefined values for stats
   const validData = placementData.filter(
@@ -113,6 +114,7 @@ export function PlacementPage({ college }: { college: College }) {
       (item.highestPackageLPA ?? 0) > 0 ||
       (item.medianPackageLPA ?? 0) > 0
   );
+  console.log("validData:----", validData);
 
   // Calculate overall stats using only validData
   const overallPlacement = validData.length
@@ -268,9 +270,7 @@ export function PlacementPage({ college }: { college: College }) {
                     ))}
                   {/* Overall Row */}
                   <div className="flex justify-between items-center py-3 bg-slate-50 px-4 rounded-lg border border-slate-200 mt-4">
-                    <span className="font-medium text-slate-900">
-                      Overall (B.Tech)
-                    </span>
+                    <span className="font-medium text-slate-900">Overall</span>
                     <span className="font-semibold text-blue-700">
                       {overallPlacement}%
                     </span>
@@ -461,7 +461,7 @@ export function PlacementPage({ college }: { college: College }) {
       </section> */}
 
       {/* Top Recruiters Section */}
-      <TopRecruiters slug={college?.slug} year={year} />
+      {/* <TopRecruiters slug={college?.slug} year={year} /> */}
     </div>
   );
 }
