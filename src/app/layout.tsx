@@ -10,6 +10,9 @@ export const metadata: Metadata = {
     shortcut: "/favicon.ico",
     apple: "/favicon.ico", // Optional for Apple devices
   },
+  alternates: {
+    canonical: "https://pncsquare.in/",
+  },
 };
 
 export default function RootLayout({
