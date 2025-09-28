@@ -6,6 +6,7 @@ import { Input } from "../ui/input";
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import Image from "next/image";
 
 export function Header() {
   const pathname = usePathname();
@@ -39,11 +40,19 @@ export function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
+            {/* <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">p&c</span>
-            </div>
+            </div> */}
+            <Image
+              src="/image/logo.png"
+              alt="PNC Square Logo"
+              width={40}
+              height={40}
+              className="w-10 h-10 rounded-lg"
+            />
+
             <div className="flex flex-col">
-              <div className="font-bold text-slate-900 text-lg">P&C Square</div>
+              <div className="font-bold text-slate-900 text-lg">PNC Square</div>
               <div className="text-xs text-gray-500">
                 Find Your Dream College
               </div>
