@@ -1,6 +1,7 @@
 import "./globals.css";
 import { Header as Navbar } from "@/components/common/Navbar";
 import type { Metadata } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
 
 export const metadata: Metadata = {
   title: "P&C square - College & Exam Finder",
@@ -21,11 +22,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="bg-gray-50 text-gray-900">
-        <Navbar />
-        <main className="mx-auto">{children}</main>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body className="bg-gray-50 text-gray-900">
+          <Navbar />
+          <main className="mx-auto">{children}</main>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

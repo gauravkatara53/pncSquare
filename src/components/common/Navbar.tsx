@@ -7,13 +7,15 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
+import { useUser } from "@clerk/nextjs";
+import AuthPopup from "./AuthPopup";
 
 export function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const { user } = useUser();
   const navItems = [
     { name: "Colleges", id: "colleges", href: "/colleges" },
     { name: "Courses", id: "courses", href: "/courses" },
@@ -22,8 +24,9 @@ export function Header() {
     { name: "Cutoffs", id: "cutoff", href: "/cutoff" },
     { name: "News", id: "news", href: "/news" },
   ];
+  const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState<"signIn" | "signUp">("signIn");
 
-  // Form submit handler for search
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchTerm.trim()) {
@@ -40,9 +43,6 @@ export function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            {/* <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">p&c</span>
-            </div> */}
             <Image
               src="/image/logo.png"
               alt="PNC Square Logo"
@@ -50,7 +50,6 @@ export function Header() {
               height={40}
               className="w-10 h-10 rounded-lg"
             />
-
             <div className="flex flex-col">
               <div className="font-bold text-slate-900 text-lg">PNC Square</div>
               <div className="text-xs text-gray-500">
@@ -79,20 +78,37 @@ export function Header() {
           </form>
 
           {/* Desktop Buttons */}
-          <div className="hidden md:flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-gray-900 hover:text-gray-900"
-            >
-              <User className="w-4 h-4 mr-2" />
-              Sign Up
-            </Button>
-          </div>
+          {user ? (
+            <div className="hidden md:flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-gray-900 hover:text-gray-900"
+              >
+                <User className="w-4 h-4 mr-2" />
+                {user.firstName}
+              </Button>
+            </div>
+          ) : (
+            <div className="hidden md:flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-gray-900 hover:text-gray-900"
+                onClick={() => {
+                  setMode("signIn"); // open sign in modal by default
+                  setOpen(true);
+                }}
+              >
+                <User className="w-4 h-4 mr-2" />
+                Sign In
+              </Button>
+            </div>
+          )}
 
           {/* Mobile Menu */}
           <div className="flex items-center gap-2 md:hidden">
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" onClick={() => setOpen(true)}>
               <User className="w-6 h-6" />
             </Button>
             <Button
@@ -109,7 +125,6 @@ export function Header() {
       {/* Navigation */}
       <div className="bg-slate-900 border-t">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Desktop Nav */}
           <nav className="hidden md:flex space-x-6 py-3 overflow-x-auto">
             {navItems.map((item) => {
               const isActive = pathname?.startsWith(item.href) ?? false;
@@ -153,6 +168,9 @@ export function Header() {
           )}
         </div>
       </div>
+
+      {/* Auth Popup */}
+      <AuthPopup open={open} setOpen={setOpen} mode={mode} setMode={setMode} />
     </header>
   );
 }

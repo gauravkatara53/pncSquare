@@ -1,57 +1,20 @@
-// src/api/apiService.ts
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import axios, { AxiosInstance, AxiosResponse } from "axios";
 
-// Set your main API URL. Use environment variable for flexibility.
-// const BASE_URL =
-//   typeof window === "undefined"
-//     ? "http://localhost:3000/api/v1" // SSR/Node side
-//     : "/api/v1"; // Browser side
 const isServer = typeof window === "undefined";
 
 const BASE_URL = isServer
-  ? process.env.API_INTERNAL_URL || "https://pnc-backend.onrender.com/api/v1" // server side uses full URL
-  : "/api/v1"; // client side uses relative URL to utilize Next.js rewrite
-
-// process.env.NEXT_PUBLIC_API_URL ||
+  ? process.env.API_INTERNAL_URL || "https://pnc-backend.onrender.com/api/v1"
+  : "/api/v1";
 
 const api: AxiosInstance = axios.create({
   baseURL: BASE_URL,
-  timeout: 60000, // 60 seconds timeout
+  timeout: 60000,
   headers: {
     "Content-Type": "application/json",
   },
   withCredentials: true,
 });
 
-// Request Interceptor for logging, auth, etc.
-// Removed unnecessary empty interface; use AxiosRequestConfig directly.
-
-interface RequestInterceptorError {
-  message: string;
-  config?: AxiosRequestConfig;
-  code?: string;
-  request?: unknown;
-  response?: AxiosResponse;
-  isAxiosError?: boolean;
-  toJSON?: () => object;
-}
-
-api.interceptors.request.use(
-  (
-    config: import("axios").InternalAxiosRequestConfig
-  ): import("axios").InternalAxiosRequestConfig => {
-    if (process.env.NODE_ENV === "development") {
-      console.log("🔄 Making request to:", config.url);
-    }
-    return config;
-  },
-  (error: RequestInterceptorError): Promise<RequestInterceptorError> =>
-    Promise.reject(error)
-);
-
-// Optional: Add refresh token/401 logic here, as needed for authentication.
-
-// Generic typed API service
 export interface ApiService {
   get<T = unknown>(url: string, params?: object): Promise<T>;
   post<T = unknown>(url: string, data: unknown, config?: object): Promise<T>;
