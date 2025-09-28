@@ -3,7 +3,7 @@ import { auth } from "@clerk/nextjs/server"; // ✅ safe in server file
 
 const BASE_URL =
   process.env.API_INTERNAL_URL || "https://pnc-backend.onrender.com/api/v1";
-// check
+
 const api: AxiosInstance = axios.create({
   baseURL: BASE_URL,
   timeout: 60000,
