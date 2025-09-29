@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { SignIn, SignUp } from "@clerk/nextjs";
+import { SignIn } from "@clerk/nextjs";
 
 interface AuthPopupProps {
   open: boolean;
@@ -43,37 +43,10 @@ export default function AuthPopup({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div
-        ref={popupRef}
-        className="p-6 rounded-xl w-[400px] relative bg-white"
-      >
-        {mode === "signIn" ? (
-          <div>
-            <SignIn routing="hash" afterSignInUrl="/" />
-            <p className="text-sm text-center mt-2">
-              Don’t have an account?{" "}
-              <button
-                onClick={() => setMode("signUp")}
-                className="text-blue-600 hover:underline"
-              >
-                Sign up
-              </button>
-            </p>
-          </div>
-        ) : (
-          <div>
-            <SignUp routing="hash" afterSignUpUrl="/" />
-            <p className="text-sm text-center mt-2">
-              Already have an account?{" "}
-              <button
-                onClick={() => setMode("signIn")}
-                className="text-blue-600 hover:underline"
-              >
-                Sign in
-              </button>
-            </p>
-          </div>
-        )}
+      <div ref={popupRef} className="p-6 rounded-xl w-[400px] relative">
+        <div>
+          <SignIn routing="hash" afterSignInUrl="/" />
+        </div>
       </div>
     </div>
   );
