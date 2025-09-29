@@ -6,8 +6,7 @@ export default function SignInPage() {
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-50">
       <div className="p-8 bg-white rounded shadow-md w-[400px]">
-        {/* <SignIn routing="hash" signUpUrl="/signup" /> */}
-        <h1>hello</h1>
+        <SignIn path="/signin" routing="path" signUpUrl="/signup" />
       </div>
     </div>
   );
