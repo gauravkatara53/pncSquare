@@ -7,15 +7,15 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-// import { useUser } from "@clerk/nextjs";
-// import AuthPopup from "./AuthPopup";
+import { useUser } from "@clerk/nextjs";
+import AuthPopup from "./AuthPopup";
 
 export function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  // const { user } = useUser();
+  const { user } = useUser();
   const navItems = [
     { name: "Colleges", id: "colleges", href: "/colleges" },
     { name: "Courses", id: "courses", href: "/courses" },
@@ -78,7 +78,7 @@ export function Header() {
           </form>
 
           {/* Desktop Buttons */}
-          {/* {user ? (
+          {user ? (
             <div className="hidden md:flex items-center gap-4">
               <Button
                 variant="ghost"
@@ -104,21 +104,7 @@ export function Header() {
                 Sign In
               </Button>
             </div>
-          )} */}
-          <div className="hidden md:flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-gray-900 hover:text-gray-900"
-              onClick={() => {
-                setMode("signIn"); // open sign in modal by default
-                setOpen(true);
-              }}
-            >
-              <User className="w-4 h-4 mr-2" />
-              Sign In
-            </Button>
-          </div>
+          )}
 
           {/* Mobile Menu */}
           <div className="flex items-center gap-2 md:hidden">
@@ -184,7 +170,7 @@ export function Header() {
       </div>
 
       {/* Auth Popup */}
-      {/* <AuthPopup open={open} setOpen={setOpen} mode={mode} setMode={setMode} /> */}
+      <AuthPopup open={open} setOpen={setOpen} mode={mode} setMode={setMode} />
     </header>
   );
 }
