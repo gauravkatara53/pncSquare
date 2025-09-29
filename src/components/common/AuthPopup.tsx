@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { SignIn, SignUp } from "@clerk/nextjs";
 
 interface AuthPopupProps {
@@ -15,32 +16,64 @@ export default function AuthPopup({
   mode,
   setMode,
 }: AuthPopupProps) {
+  const popupRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        popupRef.current &&
+        !popupRef.current.contains(event.target as Node)
+      ) {
+        setOpen(false);
+      }
+    }
+
+    if (open) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [open, setOpen]);
+
   if (!open) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-xl w-[400px] relative">
-        <button
-          className="absolute top-3 right-3 text-gray-500"
-          onClick={() => setOpen(false)}
-          aria-label="Close authentication popup"
-        >
-          ✖
-        </button>
-
+      <div
+        ref={popupRef}
+        className="p-6 rounded-xl w-[400px] relative bg-white"
+      >
         {mode === "signIn" ? (
-          <SignIn routing="hash" signUpUrl="/sign-up" afterSignInUrl="/" />
+          <div>
+            <SignIn routing="hash" afterSignInUrl="/" />
+            <p className="text-sm text-center mt-2">
+              Don’t have an account?{" "}
+              <button
+                onClick={() => setMode("signUp")}
+                className="text-blue-600 hover:underline"
+              >
+                Sign up
+              </button>
+            </p>
+          </div>
         ) : (
-          <SignUp routing="hash" signInUrl="/sign-in" afterSignUpUrl="/" />
+          <div>
+            <SignUp routing="hash" afterSignUpUrl="/" />
+            <p className="text-sm text-center mt-2">
+              Already have an account?{" "}
+              <button
+                onClick={() => setMode("signIn")}
+                className="text-blue-600 hover:underline"
+              >
+                Sign in
+              </button>
+            </p>
+          </div>
         )}
-
-        <button
-          className="mt-4 text-blue-600 underline"
-          onClick={() => setMode(mode === "signIn" ? "signUp" : "signIn")}
-          aria-label="Toggle sign in / sign up"
-        >
-          {mode === "signIn" ? "Create an account" : "Already have an account?"}
-        </button>
       </div>
     </div>
   );
