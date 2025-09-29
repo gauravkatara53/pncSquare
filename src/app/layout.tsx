@@ -22,13 +22,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
-      <html lang="en">
-        <body className="bg-gray-50 text-gray-900">
-          <Navbar />
-          <main className="mx-auto">{children}</main>
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en">
+      <body className="bg-gray-50 text-gray-900">
+        <Navbar />
+        <main className="mx-auto">{children}</main>
+      </body>
+    </html>
   );
 }
