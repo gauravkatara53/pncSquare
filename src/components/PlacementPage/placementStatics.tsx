@@ -461,7 +461,7 @@ export function PlacementPage({ college }: { college: College }) {
       </section> */}
 
       {/* Top Recruiters Section */}
-      {/* <TopRecruiters slug={college?.slug} year={year} /> */}
+      <TopRecruiters slug={college?.slug} year={year} />
     </div>
   );
 }
