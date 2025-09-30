@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Card } from "../ui/card";
 import { Badge } from "../ui/badge";
-import { Building2, MapPin, Users } from "lucide-react";
+import { Users, MapPin } from "lucide-react";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
 import { apiService } from "../../ApiService/apiService";
 
@@ -50,7 +50,6 @@ function RecruiterCard({
           width={48}
           height={48}
         />
-
         <div className="flex-1 min-w-0">
           <h4 className="font-semibold text-gray-900 truncate">{name}</h4>
           <Badge variant="secondary" className="mb-2 text-xs">
@@ -118,6 +117,13 @@ export function TopRecruiters({ slug, year }: TopRecruitersProps) {
     fetchRecruiters();
   }, [slug, year]);
 
+  const noDataAvailable =
+    !loading && (recruiters.length === 0 || !summaryStats.totalRecruiters);
+
+  if (noDataAvailable) {
+    return null; // Hide entire section if no data for the year
+  }
+
   return (
     <Card className="px-2 sm:px-6 py-4 sm:py-6">
       <div className="flex items-center justify-between mb-6">
@@ -131,25 +137,19 @@ export function TopRecruiters({ slug, year }: TopRecruitersProps) {
 
       <div className="mb-6">
         <ImageWithFallback
-          src={
-            "https://www.krcollege.in/uploads/page/1741761252_placement1.png"
-          }
+          src="https://ik.imagekit.io/ak2ol9uti/PNC-MANUL/banner.png"
           alt="Corporate recruiters"
-          className="w-full h-24 object-cover rounded-lg"
+          className="w-full h-24 object-cover object-center rounded-lg"
         />
       </div>
 
       {loading ? (
         <div className="text-center text-gray-500">Loading recruiters...</div>
-      ) : recruiters.length > 0 ? (
+      ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {recruiters.map((recruiter) => (
             <RecruiterCard key={recruiter._id} {...recruiter} />
           ))}
-        </div>
-      ) : (
-        <div className="text-center text-gray-400 py-8">
-          No recruiter data available for this year.
         </div>
       )}
 

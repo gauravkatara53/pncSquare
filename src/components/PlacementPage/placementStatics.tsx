@@ -39,10 +39,6 @@ export function PlacementPage({ college }: { college: College }) {
   const [loading, setLoading] = useState(false);
 
   const years = [2025, 2024, 2023]; // example years
-  const isPlacementRateAvailable = college.isPlacementRateAvailable;
-  const isMedianPackageAvailable = college.isMedianPackageAvailable;
-  const isHighestPackageAvailable = college.isHighestPackageAvailable;
-  const isAveragePackageAvailable = college.isAveragePackageAvailable;
 
   useEffect(() => {
     async function fetchPlacementData() {
@@ -104,9 +100,8 @@ export function PlacementPage({ college }: { college: College }) {
       fetchPlacementData();
     }
   }, [college?.slug, year]);
-  console.log("placementData:", placementData);
 
-  // Filter out branches with ALL zero/null/undefined values for stats
+  // Filter out branches where all stats are zero or null/undefined
   const validData = placementData.filter(
     (item) =>
       (item.placementPercentage ?? 0) > 0 ||
@@ -114,53 +109,70 @@ export function PlacementPage({ college }: { college: College }) {
       (item.highestPackageLPA ?? 0) > 0 ||
       (item.medianPackageLPA ?? 0) > 0
   );
-  console.log("validData:----", validData);
 
-  // Calculate overall stats using only validData
-  const overallPlacement = validData.length
+  // Filter valid data separately for each section's requirement
+  const validPlacementRateData = validData.filter(
+    (item) => (item.placementPercentage ?? 0) > 0
+  );
+  const validMedianPackageData = validData.filter(
+    (item) => (item.medianPackageLPA ?? 0) > 0
+  );
+  const validHighestPackageData = validData.filter(
+    (item) => (item.highestPackageLPA ?? 0) > 0
+  );
+  const validAveragePackageData = validData.filter(
+    (item) => (item.averagePackageLPA ?? 0) > 0
+  );
+
+  // Overall Placement % using validPlacementRateData
+  const overallPlacement = validPlacementRateData.length
     ? (
-        validData
-          .filter((d) => (d.placementPercentage ?? 0) > 0)
-          .reduce((acc, cur) => acc + cur.placementPercentage, 0) /
-        validData.filter((d) => (d.placementPercentage ?? 0) > 0).length
+        validPlacementRateData.reduce(
+          (acc, cur) => acc + cur.placementPercentage,
+          0
+        ) / validPlacementRateData.length
       ).toFixed(2)
     : "-";
 
-  const overallAvgPackage = validData.length
-    ? (
-        validData
-          .filter((d) => (d.averagePackageLPA ?? 0) > 0)
-          .reduce((acc, cur) => acc + cur.averagePackageLPA, 0) /
-        validData.filter((d) => (d.averagePackageLPA ?? 0) > 0).length
-      ).toFixed(2)
-    : "-";
-
-  const overallHighestPackage = validData.length
-    ? Math.max(
-        ...validData
-          .filter((d) => (d.highestPackageLPA ?? 0) > 0)
-          .map((d) => d.highestPackageLPA)
-      )
-    : "-";
-
+  // Overall Median Package calculation
   const overallMedianPackage =
-    validData.length > 0
+    validMedianPackageData.length > 0
       ? (() => {
-          const medians = validData
+          const medians = validMedianPackageData
             .map((d) => d.medianPackageLPA)
             .filter((v): v is number => v !== null && v !== undefined && v > 0);
-          if (medians.length === 0) return null;
           medians.sort((a, b) => a - b);
           const mid = Math.floor(medians.length / 2);
           if (medians.length % 2 === 0) {
-            const left = medians[mid - 1];
-            const right = medians[mid];
-            return ((left + right) / 2).toFixed(2);
+            return ((medians[mid - 1] + medians[mid]) / 2).toFixed(2);
           } else {
             return medians[mid].toFixed(2);
           }
         })()
       : null;
+
+  // Overall Highest Package calculation
+  const overallHighestPackage = validHighestPackageData.length
+    ? Math.max(...validHighestPackageData.map((d) => d.highestPackageLPA))
+    : "-";
+
+  // Overall Average Package calculation
+  const overallAvgPackage = validAveragePackageData.length
+    ? (
+        validAveragePackageData.reduce(
+          (acc, cur) => acc + cur.averagePackageLPA,
+          0
+        ) / validAveragePackageData.length
+      ).toFixed(2)
+    : "-";
+
+  /* Determine if Branch-wise Placement section should render at all:
+     Render only if at least one placement subsection has valid data and corresponding availability flags */
+  const hasAnyBranchPlacementData =
+    (college.isPlacementRateAvailable && validPlacementRateData.length > 0) ||
+    (college.isMedianPackageAvailable && validMedianPackageData.length > 0) ||
+    (college.isHighestPackageAvailable && validHighestPackageData.length > 0) ||
+    (college.isAveragePackageAvailable && validAveragePackageData.length > 0);
 
   return (
     <div className="min-h-screen bg-white">
@@ -183,253 +195,275 @@ export function PlacementPage({ college }: { college: College }) {
         </select>
       </section>
 
-      {/* Placement Statistics - Overall stats cards */}
-      <section className="mb-16">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl font-semibold text-slate-900 mb-4">
-            Placement Statistics
-          </h2>
-          <p className="text-lg text-slate-600 max-w-3xl mx-auto">
-            Comprehensive overview of placement achievements across all
-            engineering disciplines
-          </p>
+      {/* Placement Statistics - Overall cards */}
+      {loading ? (
+        <div className="text-center mb-16">
+          <CardSkeletonGrid />
         </div>
+      ) : (
+        placementStats && (
+          <section className="mb-16">
+            <div className="text-center mb-12">
+              <h2 className="text-2xl font-semibold text-slate-900 mb-4">
+                Placement Statistics
+              </h2>
+              <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+                Comprehensive overview of placement achievements across all
+                engineering disciplines
+              </p>
+            </div>
+            <StatsCards
+              data={[
+                {
+                  totalOffers:
+                    placementStats.totalOffers !== undefined
+                      ? placementStats.totalOffers.toString()
+                      : "-",
+                  highestPackage:
+                    placementStats.highestPackage !== undefined
+                      ? placementStats.highestPackage.toString()
+                      : "-",
+                  averagePackage:
+                    placementStats.averagePackage !== undefined
+                      ? placementStats.averagePackage.toString()
+                      : "-",
+                  recruiters:
+                    placementStats.recruiters !== undefined
+                      ? placementStats.recruiters.toString()
+                      : "-",
+                },
+              ]}
+            />
+          </section>
+        )
+      )}
 
-        {loading ? (
-          <div className="text-center">
-            <CardSkeletonGrid />
+      {/* Branch-wise Placement Sections */}
+      {hasAnyBranchPlacementData && (
+        <section className="mb-16">
+          <div className="text-center mb-12">
+            <h2 className="text-2xl font-semibold text-slate-900 mb-4">
+              {college?.name} Placement {year}
+            </h2>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+              Detailed branch-wise placement data and package information
+            </p>
           </div>
-        ) : placementStats ? (
-          <StatsCards
-            data={[
-              {
-                totalOffers:
-                  placementStats.totalOffers !== undefined
-                    ? placementStats.totalOffers.toString()
-                    : "-",
-                highestPackage:
-                  placementStats.highestPackage !== undefined
-                    ? placementStats.highestPackage.toString()
-                    : "-",
-                averagePackage:
-                  placementStats.averagePackage !== undefined
-                    ? placementStats.averagePackage.toString()
-                    : "-",
-                recruiters:
-                  placementStats.recruiters !== undefined
-                    ? placementStats.recruiters.toString()
-                    : "-",
-              },
-            ]}
-          />
-        ) : (
-          <p className="text-center">No placement stats available.</p>
-        )}
-      </section>
 
-      <section className="mb-16">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl font-semibold text-slate-900 mb-4">
-            {college?.name} Placement {year}
-          </h2>
-          <p className="text-lg text-slate-600 max-w-3xl mx-auto">
-            Detailed branch-wise placement data and package information
-          </p>
-        </div>
-        <div className="grid gap-8">
-          {/* Placement Statistics by Branch */}
-          {isPlacementRateAvailable && validData.length > 0 && (
-            <Card className="border border-slate-200 shadow-sm">
-              <div className="p-4 sm:p-8">
-                <h3 className="text-lg font-semibold text-slate-900 mb-6">
-                  Placement Statistics by Branch
-                </h3>
-                <div className="space-y-4 ">
-                  {validData
-                    .sort(
-                      (a, b) => b.placementPercentage - a.placementPercentage
-                    )
-                    .map((item) => (
-                      <div
-                        key={item._id}
-                        className="flex justify-between items-center py-2 border-b border-slate-100 last:border-b-0"
-                      >
-                        <span className="text-slate-700 text-sm">
-                          {item.branch}
+          <div className="grid gap-8">
+            {/* Placement Rate Section */}
+            {college.isPlacementRateAvailable &&
+              validPlacementRateData.length > 0 && (
+                <Card className="border border-slate-200 shadow-sm">
+                  <div className="p-4 sm:p-8">
+                    <h3 className="text-lg font-semibold text-slate-900 mb-6">
+                      Placement Statistics by Branch
+                    </h3>
+                    <div className="space-y-4">
+                      {validPlacementRateData
+                        .sort(
+                          (a, b) =>
+                            b.placementPercentage - a.placementPercentage
+                        )
+                        .map((item) => (
+                          <div
+                            key={item._id}
+                            className="flex justify-between items-center py-2 border-b border-slate-100 last:border-b-0"
+                          >
+                            <span className="text-slate-700 text-sm">
+                              {item.branch}
+                            </span>
+                            <span
+                              className={`font-medium ${
+                                item.placementPercentage === 100
+                                  ? "text-emerald-700"
+                                  : "text-slate-900"
+                              }`}
+                            >
+                              {Number(item.placementPercentage ?? 0).toFixed(2)}
+                              %
+                            </span>
+                          </div>
+                        ))}
+                      <div className="flex justify-between items-center py-3 bg-slate-50 px-4 rounded-lg border border-slate-200 mt-4">
+                        <span className="font-medium text-slate-900">
+                          Overall
                         </span>
-                        <span
-                          className={`font-medium ${
-                            item.placementPercentage === 100
-                              ? "text-emerald-700"
-                              : "text-slate-900"
-                          }`}
-                        >
-                          {Number(item.placementPercentage ?? 0).toFixed(2)}%
+                        <span className="font-semibold text-blue-700">
+                          {overallPlacement}%
                         </span>
                       </div>
-                    ))}
-                  {/* Overall Row */}
-                  <div className="flex justify-between items-center py-3 bg-slate-50 px-4 rounded-lg border border-slate-200 mt-4">
-                    <span className="font-medium text-slate-900">Overall</span>
-                    <span className="font-semibold text-blue-700">
-                      {overallPlacement}%
-                    </span>
+                    </div>
                   </div>
-                </div>
-              </div>
-            </Card>
-          )}
+                </Card>
+              )}
 
-          {/* Median Package (Branch-wise) */}
-          {isMedianPackageAvailable && validData.length > 0 && (
-            <Card className="border border-slate-200 shadow-sm mb-8">
-              <div className="p-4 sm:p-8">
-                <h3 className="text-lg font-semibold text-slate-900 mb-6">
-                  Median Package (Branch-wise)
-                </h3>
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse text-sm">
-                    <thead>
-                      <tr className="bg-slate-100">
-                        <th className="border px-4 py-2 text-left">Branch</th>
-                        <th className="border px-4 py-2 text-left">
-                          Median CTC (in LPA)
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {validData
-                        .filter((item) => (item.medianPackageLPA ?? 0) > 0)
-                        .sort(
-                          (a, b) =>
-                            (b.medianPackageLPA ?? 0) -
-                            (a.medianPackageLPA ?? 0)
-                        )
-                        .map((item) => (
-                          <tr key={item._id} className="hover:bg-slate-50">
-                            <td className="border px-4 py-2 break-words max-w-[70%]">
-                              {item.branch}
+            {/* Median Package Section */}
+            {college.isMedianPackageAvailable &&
+              validMedianPackageData.length > 0 && (
+                <Card className="border border-slate-200 shadow-sm mb-8">
+                  <div className="p-4 sm:p-8">
+                    <h3 className="text-lg font-semibold text-slate-900 mb-6">
+                      Median Package (Branch-wise)
+                    </h3>
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse text-sm">
+                        <thead>
+                          <tr className="bg-slate-100">
+                            <th className="border px-4 py-2 text-left">
+                              Branch
+                            </th>
+                            <th className="border px-4 py-2 text-left">
+                              Median CTC (in LPA)
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {validMedianPackageData
+                            .sort(
+                              (a, b) =>
+                                (b.medianPackageLPA ?? 0) -
+                                (a.medianPackageLPA ?? 0)
+                            )
+                            .map((item) => (
+                              <tr key={item._id} className="hover:bg-slate-50">
+                                <td className="border px-4 py-2 break-words max-w-[70%]">
+                                  {item.branch}
+                                </td>
+                                <td className="border px-4 py-2">
+                                  ₹{Number(item.medianPackageLPA).toFixed(2)}
+                                </td>
+                              </tr>
+                            ))}
+                          <tr className="bg-slate-50 font-semibold text-green-700">
+                            <td className="border px-4 py-2 text-slate-900">
+                              Overall (B.Tech)
                             </td>
                             <td className="border px-4 py-2">
-                              ₹{Number(item.medianPackageLPA).toFixed(2)}
+                              {overallMedianPackage !== null
+                                ? `₹${overallMedianPackage}`
+                                : "N/A"}
                             </td>
                           </tr>
-                        ))}
-                      <tr className="bg-slate-50 font-semibold text-green-700">
-                        <td className="border px-4 py-2 text-slate-900">
-                          Overall (B.Tech)
-                        </td>
-                        <td className="border px-4 py-2">
-                          {overallMedianPackage !== null
-                            ? `₹${overallMedianPackage}`
-                            : "N/A"}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </Card>
-          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </Card>
+              )}
 
-          {/* Highest Package */}
-          {isHighestPackageAvailable && validData.length > 0 && (
-            <Card className="border border-slate-200 shadow-sm mb-8">
-              <div className="p-4 sm:p-8">
-                <h3 className="text-lg font-semibold text-slate-900 mb-6">
-                  Highest Package (Branch-wise)
-                </h3>
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse text-sm">
-                    <thead>
-                      <tr className="bg-slate-100">
-                        <th className="border px-4 py-2 text-left">Branch</th>
-                        <th className="border px-4 py-2 text-left">
-                          Max CTC (in LPA)
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {validData
-                        .filter((item) => (item.highestPackageLPA ?? 0) > 0)
-                        .sort(
-                          (a, b) => b.highestPackageLPA - a.highestPackageLPA
-                        )
-                        .map((item) => (
-                          <tr key={item._id} className="hover:bg-slate-50">
-                            <td className="border px-4 py-2 break-words max-w-[70%]">
-                              {item.branch}
+            {/* Highest Package Section */}
+            {college.isHighestPackageAvailable &&
+              validHighestPackageData.length > 0 && (
+                <Card className="border border-slate-200 shadow-sm mb-8">
+                  <div className="p-4 sm:p-8">
+                    <h3 className="text-lg font-semibold text-slate-900 mb-6">
+                      Highest Package (Branch-wise)
+                    </h3>
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse text-sm">
+                        <thead>
+                          <tr className="bg-slate-100">
+                            <th className="border px-4 py-2 text-left">
+                              Branch
+                            </th>
+                            <th className="border px-4 py-2 text-left">
+                              Max CTC (in LPA)
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {validHighestPackageData
+                            .sort(
+                              (a, b) =>
+                                b.highestPackageLPA - a.highestPackageLPA
+                            )
+                            .map((item) => (
+                              <tr key={item._id} className="hover:bg-slate-50">
+                                <td className="border px-4 py-2 break-words max-w-[70%]">
+                                  {item.branch}
+                                </td>
+                                <td className="border px-4 py-2">
+                                  ₹
+                                  {Number(item.highestPackageLPA ?? 0).toFixed(
+                                    2
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          <tr className="bg-slate-50 font-semibold text-green-700">
+                            <td className="border px-4 py-2 text-slate-900">
+                              Overall (B.Tech)
                             </td>
                             <td className="border px-4 py-2">
-                              ₹{Number(item.highestPackageLPA ?? 0).toFixed(2)}
+                              ₹{overallHighestPackage}
                             </td>
                           </tr>
-                        ))}
-                      <tr className="bg-slate-50 font-semibold text-green-700">
-                        <td className="border px-4 py-2 text-slate-900">
-                          Overall (B.Tech)
-                        </td>
-                        <td className="border px-4 py-2">
-                          ₹{overallHighestPackage}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </Card>
-          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </Card>
+              )}
 
-          {/* Average Package */}
-          {isAveragePackageAvailable && validData.length > 0 && (
-            <Card className="border border-slate-200 shadow-sm">
-              <div className="p-4 sm:p-8">
-                <h3 className="text-lg font-semibold text-slate-900 mb-6">
-                  Average Package (Branch-wise)
-                </h3>
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse text-sm">
-                    <thead>
-                      <tr className="bg-slate-100">
-                        <th className="border px-4 py-2 text-left">Branch</th>
-                        <th className="border px-4 py-2 text-left">
-                          Avg CTC (in LPA)
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {validData
-                        .filter((item) => (item.averagePackageLPA ?? 0) > 0)
-                        .sort(
-                          (a, b) =>
-                            (b.averagePackageLPA ?? 0) -
-                            (a.averagePackageLPA ?? 0)
-                        )
-                        .map((item) => (
-                          <tr key={item._id} className="hover:bg-slate-50">
-                            <td className="border px-4 py-2 break-words max-w-[70%]">
-                              {item.branch}
+            {/* Average Package Section */}
+            {college.isAveragePackageAvailable &&
+              validAveragePackageData.length > 0 && (
+                <Card className="border border-slate-200 shadow-sm">
+                  <div className="p-4 sm:p-8">
+                    <h3 className="text-lg font-semibold text-slate-900 mb-6">
+                      Average Package (Branch-wise)
+                    </h3>
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse text-sm">
+                        <thead>
+                          <tr className="bg-slate-100">
+                            <th className="border px-4 py-2 text-left">
+                              Branch
+                            </th>
+                            <th className="border px-4 py-2 text-left">
+                              Avg CTC (in LPA)
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {validAveragePackageData
+                            .sort(
+                              (a, b) =>
+                                (b.averagePackageLPA ?? 0) -
+                                (a.averagePackageLPA ?? 0)
+                            )
+                            .map((item) => (
+                              <tr key={item._id} className="hover:bg-slate-50">
+                                <td className="border px-4 py-2 break-words max-w-[70%]">
+                                  {item.branch}
+                                </td>
+                                <td className="border px-4 py-2">
+                                  ₹
+                                  {Number(item.averagePackageLPA ?? 0).toFixed(
+                                    2
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          <tr className="bg-slate-50 font-semibold">
+                            <td className="border px-4 py-2">
+                              Overall (B.Tech)
                             </td>
                             <td className="border px-4 py-2">
-                              ₹{Number(item.averagePackageLPA ?? 0).toFixed(2)}
+                              ₹{overallAvgPackage}
                             </td>
                           </tr>
-                        ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </Card>
+              )}
+          </div>
+        </section>
+      )}
 
-                      <tr className="bg-slate-50 font-semibold">
-                        <td className="border px-4 py-2">Overall (B.Tech)</td>
-                        <td className="border px-4 py-2">
-                          ₹{overallAvgPackage}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </Card>
-          )}
-        </div>
-      </section>
       {/* Charts Section */}
       <section className="mb-16">
         <div className="text-center mb-12 flex justify-center">
@@ -445,20 +479,6 @@ export function PlacementPage({ college }: { college: College }) {
           )}
         </div>
       </section>
-      {/* <section className="mb-16">
-        <div className="text-center mb-12 flex justify-center">
-          {placementStats?.company_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={placementStats.company_url}
-              alt="Placement Graphs"
-              className="w-full max-w-[1200px] h-auto rounded border border-slate-200 pb-8"
-            />
-          ) : (
-            <p className="text-center text-slate-500 pb-8"></p>
-          )}
-        </div>
-      </section> */}
 
       {/* Top Recruiters Section */}
       <TopRecruiters slug={college?.slug} year={year} />
