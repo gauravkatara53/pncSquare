@@ -17,7 +17,7 @@ export function Header() {
   const [searchTerm, setSearchTerm] = useState("");
   const { user } = useUser();
   const navItems = [
-    { name: "Colleges", id: "colleges", href: "/colleges" },
+    { name: "Colleges", id: "colleges", href: "/colleges?page=1&limit=9" },
     { name: "Courses", id: "courses", href: "/courses" },
     { name: "Exams", id: "exams", href: "/exam" },
     { name: "Reviews", id: "reviews", href: "/review" },
