@@ -36,6 +36,16 @@ export function Header() {
     }
   };
 
+  // handle user icon click (desktop + mobile)
+  const handleUserClick = () => {
+    if (user) {
+      router.push("/profile"); // if logged in → profile
+    } else {
+      setMode("signIn"); // if not logged in → show login modal
+      setOpen(true);
+    }
+  };
+
   return (
     <header className="bg-white border-b border-gray-500 top-0 z-50 shadow-sm">
       {/* Main Header */}
@@ -78,37 +88,21 @@ export function Header() {
           </form>
 
           {/* Desktop Buttons */}
-          {user ? (
-            <div className="hidden md:flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-gray-900 hover:text-gray-900"
-              >
-                <User className="w-4 h-4 mr-2" />
-                {user.firstName}
-              </Button>
-            </div>
-          ) : (
-            <div className="hidden md:flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-gray-900 hover:text-gray-900"
-                onClick={() => {
-                  setMode("signIn"); // open sign in modal by default
-                  setOpen(true);
-                }}
-              >
-                <User className="w-4 h-4 mr-2" />
-                Sign In
-              </Button>
-            </div>
-          )}
+          <div className="hidden md:flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-gray-900 hover:text-gray-900"
+              onClick={handleUserClick}
+            >
+              <User className="w-4 h-4 mr-2" />
+              {user ? user.firstName : "Sign In"}
+            </Button>
+          </div>
 
           {/* Mobile Menu */}
           <div className="flex items-center gap-2 md:hidden">
-            <Button variant="ghost" size="sm" onClick={() => setOpen(true)}>
+            <Button variant="ghost" size="sm" onClick={handleUserClick}>
               <User className="w-6 h-6" />
             </Button>
             <Button
