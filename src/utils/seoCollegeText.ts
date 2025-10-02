@@ -39,18 +39,29 @@ export function generateTitleAndDescription(filters: FiltersType) {
       ? tag
       : [];
 
-  let title = "Colleges in India";
-  let description = "Discover top colleges across India. Find comprehensive info on admissions, placements, fees, and campus life.";
+  let title = "Colleges in India | Pncsquare";
+  let description =
+    "Discover top colleges across India. Find comprehensive info on admissions, placements, fees, and campus life.";
 
   if (normalizedState.length && normalizedStream.length) {
-    title = `${normalizedStream.join(", ")} Colleges in ${normalizedState.join(", ")}`;
-    description = `Explore ${normalizedStream.join(", ")} colleges in ${normalizedState.join(", ")}. Admission, placement, campus, info and more.`;
+    title = `${normalizedStream.join(", ")} Colleges in ${normalizedState.join(
+      ", "
+    )}`;
+    description = `Explore ${normalizedStream.join(
+      ", "
+    )} colleges in ${normalizedState.join(
+      ", "
+    )}. Admission, placement, campus, info and more. | Pncsquare`;
   } else if (normalizedStream.length) {
     title = `${normalizedStream.join(", ")} Colleges in India`;
-    description = `Top ${normalizedStream.join(", ")} colleges in India. Info on fees, placements, and more.`;
+    description = `Top ${normalizedStream.join(
+      ", "
+    )} colleges in India. Info on fees, placements, and more. | Pncsquare`;
   } else if (normalizedState.length) {
     title = `Colleges in ${normalizedState.join(", ")}`;
-    description = `Find the best colleges in ${normalizedState.join(", ")}. Compare placements, fees, and details.`;
+    description = `Find the best colleges in ${normalizedState.join(
+      ", "
+    )}. Compare placements, fees, and details. | Pncsquare`;
   }
 
   if (normalizedTag.length) {
@@ -66,4 +77,3 @@ export function generateTitleAndDescription(filters: FiltersType) {
 
   return { title, description };
 }
-

@@ -10,12 +10,7 @@ interface AuthPopupProps {
   setMode: React.Dispatch<React.SetStateAction<"signIn" | "signUp">>;
 }
 
-export default function AuthPopup({
-  open,
-  setOpen,
-  mode,
-  setMode,
-}: AuthPopupProps) {
+export default function AuthPopup({ open, setOpen }: AuthPopupProps) {
   const { isSignedIn } = useUser(); // Clerk hook to check login status
   const popupRef = useRef<HTMLDivElement>(null);
 

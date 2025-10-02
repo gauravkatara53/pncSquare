@@ -4,12 +4,12 @@ import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 
 export const metadata: Metadata = {
-  title: "Pncsquare - College & Exam Finder",
+  title: "Home | Pncsquare - College & Exam Finder",
   description: "Find your dream IIT, NIT, or other colleges easily.",
   icons: {
     icon: "/favicon.ico", // Default favicon
     shortcut: "/favicon.ico",
-    apple: "/favicon.ico", // Optional for Apple devices
+    apple: "/favicon.ico",
   },
   alternates: {
     canonical: "https://pncsquare.in/",

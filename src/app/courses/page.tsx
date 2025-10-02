@@ -1,60 +1,44 @@
-"use client";
-import { useState } from "react";
-import { Footer } from "@/components/common/footer";
-import {
-  HeroSection,
-  SortFilterBar,
-  CourseTabs,
-  LoadMoreButton,
-  courseData,
-  categories,
-  //   type CourseData,
-} from "@/components/courses";
+import CoursesClient from "./CoursesClient";
+
+export const metadata = {
+  title: "Courses | Pncsquare",
+  description:
+    "Explore a wide range of courses on PNC Square. Filter by category, duration, and degree. Find the perfect course tailored to your career goals.",
+  keywords: [
+    "courses",
+    "online courses",
+    "college courses",
+    "Pncsquare courses",
+    "education",
+  ],
+  openGraph: {
+    title: "Courses | Pncsquare",
+    description:
+      "Explore a wide range of courses on Pncsquare. Filter by category, duration, and degree. Find the perfect course tailored to your career goals.",
+    url: "https://pncsquare.in/courses",
+    siteName: "Pncsquare",
+    images: [
+      {
+        url: "https://pncsquare.in/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "PNC Square Courses",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Courses | Pncsquare",
+    description:
+      "Explore a wide range of courses on Pncsquare. Filter by category, duration, and degree. Find the perfect course tailored to your career goals.",
+    images: ["https://pncsquare.in/og-image.png"],
+  },
+  alternates: {
+    canonical: "https://pncsquare.in/courses",
+  },
+};
 
 export default function CoursesPage() {
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedDuration, setSelectedDuration] = useState("all");
-  const [selectedDegree, setSelectedDegree] = useState("all");
-  const [sortBy, setSortBy] = useState("popularity");
-
-  const filteredCourses = courseData.filter((course) => {
-    return (
-      (selectedCategory === "all" || course.category === selectedCategory) &&
-      (selectedDuration === "all" || course.duration === selectedDuration) &&
-      (selectedDegree === "all" || course.degree === selectedDegree)
-    );
-  });
-
-  const handleLoadMore = () => {
-    // Implement load more functionality
-    console.log("Loading more courses...");
-  };
-
-  return (
-    <div className="min-h-screen bg-white">
-      <HeroSection
-        selectedCategory={selectedCategory}
-        selectedDuration={selectedDuration}
-        selectedDegree={selectedDegree}
-        onCategoryChange={setSelectedCategory}
-        onDurationChange={setSelectedDuration}
-        onDegreeChange={setSelectedDegree}
-        categories={categories}
-      />
-
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <SortFilterBar
-          filteredCoursesCount={filteredCourses.length}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-        />
-
-        <CourseTabs courses={filteredCourses} />
-
-        <LoadMoreButton onLoadMore={handleLoadMore} />
-      </div>
-
-      <Footer />
-    </div>
-  );
+  return <CoursesClient />;
 }

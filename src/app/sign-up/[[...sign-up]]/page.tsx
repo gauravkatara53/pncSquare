@@ -1,7 +1,7 @@
 "use client";
 
 import { SignUp, useUser } from "@clerk/nextjs";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function Page() {
   const { user, isLoaded } = useUser();
