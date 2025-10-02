@@ -61,7 +61,7 @@ export function Header() {
               className="w-10 h-10 rounded-lg"
             />
             <div className="flex flex-col">
-              <div className="font-bold text-slate-900 text-lg">PNC Square</div>
+              <div className="font-bold text-slate-900 text-lg">PNCSquare</div>
               <div className="text-xs text-gray-500">
                 Find Your Dream College
               </div>
