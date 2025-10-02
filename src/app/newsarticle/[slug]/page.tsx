@@ -44,9 +44,9 @@ export async function generateMetadata({
 
     if (!article || !article.title) {
       return {
-        title: "Article Not Found | PNC Square",
+        title: "Article Not Found | Pncsquare",
         description: "The requested news article could not be found.",
-        keywords: ["PNC Square", "news", "latest news", "article not found"],
+        keywords: ["Pncsquare", "news", "latest news", "article not found"],
         alternates: {
           canonical: "https://pncsquare.in/newsarticle", // fallback canonical
         },
@@ -58,12 +58,12 @@ export async function generateMetadata({
     return {
       title: article.title,
       description:
-        article.summary?.slice(0, 160) || "News article from PNC Square",
+        article.summary?.slice(0, 160) || "News article from Pncsquare",
       keywords: [
         article.title,
         article.category,
         ...article.tags,
-        "PNC Square",
+        "Pncsquare",
         "latest news",
         "college news",
         "education updates",
@@ -100,7 +100,7 @@ export async function generateMetadata({
     return {
       title: "Error | News Article",
       description: "There was an error fetching the news article details.",
-      keywords: ["PNC Square", "news", "error", "article issue"],
+      keywords: ["Pncsquare", "news", "error", "article issue"],
       alternates: {
         canonical: "https://pnc-square.vercel.app/newsarticle",
       },

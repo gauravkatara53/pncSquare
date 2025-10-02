@@ -46,10 +46,10 @@ export async function generateMetadata({
     }
 
     return {
-      title: `${college.name} – Admission, Cutoff, Fees, Courses & Placements 2025 | PNC Square`,
+      title: `${college.name} – Admission, Cutoff, Fees, Courses & Placements 2025 |Pncsquare`,
       description:
         college.bio ||
-        `Explore ${college.name} - Admission, Cutoff, Fees, Courses & Placements 2025 | PNC Square`,
+        `Explore ${college.name} - Admission, Cutoff, Fees, Courses & Placements 2025 | Pncsquare`,
       keywords: [
         college.name,
         `${college.name} placements`,
@@ -57,7 +57,7 @@ export async function generateMetadata({
         `${college.name} admission`,
         `${college.name} fees`,
         `${college.name} courses`,
-        "PNC Square",
+        "Pncsquare",
         "college placements India",
         "admission process",
         "JEE Advanced",
@@ -71,7 +71,7 @@ export async function generateMetadata({
         title: `${college.name} – Placements, Cutoff, Fees & Courses`,
         description:
           college.bio ||
-          `Explore ${college.name} - Admission, Cutoff, Fees, Courses & Placements 2025 | PNC Square`,
+          `Explore ${college.name} - Admission, Cutoff, Fees, Courses & Placements 2025 | Pncsquare`,
         images: [
           {
             url: college.image_url,
@@ -90,7 +90,7 @@ export async function generateMetadata({
     return {
       title: "Error | College Information",
       description: "There was an error fetching college details.",
-      keywords: ["college error", "college info not found", "PNC Square"],
+      keywords: ["college error", "college info not found", "Pncsquare"],
       alternates: {
         canonical: `${baseUrl}/${slug}`,
       },

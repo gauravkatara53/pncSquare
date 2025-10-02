@@ -70,7 +70,7 @@ export default function AboutUsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              About <span className="text-yellow-400">PncSquare</span>
+              About <span className="text-yellow-400">Pncsquare</span>
             </h1>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
               Empowering students across India to discover their perfect college
@@ -196,7 +196,7 @@ export default function AboutUsPage() {
 
             <p>
               What began as a focused database of colleges quickly grew into a
-              comprehensive higher-education resource. Today, PNCsquare.in hosts
+              comprehensive higher-education resource. Today, Pncsquare.in hosts
               detailed profiles and rank data for thousands of colleges across
               India, helping millions of students every year make informed
               choices about entrance exams, courses, and careers.
@@ -211,7 +211,7 @@ export default function AboutUsPage() {
             </p>
 
             <p>
-              Looking ahead, PNCsquare is expanding into international guidance,
+              Looking ahead, Pncsquare is expanding into international guidance,
               skill-development programs, and AI-driven career matching. Our
               mission is simple and steady: to give every student the facts and
               context they need to choose the best path forward.

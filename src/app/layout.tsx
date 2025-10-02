@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 
 export const metadata: Metadata = {
-  title: "P&C square - College & Exam Finder",
+  title: "Pncsquare - College & Exam Finder",
   description: "Find your dream IIT, NIT, or other colleges easily.",
   icons: {
     icon: "/favicon.ico", // Default favicon

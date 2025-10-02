@@ -55,13 +55,13 @@ export function Header() {
           <Link href="/" className="flex items-center gap-2">
             <Image
               src="/image/logo.png"
-              alt="PNC Square Logo"
+              alt="Pncsquare Logo"
               width={40}
               height={40}
               className="w-10 h-10 rounded-lg"
             />
             <div className="flex flex-col">
-              <div className="font-bold text-slate-900 text-lg">PNCSquare</div>
+              <div className="font-bold text-slate-900 text-lg">Pncsquare</div>
               <div className="text-xs text-gray-500">
                 Find Your Dream College
               </div>
