@@ -83,13 +83,13 @@ export default function CutoffTrends() {
                       dot={{ fill: "#8B5CF6", r: 3 }}
                       name="CAT (%)"
                     />
-                    {/* <Line
-                      dataKey="gate"
+                    <Line
+                      dataKey="iit"
                       stroke="#F59E0B"
                       strokeWidth={2}
                       dot={{ fill: "#F59E0B", r: 3 }}
-                      name="GATE"
-                    /> */}
+                      name="IIT"
+                    />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
