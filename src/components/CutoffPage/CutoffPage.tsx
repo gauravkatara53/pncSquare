@@ -12,6 +12,7 @@ import { CollegeWiseCutoffs } from "@/components/CutoffPage/CollegeWiseCutoffs";
 import { ExamInfoCards } from "@/components/CutoffPage/ExamInfoCards";
 import { examData } from "@/components/CutoffPage/data";
 import { apiService } from "@/ApiService/apiService";
+import { Footer } from "../common/footer";
 
 // Interfaces skipped for brevity ...
 
@@ -97,18 +98,25 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
   const [loading, setLoading] = useState(false);
   const [filtersApplied, setFiltersApplied] = useState(false);
 
-  // Metadata states updated only on appliedFilters change
-  const [pageTitle, setPageTitle] = useState(
-    `Entrance Exam Cutoff Analysis - ${appliedFilters.exam}`
-  );
-  const [pageDescription, setPageDescription] = useState(
-    `Explore cutoff information for ${appliedFilters.exam}`
-  );
+  // Effect to update document title and metadata on stagedExam change
+  useEffect(() => {
+    const currentExam = examData[stagedExam as keyof typeof examData];
+    const examName = currentExam ? currentExam.name : stagedExam;
 
-  // Result container ref for scroll
-  const resultsSectionRef = useRef<HTMLDivElement>(null);
+    // Update document title
+    document.title = `Cutoff Analysis - ${examName}`;
 
-  // Update URL and metadata only on appliedFilters change
+    // Update meta description
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.setAttribute(
+        "content",
+        `Explore cutoff information for ${examName}. See trends, college-wise cutoffs, and more.`
+      );
+    }
+  }, [stagedExam]);
+
+  // Effect to update URL and metadata only on appliedFilters change
   useEffect(() => {
     // Update URL query params
     const params = new URLSearchParams();
@@ -122,36 +130,6 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
       params.set("subCategory", appliedFilters.subCategory);
 
     router.replace(`/cutoff?${params.toString()}`);
-
-    // Build page title and description based on applied filters
-    const parts: string[] = [appliedFilters.exam];
-    if (appliedFilters.year) parts.push(`Year: ${appliedFilters.year}`);
-    if (appliedFilters.category)
-      parts.push(`Seat Type: ${appliedFilters.category}`);
-    if (appliedFilters.quota) parts.push(`Quota: ${appliedFilters.quota}`);
-    if (appliedFilters.round) parts.push(`Round: ${appliedFilters.round}`);
-    if (appliedFilters.subCategory)
-      parts.push(`Subcategory: ${appliedFilters.subCategory}`);
-
-    const newTitle =
-      parts.length > 0
-        ? `Cutoff Analysis - ${parts.join(", ")}`
-        : `Entrance Exam Cutoff Analysis - ${appliedFilters.exam}`;
-
-    let newDescription = `Explore cutoff information for ${appliedFilters.exam}`;
-    if (appliedFilters.year) newDescription += ` in ${appliedFilters.year}`;
-    if (appliedFilters.category)
-      newDescription += `, category ${appliedFilters.category}`;
-    if (appliedFilters.quota)
-      newDescription += `, quota ${appliedFilters.quota}`;
-    if (appliedFilters.round)
-      newDescription += `, round ${appliedFilters.round}`;
-    if (appliedFilters.subCategory)
-      newDescription += `, subcategory ${appliedFilters.subCategory}`;
-    newDescription += ". See trends, college-wise cutoffs, and more.";
-
-    setPageTitle(newTitle);
-    setPageDescription(newDescription);
   }, [appliedFilters, router]);
 
   // Check if all filters are selected (use staged filters to enable/disable Apply button)
@@ -261,6 +239,34 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
     setFiltersApplied(false);
   };
 
+  // Handle exam change: update staged exam and reset other filters
+  const handleExamChange = (exam: string) => {
+    setStagedExam(exam);
+    // Reset other filters when exam changes
+    setStagedYear("");
+    setStagedCategory("");
+    setStagedQuota("");
+    setStagedRound("");
+    setStagedSubCategory("");
+    // Also reset applied filters for non-exam fields
+    setAppliedFilters((prev) => ({
+      ...prev,
+      exam,
+      year: "",
+      category: "",
+      quota: "",
+      round: "",
+      subCategory: "",
+    }));
+    // Reset data and UI state
+    setCutoffData([]);
+    setShowFilteredResults(false);
+    setFiltersApplied(false);
+  };
+
+  // Ref for scrolling to results section
+  const resultsSectionRef = useRef<HTMLDivElement | null>(null);
+
   // Scroll to results on load
   useEffect(() => {
     if (!loading && showFilteredResults && filtersApplied) {
@@ -333,8 +339,16 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
   return (
     <>
       <Head>
-        <title>{pageTitle}</title>
-        <meta name="description" content={pageDescription} />
+        <title>
+          Cutoff Analysis -{" "}
+          {examData[stagedExam as keyof typeof examData]?.name || stagedExam}
+        </title>
+        <meta
+          name="description"
+          content={`Explore cutoff information for ${
+            examData[stagedExam as keyof typeof examData]?.name || stagedExam
+          }. See trends, college-wise cutoffs, and more.`}
+        />
       </Head>
       <div className="min-h-screen bg-white">
         <HeroSection
@@ -344,7 +358,7 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
           selectedQuota={stagedQuota}
           selectedRound={stagedRound}
           selectedSubCategory={stagedSubCategory}
-          onExamChange={setStagedExam}
+          onExamChange={handleExamChange}
           onYearChange={setStagedYear}
           onCategoryChange={setStagedCategory}
           onQuotaChange={setStagedQuota}
@@ -388,6 +402,7 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
           )}
         </div>
       </div>
+      <Footer />
     </>
   );
 }
