@@ -20,21 +20,36 @@ export function Footer() {
   ];
 
   const examLinks = [
-    { name: "JEE Main", href: "#" },
-    { name: "JEE Advanced", href: "#" },
-    { name: "NEET UG", href: "#" },
-    { name: "GATE", href: "#" },
-    { name: "CAT", href: "#" },
-    { name: "CLAT", href: "#" },
+    { name: "JEE Main", href: "exam?exam=jee-main" },
+    { name: "JEE Advanced", href: "exam?exam=jee-advanced" },
+    { name: "NEET UG", href: "exam?exam=neet-ug" },
+    { name: "GATE", href: "exam?exam=gate" },
+    { name: "CAT", href: "exam?exam=cat" },
+    { name: "CLAT", href: "exam?exam=clat" },
   ];
 
   const collegeLinks = [
-    { name: "Engineering Colleges", href: "#" },
-    { name: "Medical Colleges", href: "#" },
-    { name: "Management Colleges", href: "#" },
-    { name: "Law Colleges", href: "#" },
-    { name: "Arts & Science", href: "#" },
-    { name: "Pharmacy Colleges", href: "#" },
+    {
+      name: "Engineering Colleges",
+      href: "colleges?stream=Engineering&page=1&limit=9",
+    },
+    {
+      name: "Medical Colleges",
+      href: "colleges?stream=Medical&page=1&limit=9",
+    },
+    {
+      name: "Management Colleges",
+      href: "colleges?stream=Management&page=1&limit=9",
+    },
+    { name: "Law Colleges", href: "colleges?stream=Law&page=1&limit=9" },
+    {
+      name: "Arts & Science",
+      href: "colleges?stream=Arts%20&%20Science&page=1&limit=9",
+    },
+    {
+      name: "Pharmacy Colleges",
+      href: "colleges?stream=Pharmacy&page=1&limit=9",
+    },
   ];
 
   return (
@@ -161,22 +176,22 @@ export function Footer() {
                   <Instagram className="w-5 h-5" />
                 </a>
                 <a
-                  href="#"
+                  href="https://www.linkedin.com/company/pncsquare/"
                   className="text-gray-400 hover:text-yellow-400 transition-colors"
                 >
                   <Linkedin className="w-5 h-5" />
                 </a>
-                <a
+                {/* <a
                   href="#"
                   className="text-gray-400 hover:text-yellow-400 transition-colors"
                 >
                   <Youtube className="w-5 h-5" />
-                </a>
+                </a> */}
               </div>
             </div>
 
             <div className="text-gray-400 text-sm text-center sm:text-right mt-2 sm:mt-0">
-              <p>© 2025 P&C Square. All rights reserved.</p>
+              <p>© 2025 Pncsquare. All rights reserved.</p>
               <p className="mt-1">Made with ❤️ for students across India</p>
             </div>
           </div>
