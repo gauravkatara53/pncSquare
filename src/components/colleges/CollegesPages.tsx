@@ -430,7 +430,17 @@ const FILTER_OPTIONS = {
   ],
   streams: ["Engineering", "Medical", "Management"],
   instituteTypes: ["Private", "Govt", "Deemed"],
-  tags: ["IIT", "NIT", "IIIT", "GFTI", "Private", "State", "AIIMS", "Other"],
+  tags: [
+    "IIT",
+    "NIT",
+    "IIIT",
+    "GFTI",
+    "IIM",
+    "Private",
+    "State",
+    "AIIMS",
+    "Other",
+  ],
 };
 
 function Filters({ filters, toggleFilter, handleInputChange }: FiltersProps) {

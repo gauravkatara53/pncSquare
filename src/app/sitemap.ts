@@ -74,6 +74,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       { url: `${baseUrl}/aboutus`, lastModified: new Date() },
       { url: `https://pncsquare.in/privacy-policy`, lastModified: new Date() },
       { url: `https://pncsquare.in/help-center`, lastModified: new Date() },
+      { url: `https://pncsquare.in/favicon.ico`, lastModified: new Date() },
     ];
   }
 }
