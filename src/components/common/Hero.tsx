@@ -11,15 +11,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Typewriter } from "react-simple-typewriter";
 import { useRouter } from "next/navigation";
 
 import { states, streams, instituteTypes, heroImages } from "@/Data/filters";
+import { collegeSearchSuggestions } from "@/Data/searchSuggestion";
 
 export default function HeroSection() {
   const router = useRouter();
   const [index, setIndex] = useState(0);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [filteredSuggestions, setFilteredSuggestions] = useState<
+    typeof collegeSearchSuggestions
+  >([]);
+  const searchRef = useRef<HTMLDivElement>(null);
 
   const [filters, setFilters] = useState({
     state: "",
@@ -34,6 +40,56 @@ export default function HeroSection() {
       setIndex((prev) => (prev + 1) % heroImages.length);
     }, 4000);
     return () => clearInterval(interval);
+  }, []);
+
+  // Handle mobile search input changes and filter suggestions
+  const handleMobileSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setFilters((p) => ({ ...p, searchTerm: value }));
+
+    if (value.trim().length >= 2) {
+      const filtered = collegeSearchSuggestions
+        .filter(
+          (college) =>
+            college.name.toLowerCase().includes(value.toLowerCase()) ||
+            college.type.toLowerCase().includes(value.toLowerCase())
+        )
+        .slice(0, 4); // Limit to 4 suggestions
+
+      setFilteredSuggestions(filtered);
+      setShowSuggestions(filtered.length > 0);
+    } else {
+      setShowSuggestions(false);
+      setFilteredSuggestions([]);
+    }
+  };
+
+  // Handle suggestion click
+  const handleSuggestionClick = (
+    college: (typeof collegeSearchSuggestions)[0]
+  ) => {
+    setFilters((p) => ({ ...p, searchTerm: college.name }));
+    setShowSuggestions(false);
+    const params = new URLSearchParams();
+    params.append("searchTerm", college.name);
+    router.push(`/colleges?${params.toString()}`);
+  };
+
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   // add this helper above your component or inside it
@@ -153,22 +209,53 @@ export default function HeroSection() {
           </div>
 
           {/* Mobile Search */}
-          <div className="md:hidden flex items-center mt-4">
-            <input
-              type="text"
-              placeholder="Search colleges..."
-              className="w-full pr-12 pl-4 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
-              value={filters.searchTerm}
-              onChange={(e) =>
-                setFilters((p) => ({ ...p, searchTerm: e.target.value }))
-              }
-            />
-            <button
-              type="submit"
-              className="absolute right-6 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 p-2 rounded-xl"
-            >
-              <Search className="w-5 h-5" />
-            </button>
+          <div className="md:hidden mt-4 relative" ref={searchRef}>
+            <div className="flex items-center">
+              <input
+                type="text"
+                placeholder="Search colleges..."
+                className="w-full pr-12 pl-4 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
+                value={filters.searchTerm}
+                onChange={handleMobileSearchChange}
+                onFocus={() => {
+                  if (
+                    filters.searchTerm.length >= 2 &&
+                    filteredSuggestions.length > 0
+                  ) {
+                    setShowSuggestions(true);
+                  }
+                }}
+              />
+              <button
+                type="submit"
+                className="absolute right-2 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 p-2 rounded-xl"
+              >
+                <Search className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Mobile Search Suggestions */}
+            {showSuggestions && filteredSuggestions.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 max-h-48 overflow-y-auto">
+                {filteredSuggestions.map((college, index) => (
+                  <div
+                    key={`hero-mobile-${college.id}-${index}`}
+                    onClick={() => handleSuggestionClick(college)}
+                    className="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0 flex items-center justify-between"
+                  >
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium text-gray-900">
+                        {college.name}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {college.type}
+                      </span>
+                    </div>
+                    <Search className="w-4 h-4 text-gray-400" />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </form>
       </div>

@@ -3,18 +3,24 @@
 import { Search, Menu, User } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { useUser } from "@clerk/nextjs";
 import AuthPopup from "./AuthPopup";
+import { collegeSearchSuggestions } from "../../Data/searchSuggestion";
 
 export function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [filteredSuggestions, setFilteredSuggestions] = useState<
+    typeof collegeSearchSuggestions
+  >([]);
+  const searchRef = useRef<HTMLDivElement>(null);
   const { user } = useUser();
   const navItems = [
     { name: "Colleges", id: "colleges", href: "/colleges?page=1&limit=9" },
@@ -27,14 +33,65 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<"signIn" | "signUp">("signIn");
 
+  // Handle search input changes and filter suggestions
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+
+    if (value.trim().length >= 2) {
+      const filtered = collegeSearchSuggestions
+        .filter(
+          (college) =>
+            college.name.toLowerCase().includes(value.toLowerCase()) ||
+            college.type.toLowerCase().includes(value.toLowerCase())
+        )
+        .slice(0, 4); // Limit to 4 suggestions
+
+      setFilteredSuggestions(filtered);
+      setShowSuggestions(filtered.length > 0);
+    } else {
+      setShowSuggestions(false);
+      setFilteredSuggestions([]);
+    }
+  };
+
+  // Handle suggestion click
+  const handleSuggestionClick = (
+    college: (typeof collegeSearchSuggestions)[0]
+  ) => {
+    setSearchTerm(college.name);
+    setShowSuggestions(false);
+    const params = new URLSearchParams();
+    params.append("searchTerm", college.name);
+    router.push(`/colleges?${params.toString()}`);
+  };
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchTerm.trim()) {
+      setShowSuggestions(false);
       const params = new URLSearchParams();
       params.append("searchTerm", searchTerm.trim());
       router.push(`/colleges?${params.toString()}`);
     }
   };
+
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // handle user icon click (desktop + mobile)
   const handleUserClick = () => {
@@ -68,22 +125,53 @@ export function Header() {
             </div>
           </Link>
 
-          {/* Search Bar */}
+          {/* Search Bar - Hidden on Mobile */}
           <form
             onSubmit={handleSearch}
             className="flex-1 max-w-2xl mx-8 hidden md:block"
             role="search"
             aria-label="Search colleges"
           >
-            <div className="relative">
+            <div className="relative" ref={searchRef}>
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <Input
                 placeholder="Search College, Course, Exam..."
                 className="pl-10 pr-4 py-2 w-full bg-gray-50 border-gray-300 focus:border-blue-500"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={handleSearchChange}
                 aria-label="Search Colleges"
+                onFocus={() => {
+                  if (
+                    searchTerm.length >= 2 &&
+                    filteredSuggestions.length > 0
+                  ) {
+                    setShowSuggestions(true);
+                  }
+                }}
               />
+
+              {/* Search Suggestions Dropdown */}
+              {showSuggestions && filteredSuggestions.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
+                  {filteredSuggestions.map((college, index) => (
+                    <div
+                      key={`${college.id}-${index}`}
+                      onClick={() => handleSuggestionClick(college)}
+                      className="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0 flex items-center justify-between"
+                    >
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium text-gray-900">
+                          {college.name}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {college.type}
+                        </span>
+                      </div>
+                      <Search className="w-4 h-4 text-gray-400" />
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </form>
 

@@ -25,4 +25,4 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
-//http://localhost:1083/api/v1 ,, https://pnc-backend.onrender.com
+//http://localhost:5002/api/v1 ,, https://pnc-backend.onrender.com
