@@ -25,7 +25,11 @@ export default function HeroSection() {
   const [filteredSuggestions, setFilteredSuggestions] = useState<
     typeof collegeSearchSuggestions
   >([]);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const heroSectionRef = useRef<HTMLElement>(null);
 
   const [filters, setFilters] = useState({
     state: "",
@@ -42,19 +46,119 @@ export default function HeroSection() {
     return () => clearInterval(interval);
   }, []);
 
+  // Enhanced fuzzy search function
+  const fuzzySearch = (
+    searchTerm: string,
+    colleges: typeof collegeSearchSuggestions
+  ) => {
+    const search = searchTerm.toLowerCase().trim();
+    const searchWords = search.split(/\s+/);
+
+    return colleges.filter((college) => {
+      const collegeName = college.name.toLowerCase();
+      const collegeType = college.type.toLowerCase();
+      const collegeId = college.id.toLowerCase();
+
+      // Direct match (exact substring)
+      if (
+        collegeName.includes(search) ||
+        collegeType.includes(search) ||
+        collegeId.includes(search)
+      ) {
+        return true;
+      }
+
+      // Word-by-word matching (handles reverse order like "jaipur nit")
+      const collegeWords = [
+        ...collegeName.split(/\s+/),
+        ...collegeType.split(/\s+/),
+        ...collegeId.split(/-/),
+      ];
+      const matchedWords = searchWords.filter((searchWord) =>
+        collegeWords.some(
+          (collegeWord) =>
+            collegeWord.includes(searchWord) ||
+            searchWord.includes(collegeWord) ||
+            // Simple typo tolerance (1-2 character difference)
+            (searchWord.length > 3 &&
+              collegeWord.length > 3 &&
+              Math.abs(searchWord.length - collegeWord.length) <= 2 &&
+              levenshteinDistance(searchWord, collegeWord) <= 2)
+        )
+      );
+
+      // Return true if at least half of search words match
+      return matchedWords.length >= Math.ceil(searchWords.length / 2);
+    });
+  };
+
+  // Simple Levenshtein distance for typo detection
+  const levenshteinDistance = (str1: string, str2: string): number => {
+    const matrix = Array(str2.length + 1)
+      .fill(null)
+      .map(() => Array(str1.length + 1).fill(null));
+
+    for (let i = 0; i <= str1.length; i++) matrix[0][i] = i;
+    for (let j = 0; j <= str2.length; j++) matrix[j][0] = j;
+
+    for (let j = 1; j <= str2.length; j++) {
+      for (let i = 1; i <= str1.length; i++) {
+        const substitutionCost = str1[i - 1] === str2[j - 1] ? 0 : 1;
+        matrix[j][i] = Math.min(
+          matrix[j][i - 1] + 1, // insertion
+          matrix[j - 1][i] + 1, // deletion
+          matrix[j - 1][i - 1] + substitutionCost // substitution
+        );
+      }
+    }
+
+    return matrix[str2.length][str1.length];
+  };
+
+  // Smooth scroll to search bar
+  const scrollToSearch = () => {
+    if (searchRef.current && window.innerWidth < 768) {
+      const isMobile =
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent
+        );
+      const offset = isMobile ? 80 : 100; // Less offset on mobile to account for virtual keyboard
+      const elementTop =
+        searchRef.current.getBoundingClientRect().top + window.pageYOffset;
+      const offsetPosition = elementTop - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  // Handle search input focus
+  const handleSearchFocus = () => {
+    setIsSearchFocused(true);
+    setTimeout(() => {
+      scrollToSearch();
+    }, 100); // Small delay to ensure the keyboard doesn't interfere
+
+    if (filters.searchTerm.length >= 1 && filteredSuggestions.length > 0) {
+      setShowSuggestions(true);
+    }
+  };
+
+  // Handle search input blur
+  const handleSearchBlur = () => {
+    setIsSearchFocused(false);
+  };
+
   // Handle mobile search input changes and filter suggestions
   const handleMobileSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setFilters((p) => ({ ...p, searchTerm: value }));
+    setSelectedIndex(-1); // Reset selection on new input
 
-    if (value.trim().length >= 2) {
-      const filtered = collegeSearchSuggestions
-        .filter(
-          (college) =>
-            college.name.toLowerCase().includes(value.toLowerCase()) ||
-            college.type.toLowerCase().includes(value.toLowerCase())
-        )
-        .slice(0, 4); // Limit to 4 suggestions
+    if (value.trim().length >= 1) {
+      const filtered = fuzzySearch(value, collegeSearchSuggestions).slice(0, 5); // Limit to 5 suggestions for better UX
 
       setFilteredSuggestions(filtered);
       setShowSuggestions(filtered.length > 0);
@@ -64,12 +168,47 @@ export default function HeroSection() {
     }
   };
 
+  // Handle keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showSuggestions || filteredSuggestions.length === 0) return;
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        setSelectedIndex((prev) =>
+          prev < filteredSuggestions.length - 1 ? prev + 1 : 0
+        );
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setSelectedIndex((prev) =>
+          prev > 0 ? prev - 1 : filteredSuggestions.length - 1
+        );
+        break;
+      case "Enter":
+        e.preventDefault();
+        if (selectedIndex >= 0 && selectedIndex < filteredSuggestions.length) {
+          handleSuggestionClick(filteredSuggestions[selectedIndex]);
+        } else if (filters.searchTerm.trim()) {
+          // If no suggestion selected, perform regular search
+          handleSearch(e);
+        }
+        break;
+      case "Escape":
+        setShowSuggestions(false);
+        setSelectedIndex(-1);
+        inputRef.current?.blur();
+        break;
+    }
+  };
+
   // Handle suggestion click
   const handleSuggestionClick = (
     college: (typeof collegeSearchSuggestions)[0]
   ) => {
     setFilters((p) => ({ ...p, searchTerm: college.name }));
     setShowSuggestions(false);
+    setSelectedIndex(-1);
     const params = new URLSearchParams();
     params.append("searchTerm", college.name);
     router.push(`/colleges?${params.toString()}`);
@@ -83,6 +222,8 @@ export default function HeroSection() {
         !searchRef.current.contains(event.target as Node)
       ) {
         setShowSuggestions(false);
+        setSelectedIndex(-1);
+        setIsSearchFocused(false);
       }
     };
 
@@ -91,6 +232,13 @@ export default function HeroSection() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  // Auto-scroll when suggestions appear
+  useEffect(() => {
+    if (showSuggestions && isSearchFocused) {
+      scrollToSearch();
+    }
+  }, [showSuggestions, isSearchFocused]);
 
   // add this helper above your component or inside it
   const normalize = (v: string) => v.replace(/\s+/g, " ").trim();
@@ -127,9 +275,10 @@ export default function HeroSection() {
 
   return (
     <section
-      className="relative min-h-[400px] flex items-center justify-center 
-      bg-gradient-to-br from-slate-900/10 via-blue-900/60 to-indigo-900/70 
-      rounded-b-3xl overflow-hidden"
+      ref={heroSectionRef}
+      className={`relative min-h-[300px] flex items-center justify-center 
+  bg-gradient-to-br from-slate-900/10 via-blue-900/60 to-indigo-900/70 
+  rounded-b-3xl ${showSuggestions ? "overflow-visible" : "overflow-hidden"}`}
       aria-label="Hero section for college search"
     >
       {/* Background Slider */}
@@ -175,7 +324,7 @@ export default function HeroSection() {
         {/* Search Form */}
         <form
           onSubmit={handleSearch}
-          className="max-w-5xl mx-auto bg-white/10 backdrop-blur-lg rounded-2xl p-6 md:p-8 border border-white/20 shadow-lg"
+          className="max-w-5xl mx-auto bg-white/10 backdrop-blur-lg rounded-2xl sm:px-6 sm:pt-6 sm:pb-6 -pb-8  -pt-8 md:p-8 border border-white/20 shadow-lg relative z-10"
           aria-label="Search colleges"
         >
           {/* Desktop Filters */}
@@ -209,26 +358,28 @@ export default function HeroSection() {
           </div>
 
           {/* Mobile Search */}
-          <div className="md:hidden mt-4 relative" ref={searchRef}>
-            <div className="flex items-center">
+          <motion.div
+            className="md:hidden mt-4 relative z-[100] "
+            ref={searchRef}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+          >
+            <div className="flex items-center ">
               <input
+                ref={inputRef}
                 type="text"
                 placeholder="Search colleges..."
-                className="w-full pr-12 pl-4 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-yellow-400 focus:outline-none"
+                className={`w-full pr-12 pl-4 py-3 -mt-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-yellow-400 focus:outline-none text-gray-900 placeholder-gray-500 transition-all duration-300 ${
+                  isSearchFocused ? "shadow-lg" : ""
+                }`}
                 value={filters.searchTerm}
                 onChange={handleMobileSearchChange}
-                onFocus={() => {
-                  if (
-                    filters.searchTerm.length >= 2 &&
-                    filteredSuggestions.length > 0
-                  ) {
-                    setShowSuggestions(true);
-                  }
-                }}
+                onKeyDown={handleKeyDown}
+                onFocus={handleSearchFocus}
+                onBlur={handleSearchBlur}
               />
               <button
                 type="submit"
-                className="absolute right-2 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 p-2 rounded-xl"
+                className="absolute right-2 -mt-3 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 p-2 rounded-xl"
               >
                 <Search className="w-5 h-5" />
               </button>
@@ -236,27 +387,88 @@ export default function HeroSection() {
 
             {/* Mobile Search Suggestions */}
             {showSuggestions && filteredSuggestions.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 max-h-48 overflow-y-auto">
-                {filteredSuggestions.map((college, index) => (
-                  <div
-                    key={`hero-mobile-${college.id}-${index}`}
-                    onClick={() => handleSuggestionClick(college)}
-                    className="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0 flex items-center justify-between"
-                  >
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium text-gray-900">
-                        {college.name}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        {college.type}
-                      </span>
-                    </div>
-                    <Search className="w-4 h-4 text-gray-400" />
+              <motion.div
+                initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+                className="absolute top-full left-0 right-0 mt-2 bg-white/98 backdrop-blur-lg border border-gray-200/60 rounded-2xl shadow-2xl z-[9999] max-h-64 overflow-y-auto"
+                style={{
+                  position: "absolute",
+                  zIndex: 9999,
+                  boxShadow:
+                    "0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.05)",
+                }}
+              >
+                <div className="p-2">
+                  <div className="text-xs font-semibold text-gray-500 px-3 py-2 uppercase tracking-wide">
+                    Suggested Colleges
                   </div>
-                ))}
-              </div>
+                  {filteredSuggestions.map((college, index) => (
+                    <motion.div
+                      key={`hero-mobile-${college.id}-${index}`}
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      onClick={() => handleSuggestionClick(college)}
+                      className={`group px-4 py-3 mx-1 cursor-pointer rounded-xl border transition-all duration-200 ease-in-out ${
+                        selectedIndex === index
+                          ? "bg-gradient-to-r from-blue-100 to-indigo-100 border-blue-200 shadow-md"
+                          : "hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 border-transparent hover:border-blue-100"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex flex-col flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full"></div>
+                            <span
+                              className={`text-sm font-semibold transition-colors truncate ${
+                                selectedIndex === index
+                                  ? "text-blue-800"
+                                  : "text-gray-900 group-hover:text-blue-700"
+                              }`}
+                            >
+                              {college.name}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 ml-3">
+                          <div
+                            className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${
+                              selectedIndex === index
+                                ? "bg-gradient-to-r from-blue-200 to-indigo-200 scale-110"
+                                : "bg-gradient-to-r from-blue-100 to-indigo-100 group-hover:from-blue-200 group-hover:to-indigo-200"
+                            }`}
+                          >
+                            <Search
+                              className={`w-4 h-4 transition-colors ${
+                                selectedIndex === index
+                                  ? "text-blue-700"
+                                  : "text-blue-600"
+                              }`}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+                <div className="border-t border-gray-100 p-3">
+                  <div className="text-xs text-gray-500 text-center">
+                    Press{" "}
+                    <kbd className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs font-mono">
+                      ↑↓
+                    </kbd>{" "}
+                    to navigate •{" "}
+                    <kbd className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs font-mono">
+                      Enter
+                    </kbd>{" "}
+                    to select
+                  </div>
+                </div>
+              </motion.div>
             )}
-          </div>
+          </motion.div>
         </form>
       </div>
     </section>
