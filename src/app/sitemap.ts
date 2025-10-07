@@ -57,15 +57,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
       // College streams - Engineering
       {
-        url: `${baseUrl}/colleges?stream=Engineering&page=1&limit=9`,
+        url: `${baseUrl}/colleges?stream=Engineering&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?stream=Engineering&page=2&limit=9`,
+        url: `${baseUrl}/colleges?stream=Engineering&amp;page=2&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?stream=Engineering&page=3&limit=9`,
+        url: `${baseUrl}/colleges?stream=Engineering&amp;page=3&amp;limit=9`,
         lastModified: new Date(),
       },
       {
@@ -75,30 +75,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
       // College streams - Medical
       {
-        url: `${baseUrl}/colleges?stream=Medical&page=1&limit=9`,
+        url: `${baseUrl}/colleges?stream=Medical&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?stream=Medical&page=2&limit=9`,
+        url: `${baseUrl}/colleges?stream=Medical&amp;page=2&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?stream=Medical&page=3&limit=9`,
+        url: `${baseUrl}/colleges?stream=Medical&amp;page=3&amp;limit=9`,
         lastModified: new Date(),
       },
       { url: `${baseUrl}/colleges?stream=Medical`, lastModified: new Date() },
 
       // College streams - Management
       {
-        url: `${baseUrl}/colleges?stream=Management&page=1&limit=9`,
+        url: `${baseUrl}/colleges?stream=Management&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?stream=Management&page=2&limit=9`,
+        url: `${baseUrl}/colleges?stream=Management&amp;page=2&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?stream=Management&page=3&limit=9`,
+        url: `${baseUrl}/colleges?stream=Management&amp;page=3&amp;limit=9`,
         lastModified: new Date(),
       },
       {
@@ -108,98 +108,110 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
       // College streams - Additional
       {
-        url: `${baseUrl}/colleges?stream=Architecture&page=1&limit=9`,
+        url: `${baseUrl}/colleges?stream=Architecture&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?stream=Pharmacy&page=1&limit=9`,
+        url: `${baseUrl}/colleges?stream=Pharmacy&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?stream=Law&page=1&limit=9`,
+        url: `${baseUrl}/colleges?stream=Law&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?stream=Science&page=1&limit=9`,
+        url: `${baseUrl}/colleges?stream=Science&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
 
       // College types/tags - IIT variations
       {
-        url: `${baseUrl}/colleges?tag=IIT&page=1&limit=9`,
+        url: `${baseUrl}/colleges?tag=IIT&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?tag=IIT&page=2&limit=9`,
+        url: `${baseUrl}/colleges?tag=IIT&amp;page=2&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?tag=IIT&page=3&limit=9`,
+        url: `${baseUrl}/colleges?tag=IIT&amp;page=3&amp;limit=9`,
         lastModified: new Date(),
       },
       { url: `${baseUrl}/colleges?tag=IIT`, lastModified: new Date() },
 
       // College types/tags - NIT variations
       {
-        url: `${baseUrl}/colleges?tag=NIT&page=1&limit=9`,
+        url: `${baseUrl}/colleges?tag=NIT&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?tag=NIT&page=2&limit=9`,
+        url: `${baseUrl}/colleges?tag=NIT&amp;page=2&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?tag=NIT&page=3&limit=9`,
+        url: `${baseUrl}/colleges?tag=NIT&amp;page=3&amp;limit=9`,
         lastModified: new Date(),
       },
       { url: `${baseUrl}/colleges?tag=NIT`, lastModified: new Date() },
 
       // College types/tags - IIIT variations
       {
-        url: `${baseUrl}/colleges?tag=IIIT&page=1&limit=9`,
+        url: `${baseUrl}/colleges?tag=IIIT&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?tag=IIIT&page=2&limit=9`,
+        url: `${baseUrl}/colleges?tag=IIIT&amp;page=2&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?tag=IIIT&page=3&limit=9`,
+        url: `${baseUrl}/colleges?tag=IIIT&amp;page=3&amp;limit=9`,
         lastModified: new Date(),
       },
       { url: `${baseUrl}/colleges?tag=IIIT`, lastModified: new Date() },
 
       // Additional College tags
       {
-        url: `${baseUrl}/colleges?tag=AIIMS&page=1&limit=9`,
+        url: `${baseUrl}/colleges?tag=AIIMS&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?tag=IIM&page=1&limit=9`,
+        url: `${baseUrl}/colleges?tag=IIM&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?tag=IISER&page=1&limit=9`,
+        url: `${baseUrl}/colleges?tag=IISER&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?tag=Government&page=1&limit=9`,
+        url: `${baseUrl}/colleges?tag=Government&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?tag=Private&page=1&limit=9`,
+        url: `${baseUrl}/colleges?tag=Private&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?tag=University&page=1&limit=9`,
+        url: `${baseUrl}/colleges?tag=University&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
 
       // College pagination
-      { url: `${baseUrl}/colleges?page=1&limit=10`, lastModified: new Date() },
-      { url: `${baseUrl}/colleges?page=1&limit=20`, lastModified: new Date() },
-      { url: `${baseUrl}/colleges?page=2&limit=9`, lastModified: new Date() },
-      { url: `${baseUrl}/colleges?page=3&limit=9`, lastModified: new Date() },
+      {
+        url: `${baseUrl}/colleges?page=1&amp;limit=10`,
+        lastModified: new Date(),
+      },
+      {
+        url: `${baseUrl}/colleges?page=1&amp;limit=20`,
+        lastModified: new Date(),
+      },
+      {
+        url: `${baseUrl}/colleges?page=2&amp;limit=9`,
+        lastModified: new Date(),
+      },
+      {
+        url: `${baseUrl}/colleges?page=3&amp;limit=9`,
+        lastModified: new Date(),
+      },
 
       // Exam pages - Main exams
       { url: `${baseUrl}/exam?exam=jee-main`, lastModified: new Date() },
@@ -230,27 +242,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
       // Cutoff with year variations
       {
-        url: `${baseUrl}/cutoff?examType=JEE-Main&year=2024`,
+        url: `${baseUrl}/cutoff?examType=JEE-Main&amp;year=2024`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/cutoff?examType=JEE-Main&year=2025`,
+        url: `${baseUrl}/cutoff?examType=JEE-Main&amp;year=2025`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/cutoff?examType=JEE-Advanced&year=2024`,
+        url: `${baseUrl}/cutoff?examType=JEE-Advanced&amp;year=2024`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/cutoff?examType=JEE-Advanced&year=2025`,
+        url: `${baseUrl}/cutoff?examType=JEE-Advanced&amp;year=2025`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/cutoff?examType=NEET-UG&year=2024`,
+        url: `${baseUrl}/cutoff?examType=NEET-UG&amp;year=2024`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/cutoff?examType=NEET-UG&year=2025`,
+        url: `${baseUrl}/cutoff?examType=NEET-UG&amp;year=2025`,
         lastModified: new Date(),
       },
 
@@ -278,79 +290,79 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
       // Location-based college searches
       {
-        url: `${baseUrl}/colleges?location=Delhi&page=1&limit=9`,
+        url: `${baseUrl}/colleges?location=Delhi&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?location=Mumbai&page=1&limit=9`,
+        url: `${baseUrl}/colleges?location=Mumbai&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?location=Bangalore&page=1&limit=9`,
+        url: `${baseUrl}/colleges?location=Bangalore&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?location=Chennai&page=1&limit=9`,
+        url: `${baseUrl}/colleges?location=Chennai&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?location=Hyderabad&page=1&limit=9`,
+        url: `${baseUrl}/colleges?location=Hyderabad&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?location=Pune&page=1&limit=9`,
+        url: `${baseUrl}/colleges?location=Pune&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?location=Kolkata&page=1&limit=9`,
+        url: `${baseUrl}/colleges?location=Kolkata&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
 
       // State-wise searches
       {
-        url: `${baseUrl}/colleges?state=Maharashtra&page=1&limit=9`,
+        url: `${baseUrl}/colleges?state=Maharashtra&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?state=Karnataka&page=1&limit=9`,
+        url: `${baseUrl}/colleges?state=Karnataka&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?state=Tamil Nadu&page=1&limit=9`,
+        url: `${baseUrl}/colleges?state=Tamil Nadu&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?state=Uttar Pradesh&page=1&limit=9`,
+        url: `${baseUrl}/colleges?state=Uttar Pradesh&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?state=West Bengal&page=1&limit=9`,
+        url: `${baseUrl}/colleges?state=West Bengal&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?state=Rajasthan&page=1&limit=9`,
+        url: `${baseUrl}/colleges?state=Rajasthan&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
 
       // Combined filters
       {
-        url: `${baseUrl}/colleges?stream=Engineering&tag=IIT`,
+        url: `${baseUrl}/colleges?stream=Engineering&amp;tag=IIT`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?stream=Medical&tag=AIIMS`,
+        url: `${baseUrl}/colleges?stream=Medical&amp;tag=AIIMS`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?stream=Management&tag=IIM`,
+        url: `${baseUrl}/colleges?stream=Management&amp;tag=IIM`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?stream=Engineering&tag=NIT`,
+        url: `${baseUrl}/colleges?stream=Engineering&amp;tag=NIT`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?stream=Engineering&tag=IIIT`,
+        url: `${baseUrl}/colleges?stream=Engineering&amp;tag=IIIT`,
         lastModified: new Date(),
       },
     ];
@@ -390,37 +402,37 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
       // College streams
       {
-        url: `${baseUrl}/colleges?stream=Engineering&page=1&limit=9`,
+        url: `${baseUrl}/colleges?stream=Engineering&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?stream=Medical&page=1&limit=9`,
+        url: `${baseUrl}/colleges?stream=Medical&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?stream=Management&page=1&limit=9`,
+        url: `${baseUrl}/colleges?stream=Management&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
 
       // College tags
       {
-        url: `${baseUrl}/colleges?tag=IIT&page=1&limit=9`,
+        url: `${baseUrl}/colleges?tag=IIT&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?tag=NIT&page=1&limit=9`,
+        url: `${baseUrl}/colleges?tag=NIT&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?tag=IIIT&page=1&limit=9`,
+        url: `${baseUrl}/colleges?tag=IIIT&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?tag=AIIMS&page=1&limit=9`,
+        url: `${baseUrl}/colleges?tag=AIIMS&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?tag=IIM&page=1&limit=9`,
+        url: `${baseUrl}/colleges?tag=IIM&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
 
@@ -453,19 +465,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
       // Location-based searches
       {
-        url: `${baseUrl}/colleges?location=Delhi&page=1&limit=9`,
+        url: `${baseUrl}/colleges?location=Delhi&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?location=Mumbai&page=1&limit=9`,
+        url: `${baseUrl}/colleges?location=Mumbai&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?location=Bangalore&page=1&limit=9`,
+        url: `${baseUrl}/colleges?location=Bangalore&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
       {
-        url: `${baseUrl}/colleges?location=Chennai&page=1&limit=9`,
+        url: `${baseUrl}/colleges?location=Chennai&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
     ];
