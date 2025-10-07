@@ -137,7 +137,7 @@ export function CollegeWiseCutoffs({ selectedExam }: CollegeWiseCutoffsProps) {
               </Table>
             )}
 
-            {selectedExam === "NEET" && (
+            {selectedExam === "NEET-UG" && (
               <Table>
                 <TableHeader>
                   <TableRow className="border-slate-200">

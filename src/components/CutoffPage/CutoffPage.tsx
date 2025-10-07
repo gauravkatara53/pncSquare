@@ -132,35 +132,67 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
     router.replace(`/cutoff?${params.toString()}`);
   }, [appliedFilters, router]);
 
+  // Check if exam is NEET-UG
+  const isNEET = stagedExam === "NEET-UG";
+
   // Check if all filters are selected (use staged filters to enable/disable Apply button)
-  const areAllFiltersSelected = useCallback(
-    (): boolean =>
-      stagedExam.trim() !== "" &&
-      stagedYear.trim() !== "" &&
-      stagedCategory.trim() !== "" &&
-      stagedQuota.trim() !== "" &&
-      stagedRound.trim() !== "" &&
-      stagedSubCategory.trim() !== "",
-    [
-      stagedExam,
-      stagedYear,
-      stagedCategory,
-      stagedQuota,
-      stagedRound,
-      stagedSubCategory,
-    ]
-  );
+  const areAllFiltersSelected = useCallback((): boolean => {
+    if (isNEET) {
+      // For NEET-UG, exam, year, category (seat type), and round are required
+      return (
+        stagedExam.trim() !== "" &&
+        stagedYear.trim() !== "" &&
+        stagedCategory.trim() !== "" &&
+        stagedRound.trim() !== ""
+      );
+    } else {
+      // For other exams, all filters are required
+      return (
+        stagedExam.trim() !== "" &&
+        stagedYear.trim() !== "" &&
+        stagedCategory.trim() !== "" &&
+        stagedQuota.trim() !== "" &&
+        stagedRound.trim() !== "" &&
+        stagedSubCategory.trim() !== ""
+      );
+    }
+  }, [
+    isNEET,
+    stagedExam,
+    stagedYear,
+    stagedCategory,
+    stagedQuota,
+    stagedRound,
+    stagedSubCategory,
+  ]);
 
   // Check if any filter other than exam is selected (staged filters)
   const isAnyFilterSelected = useCallback((): boolean => {
-    return (
-      stagedYear.trim() !== "" ||
-      stagedCategory.trim() !== "" ||
-      stagedQuota.trim() !== "" ||
-      stagedRound.trim() !== "" ||
-      stagedSubCategory.trim() !== ""
-    );
-  }, [stagedYear, stagedCategory, stagedQuota, stagedRound, stagedSubCategory]);
+    if (isNEET) {
+      // For NEET-UG, check year, category, and round
+      return (
+        stagedYear.trim() !== "" ||
+        stagedCategory.trim() !== "" ||
+        stagedRound.trim() !== ""
+      );
+    } else {
+      // For other exams, check all filters
+      return (
+        stagedYear.trim() !== "" ||
+        stagedCategory.trim() !== "" ||
+        stagedQuota.trim() !== "" ||
+        stagedRound.trim() !== "" ||
+        stagedSubCategory.trim() !== ""
+      );
+    }
+  }, [
+    isNEET,
+    stagedYear,
+    stagedCategory,
+    stagedQuota,
+    stagedRound,
+    stagedSubCategory,
+  ]);
 
   // Fetch cutoff data on Apply clicked, with appliedFilters update
   const applyFilters = () => {
@@ -177,22 +209,31 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
       subCategory: stagedSubCategory,
     };
 
+    // Prepare API parameters based on exam type
+    const apiParams: Record<string, string | number | undefined> = {
+      examType: newAppliedFilters.exam,
+      year: newAppliedFilters.year ? Number(newAppliedFilters.year) : undefined,
+      seatType: newAppliedFilters.category || undefined,
+    };
+
+    if (isNEET) {
+      // For NEET-UG, send examType, year, seatType, and round
+      // Don't include quota or subCategory
+      apiParams.round = newAppliedFilters.round || undefined;
+    } else {
+      // For other exams, include all parameters
+      apiParams.quota = newAppliedFilters.quota || undefined;
+      apiParams.round = newAppliedFilters.round || undefined;
+      apiParams.subCategory = newAppliedFilters.subCategory || undefined;
+    }
+
     apiService
       .get<{
         statusCode: number;
         data: CutoffItem[];
         message: string;
         success: boolean;
-      }>("/cutoff/all", {
-        examType: newAppliedFilters.exam,
-        year: newAppliedFilters.year
-          ? Number(newAppliedFilters.year)
-          : undefined,
-        seatType: newAppliedFilters.category || undefined,
-        quota: newAppliedFilters.quota || undefined,
-        round: newAppliedFilters.round || undefined,
-        subCategory: newAppliedFilters.subCategory || undefined,
-      })
+      }>("/cutoff/all", apiParams)
       .then((response) => {
         if (response.success) {
           setCutoffData(response.data);
@@ -219,18 +260,21 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
     // Reset staged filters except exam to empty
     setStagedYear("");
     setStagedCategory("");
-    setStagedQuota("");
-    setStagedRound("");
-    setStagedSubCategory("");
+    setStagedRound(""); // Reset round for both NEET and non-NEET
+    if (!isNEET) {
+      // Only reset these for non-NEET exams
+      setStagedQuota("");
+      setStagedSubCategory("");
+    }
 
     // Reset applied filters except exam to empty
     setAppliedFilters((prev) => ({
       ...prev,
       year: "",
       category: "",
-      quota: "",
-      round: "",
-      subCategory: "",
+      round: "", // Reset round for both NEET and non-NEET
+      quota: isNEET ? "" : prev.quota,
+      subCategory: isNEET ? "" : prev.subCategory,
     }));
 
     setSearchQuery("");
@@ -248,6 +292,7 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
     setStagedQuota("");
     setStagedRound("");
     setStagedSubCategory("");
+
     // Also reset applied filters for non-exam fields
     setAppliedFilters((prev) => ({
       ...prev,
@@ -258,6 +303,7 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
       round: "",
       subCategory: "",
     }));
+
     // Reset data and UI state
     setCutoffData([]);
     setShowFilteredResults(false);
@@ -368,6 +414,7 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
           applyFilters={applyFilters}
           isAnyFilterSelected={isAnyFilterSelected()}
           loading={loading}
+          isNEET={isNEET}
         />
         <div
           ref={resultsSectionRef}
@@ -385,6 +432,7 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
               expandedColleges={expandedColleges}
               toggleCollegeExpansion={toggleCollegeExpansion}
               allFiltersSelected={areAllFiltersSelected()}
+              isNEET={isNEET}
             />
           )}
         </div>

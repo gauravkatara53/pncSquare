@@ -88,8 +88,8 @@ export const examData = {
       change: { general: -0.1, obc: 4.0, sc: 7.5, st: 8.5 },
     },
   },
-  NEET: {
-    name: "NEET",
+  "NEET-UG": {
+    name: "NEET-UG",
     icon: Stethoscope,
     description: "Score based cutoffs for medical college admissions",
     trendData: neetTrends,

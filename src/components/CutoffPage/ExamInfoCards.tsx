@@ -29,7 +29,7 @@ export function ExamInfoCards({ selectedExam }: ExamInfoCardsProps) {
                 <p>• Mode: Computer Based Test (CBT)</p>
               </>
             )}
-            {selectedExam === "NEET" && (
+            {selectedExam === "NEET-UG" && (
               <>
                 <p>• Duration: 3 hours 20 minutes</p>
                 <p>• Total Questions: 200</p>
@@ -59,7 +59,7 @@ export function ExamInfoCards({ selectedExam }: ExamInfoCardsProps) {
                 <p>• Counselling: June onwards</p>
               </>
             )}
-            {selectedExam === "NEET" && (
+            {selectedExam === "NEET-UG" && (
               <>
                 <p>• Registration: Feb 9 - Mar 9</p>
                 <p>• Exam Date: May 5, 2024</p>
@@ -89,7 +89,7 @@ export function ExamInfoCards({ selectedExam }: ExamInfoCardsProps) {
                 <p>• Conducting Body: NTA</p>
               </>
             )}
-            {selectedExam === "NEET" && (
+            {selectedExam === "NEET-UG" && (
               <>
                 <p>• Total Applicants: ~20 lakh</p>
                 <p>• Total Seats: ~1.08 lakh</p>

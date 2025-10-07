@@ -40,6 +40,7 @@ interface FilteredCollegeSearchResultsProps {
   expandedColleges: Record<string, boolean>;
   toggleCollegeExpansion: (collegeId: string) => void;
   allFiltersSelected?: boolean;
+  isNEET?: boolean;
 }
 
 // Helper function to group branches by course name
@@ -76,6 +77,7 @@ export function FilteredCollegeSearchResults({
   expandedColleges,
   toggleCollegeExpansion,
   allFiltersSelected,
+  isNEET = false,
 }: FilteredCollegeSearchResultsProps) {
   if (!showFilteredResults) return null;
 
@@ -173,6 +175,11 @@ export function FilteredCollegeSearchResults({
                                   <th className="border px-4 py-2 text-left whitespace-normal break-words">
                                     Branch Name
                                   </th>
+                                  {isNEET && (
+                                    <th className="border px-4 py-2 text-center whitespace-normal break-words">
+                                      Quota
+                                    </th>
+                                  )}
                                   <th className="border px-4 py-2 text-center whitespace-normal break-words">
                                     Opening
                                   </th>
@@ -190,6 +197,12 @@ export function FilteredCollegeSearchResults({
                                     <td className="border px-4 py-2 break-words max-w-[70%] font-medium text-slate-900">
                                       {branch.name}
                                     </td>
+
+                                    {isNEET && (
+                                      <td className="border px-4 py-2 text-center font-medium text-gray-700">
+                                        {branch.quota || "N/A"}
+                                      </td>
+                                    )}
 
                                     <td className="border px-4 py-2 text-center font-medium text-gray-700">
                                       {branch.opening !== null ? (

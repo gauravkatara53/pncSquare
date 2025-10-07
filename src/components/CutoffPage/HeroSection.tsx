@@ -30,6 +30,7 @@ interface HeroSectionProps {
   applyFilters: () => void;
   isAnyFilterSelected: boolean;
   loading: boolean;
+  isNEET?: boolean;
 }
 
 export function HeroSection({
@@ -49,6 +50,7 @@ export function HeroSection({
   applyFilters,
   isAnyFilterSelected,
   loading,
+  isNEET = false,
 }: HeroSectionProps) {
   // Base rounds for all exams except 2024 year (which hides Round 6)
   const baseRounds = [
@@ -166,47 +168,53 @@ export function HeroSection({
                 </Select>
               </div>
 
-              <div className="w-full sm:w-auto flex-grow min-w-[120px]">
-                <label className="text-sm font-medium text-slate-700 mb-2 block">
-                  Quota
-                </label>
-                <Select
-                  value={selectedQuota}
-                  onValueChange={onQuotaChange}
-                  disabled={isJeeAdvanced}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Quota" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white">
-                    <SelectItem value="AI">All India</SelectItem>
-                    <SelectItem value="HS">Home State</SelectItem>
-                    <SelectItem value="OS">Other State</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              {/* Quota - hidden for NEET-UG */}
+              {!isNEET && (
+                <div className="w-full sm:w-auto flex-grow min-w-[120px]">
+                  <label className="text-sm font-medium text-slate-700 mb-2 block">
+                    Quota
+                  </label>
+                  <Select
+                    value={selectedQuota}
+                    onValueChange={onQuotaChange}
+                    disabled={isJeeAdvanced}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Quota" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                      <SelectItem value="AI">All India</SelectItem>
+                      <SelectItem value="HS">Home State</SelectItem>
+                      <SelectItem value="OS">Other State</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
-              <div className="w-full sm:w-auto flex-grow min-w-[150px]">
-                <label className="text-sm font-medium text-slate-700 mb-2 block">
-                  Subcategory
-                </label>
-                <Select
-                  value={selectedSubCategory}
-                  onValueChange={onSubCategoryChange}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Subcategory" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white">
-                    <SelectItem value="Gender-Neutral">
-                      Gender-Neutral
-                    </SelectItem>
-                    <SelectItem value="Female-only (including Supernumerary)">
-                      Female-only
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              {/* Subcategory - hidden for NEET-UG */}
+              {!isNEET && (
+                <div className="w-full sm:w-auto flex-grow min-w-[150px]">
+                  <label className="text-sm font-medium text-slate-700 mb-2 block">
+                    Subcategory
+                  </label>
+                  <Select
+                    value={selectedSubCategory}
+                    onValueChange={onSubCategoryChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Subcategory" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                      <SelectItem value="Gender-Neutral">
+                        Gender-Neutral
+                      </SelectItem>
+                      <SelectItem value="Female-only (including Supernumerary)">
+                        Female-only
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               <div className="w-full sm:w-auto flex-grow min-w-[150px]">
                 <label className="text-sm font-medium text-slate-700 mb-2 block">
@@ -220,20 +228,42 @@ export function HeroSection({
                     <SelectValue placeholder="Select Seat Type" />
                   </SelectTrigger>
                   <SelectContent className="bg-white">
-                    <SelectItem value="OPEN">Open</SelectItem>
-                    <SelectItem value="SC (PwD)">SC (PwD)</SelectItem>
-                    <SelectItem value="ST (PwD)">ST (PwD)</SelectItem>
-                    <SelectItem value="OBC-NCL (PwD)">OBC-NCL (PwD)</SelectItem>
-                    <SelectItem value="EWS (PwD)">EWS (PwD)</SelectItem>
-                    <SelectItem value="OPEN (PwD)">OPEN (PwD)</SelectItem>
-                    <SelectItem value="ST">ST</SelectItem>
-                    <SelectItem value="EWS">EWS</SelectItem>
-                    <SelectItem value="OBC-NCL">OBC-NCL</SelectItem>
-                    <SelectItem value="SC">SC</SelectItem>
+                    {isNEET ? (
+                      // NEET-UG specific seat types
+                      <>
+                        <SelectItem value="EWS">EWS</SelectItem>
+                        <SelectItem value="EWS PwD">EWS PwD</SelectItem>
+                        <SelectItem value="General">General</SelectItem>
+                        <SelectItem value="General PwD">General PwD</SelectItem>
+                        <SelectItem value="OBC">OBC</SelectItem>
+                        <SelectItem value="OBC PwD">OBC PwD</SelectItem>
+                        <SelectItem value="SC">SC</SelectItem>
+                        <SelectItem value="SC PwD">SC PwD</SelectItem>
+                        <SelectItem value="ST">ST</SelectItem>
+                        <SelectItem value="ST PwD">ST PwD</SelectItem>
+                      </>
+                    ) : (
+                      // Default seat types for other exams
+                      <>
+                        <SelectItem value="OPEN">Open</SelectItem>
+                        <SelectItem value="SC (PwD)">SC (PwD)</SelectItem>
+                        <SelectItem value="ST (PwD)">ST (PwD)</SelectItem>
+                        <SelectItem value="OBC-NCL (PwD)">
+                          OBC-NCL (PwD)
+                        </SelectItem>
+                        <SelectItem value="EWS (PwD)">EWS (PwD)</SelectItem>
+                        <SelectItem value="OPEN (PwD)">OPEN (PwD)</SelectItem>
+                        <SelectItem value="ST">ST</SelectItem>
+                        <SelectItem value="EWS">EWS</SelectItem>
+                        <SelectItem value="OBC-NCL">OBC-NCL</SelectItem>
+                        <SelectItem value="SC">SC</SelectItem>
+                      </>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
 
+              {/* Round - different options for NEET-UG vs other exams */}
               <div className="w-full sm:w-auto flex-grow min-w-[120px]">
                 <label className="text-sm font-medium text-slate-700 mb-2 block">
                   Round
@@ -243,11 +273,21 @@ export function HeroSection({
                     <SelectValue placeholder="Select Round" />
                   </SelectTrigger>
                   <SelectContent className="bg-white">
-                    {roundsToDisplay.map((round) => (
-                      <SelectItem key={round.value} value={round.value}>
-                        {round.label}
-                      </SelectItem>
-                    ))}
+                    {isNEET ? (
+                      // NEET-UG specific rounds (1, 2, 3)
+                      <>
+                        <SelectItem value="1">1</SelectItem>
+                        <SelectItem value="2">2</SelectItem>
+                        <SelectItem value="3">3</SelectItem>
+                      </>
+                    ) : (
+                      // Other exams rounds
+                      roundsToDisplay.map((round) => (
+                        <SelectItem key={round.value} value={round.value}>
+                          {round.label}
+                        </SelectItem>
+                      ))
+                    )}
                   </SelectContent>
                 </Select>
               </div>
