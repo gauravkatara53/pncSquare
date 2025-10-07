@@ -13,6 +13,7 @@ type CutoffDataRow = {
   round: string;
   seatType: string;
   course: string; // e.g. "5 Years, Bachelor and Master of Technology (Dual Degree)" or "4 Years, Bachelor of Technology"
+  quota?: string; // Add quota field for NEET
 };
 
 type Year = "2025" | "2024";
@@ -36,9 +37,28 @@ const seatTypeOptions = [
   "OBC-NCL",
 ];
 
+const neetSeatTypeOptions = [
+  "EWS",
+  "EWS PwD",
+  "General",
+  "General PwD",
+  "OBC",
+  "OBC PwD",
+  "SC",
+  "SC PwD",
+  "ST",
+  "ST PwD",
+];
+
 const skeletonRowsCount = 5;
 
-export function Cutoffs({ college }: { college: string }) {
+export function Cutoffs({
+  college,
+  examType,
+}: {
+  college: string;
+  examType?: string;
+}) {
   const [year, setYear] = useState("");
   const [subCategory, setSubCategory] = useState("");
   const [quota, setQuota] = useState("");
@@ -54,6 +74,12 @@ export function Cutoffs({ college }: { college: string }) {
 
   // Determine if college is IIT by checking if slug starts with "iit-" (case-insensitive)
   const isIIT = college?.toLowerCase().startsWith("iit-") ?? false;
+
+  // Determine if exam type is NEET-UG
+  const isNEET = examType === "NEET-UG";
+
+  // Get appropriate seat type options based on exam type
+  const currentSeatTypeOptions = isNEET ? neetSeatTypeOptions : seatTypeOptions;
 
   // Responsive detection
   useEffect(() => {
@@ -73,38 +99,65 @@ export function Cutoffs({ college }: { college: string }) {
       setQuota("");
     }
     // Reset other filters and data on college or year change
-    setSubCategory("");
+    if (!isNEET) {
+      setSubCategory("");
+    } else {
+      // For NEET, we don't need subCategory, so keep it empty
+      setSubCategory("");
+    }
     setSeatType("");
     setRows([]);
     setRounds([]);
     setRound("");
-  }, [college, year, isIIT]);
+  }, [college, year, isIIT, isNEET]);
 
   // Fetch cutoff data when filters change
   useEffect(() => {
-    if (!college || !year || !subCategory || !seatType) {
-      setRows([]);
-      setRounds([]);
-      setRound(""); // important reset here
-      return;
-    }
-    // For non-IIT quota must be selected
-    if (!isIIT && !quota) {
-      setRows([]);
-      setRounds([]);
-      setRound("");
-      return;
+    // For NEET-UG, only require year and seatType
+    if (isNEET) {
+      if (!college || !year || !seatType) {
+        setRows([]);
+        setRounds([]);
+        setRound("");
+        return;
+      }
+    } else {
+      // For non-NEET colleges, use existing logic
+      if (!college || !year || !subCategory || !seatType) {
+        setRows([]);
+        setRounds([]);
+        setRound(""); // important reset here
+        return;
+      }
+      // For non-IIT quota must be selected
+      if (!isIIT && !quota) {
+        setRows([]);
+        setRounds([]);
+        setRound("");
+        return;
+      }
     }
 
     setLoading(true);
+
+    // Prepare API parameters based on exam type
+    const apiParams: Record<string, string> = {
+      slug: college,
+      year,
+      seatType,
+    };
+
+    if (isNEET) {
+      // For NEET-UG, only send year and seatType
+      // No subCategory or quota needed
+    } else {
+      // For non-NEET colleges, include subCategory and quota
+      apiParams.subCategory = subCategory;
+      apiParams.quota = isIIT ? "AI" : quota;
+    }
+
     apiService
-      .get<{ data: CutoffDataRow[] }>("/cutoff/all", {
-        slug: college,
-        year,
-        quota: isIIT ? "AI" : quota,
-        seatType,
-        subCategory,
-      })
+      .get<{ data: CutoffDataRow[] }>("/cutoff/all", apiParams)
       .then((res) => {
         const dataRows = res.data as CutoffDataRow[];
         setRows(dataRows);
@@ -119,7 +172,7 @@ export function Cutoffs({ college }: { college: string }) {
         setRounds([]);
         setRound("");
       });
-  }, [college, year, subCategory, quota, seatType, isIIT]);
+  }, [college, year, subCategory, quota, seatType, isIIT, isNEET]);
 
   // Show skeleton animation on round switch only if data is loaded
   useEffect(() => {
@@ -185,33 +238,35 @@ export function Cutoffs({ college }: { college: string }) {
             </select>
           </div>
 
-          {/* Sub Category */}
-          <div className="flex-1">
-            <label className="block mb-2 font-semibold text-slate-700 text-left">
-              Sub Category
-            </label>
-            <select
-              className="w-full rounded border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-              value={subCategory}
-              onChange={(e) => {
-                setSubCategory(e.target.value);
-                setRows([]);
-                setRounds([]);
-                setRound("");
-              }}
-              disabled={!year}
-            >
-              <option value="">Select</option>
-              {subCategoryOptions.map((sub) => (
-                <option key={sub} value={sub}>
-                  {sub}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Sub Category - hidden for NEET-UG */}
+          {!isNEET && (
+            <div className="flex-1">
+              <label className="block mb-2 font-semibold text-slate-700 text-left">
+                Sub Category
+              </label>
+              <select
+                className="w-full rounded border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                value={subCategory}
+                onChange={(e) => {
+                  setSubCategory(e.target.value);
+                  setRows([]);
+                  setRounds([]);
+                  setRound("");
+                }}
+                disabled={!year}
+              >
+                <option value="">Select</option>
+                {subCategoryOptions.map((sub) => (
+                  <option key={sub} value={sub}>
+                    {sub}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
-          {/* Quota — hidden if IIT */}
-          {!isIIT && (
+          {/* Quota — hidden if IIT or NEET-UG */}
+          {!isIIT && !isNEET && (
             <div className="flex-1">
               <label className="block mb-2 font-semibold text-slate-700 text-left">
                 Quota
@@ -254,7 +309,7 @@ export function Cutoffs({ college }: { college: string }) {
               disabled={!year}
             >
               <option value="">Select Seat Type</option>
-              {seatTypeOptions.map((s) => (
+              {currentSeatTypeOptions.map((s) => (
                 <option key={s} value={s}>
                   {s}
                 </option>
@@ -266,10 +321,9 @@ export function Cutoffs({ college }: { college: string }) {
 
       {/* Rounds Navigation */}
       {year &&
-        subCategory &&
-        (isIIT || quota) &&
         seatType &&
-        rounds.length > 0 && (
+        rounds.length > 0 &&
+        (isNEET || (subCategory && (isIIT || quota))) && (
           <div className="w-full md:max-w-8xl ">
             {isMobile ? (
               <div className="bg-white rounded-lg p-4 shadow border border-slate-200 mb-4">
@@ -311,7 +365,7 @@ export function Cutoffs({ college }: { college: string }) {
         )}
 
       {/* Data Table with animation on round change */}
-      {year && subCategory && (isIIT || quota) && seatType && (
+      {year && seatType && (isNEET || (subCategory && (isIIT || quota))) && (
         <div className="overflow-x-hidden mt-4 bg-white rounded-lg shadow-md border border-slate-200 px-0 py-6 w-full">
           {loading || tableLoading ? (
             // Skeleton table with wave animation
@@ -321,6 +375,11 @@ export function Cutoffs({ college }: { college: string }) {
                   <th className="border-b px-6 py-3 text-left font-semibold text-slate-700">
                     <Skeleton width={100} />
                   </th>
+                  {isNEET && (
+                    <th className="border-b px-6 py-3 font-semibold text-slate-700 text-center">
+                      <Skeleton width={80} />
+                    </th>
+                  )}
                   <th className="border-b px-6 py-3 font-semibold text-slate-700 text-center">
                     <Skeleton width={150} />
                   </th>
@@ -338,6 +397,11 @@ export function Cutoffs({ college }: { college: string }) {
                     <td className="border-b px-6 py-3">
                       <Skeleton />
                     </td>
+                    {isNEET && (
+                      <td className="border-b px-6 py-3">
+                        <Skeleton />
+                      </td>
+                    )}
                     <td className="border-b px-6 py-3">
                       <Skeleton />
                     </td>
@@ -368,6 +432,11 @@ export function Cutoffs({ college }: { college: string }) {
                       <th className="border-b px-6 py-3 text-left font-semibold text-slate-700">
                         Branch Name
                       </th>
+                      {isNEET && (
+                        <th className="border-b px-6 py-3 font-semibold text-slate-700 text-center">
+                          Quota
+                        </th>
+                      )}
                       <th className="border-b px-6 py-3 font-semibold text-slate-700 text-center">
                         Opening
                       </th>
@@ -388,6 +457,11 @@ export function Cutoffs({ college }: { college: string }) {
                           className={idx % 2 === 0 ? "bg-white" : "bg-slate-50"}
                         >
                           <td className="border-b px-6 py-3">{row.branch}</td>
+                          {isNEET && (
+                            <td className="border-b px-6 py-3 text-center">
+                              {row.quota || "N/A"}
+                            </td>
+                          )}
                           <td className="border-b px-6 py-3 text-center">
                             {row.openingRank}
                           </td>

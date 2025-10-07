@@ -197,7 +197,10 @@ const CollegePageClient: React.FC<Props> = ({ slug }) => {
         </section>
 
         <section id="cutoff">
-          <Cutoffs college={college.slug ?? ""} />
+          <Cutoffs
+            college={slug}
+            examType={(college.examType as string) || ""}
+          />
         </section>
 
         <section id="ranking">
