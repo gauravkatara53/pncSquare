@@ -128,19 +128,47 @@ export default function NewsArticleClient({ slug }: Props) {
       </div>
     );
 
+  // Function to process HTML content and handle links
+  const processHtmlWithLinks = (htmlContent: string) => {
+    // First check if content already contains HTML links
+    if (htmlContent.includes("<a ") || htmlContent.includes("<A ")) {
+      return (
+        <span
+          dangerouslySetInnerHTML={{
+            __html: htmlContent.replace(
+              /<a\s+([^>]*?)>/gi,
+              '<a $1 target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 underline font-medium">'
+            ),
+          }}
+        />
+      );
+    }
+
+    // If no HTML links, check for plain text URLs
+    const urlRegex = /(https?:\/\/[^\s<>"]+)/gi;
+    if (urlRegex.test(htmlContent)) {
+      const processedHtml = htmlContent.replace(
+        urlRegex,
+        '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 underline font-medium break-all">Click</a>'
+      );
+      return <span dangerouslySetInnerHTML={{ __html: processedHtml }} />;
+    }
+
+    // If no URLs found, return as normal HTML
+    return <span dangerouslySetInnerHTML={{ __html: htmlContent }} />;
+  };
+
   // Render article content sections (paragraphs, images, and tables)
   const renderSections = () =>
     article.sections.map((section) => (
       <section key={section._id} className="mb-8">
         <h2 className="sm:text-2xl text-xl font-semibold mb-4">
-          {section.heading}
+          {processHtmlWithLinks(section.heading)}
         </h2>
         {section.paragraphs.map((para, idx) => (
-          <p
-            key={idx}
-            className="mb-4 leading-relaxed text-gray-700"
-            dangerouslySetInnerHTML={{ __html: para }}
-          />
+          <p key={idx} className="mb-4 leading-relaxed text-gray-700">
+            {processHtmlWithLinks(para)}
+          </p>
         ))}
         {section.image && (
           <div className="my-6">
@@ -179,7 +207,7 @@ export default function NewsArticleClient({ slug }: Props) {
                         key={cellIndex}
                         className="border border-gray-300 px-4 py-2"
                       >
-                        {cell}
+                        {processHtmlWithLinks(cell)}
                       </td>
                     ))}
                   </tr>
