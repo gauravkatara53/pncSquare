@@ -47,6 +47,13 @@ interface NewsArticle {
   updatedAt: string;
 }
 
+interface RelatedArticle {
+  id: string;
+  title: string;
+  slug: string;
+  coverImage: string;
+}
+
 // import { useParams } from "next/navigation";
 import ScrollToTop from "@/components/ScrollToTop";
 import CollegeHeroSkeleton from "@/components/colleges/CollegeSkeleton";
@@ -58,6 +65,8 @@ export default function NewsArticleClient({ slug }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCopyToast, setShowCopyToast] = useState(false);
+  const [relatedArticles, setRelatedArticles] = useState<RelatedArticle[]>([]);
+  const [relatedLoading, setRelatedLoading] = useState(false);
 
   useEffect(() => {
     if (!slug || typeof slug !== "string") {
@@ -89,6 +98,53 @@ export default function NewsArticleClient({ slug }: Props) {
 
     fetchArticle();
   }, [slug]);
+
+  // Fetch related articles after main article loads
+  useEffect(() => {
+    if (!article || relatedArticles.length > 0) return;
+
+    const fetchRelatedArticles = async () => {
+      try {
+        console.log("🔍 Fetching related articles for slug:", slug);
+        setRelatedLoading(true);
+
+        interface RelatedArticlesApiResponse {
+          data?: {
+            relatedArticles: RelatedArticle[];
+          };
+          relatedArticles?: RelatedArticle[];
+        }
+        const response: RelatedArticlesApiResponse = await apiService.get(
+          `/news/related/${slug}`
+        );
+        console.log("📄 Related articles API response:", response);
+
+        // Check if the response has the expected structure based on your API format
+        if (response && response.data && response.data.relatedArticles) {
+          console.log(
+            "✅ Found related articles:",
+            response.data.relatedArticles.length
+          );
+          setRelatedArticles(response.data.relatedArticles);
+        } else if (response && response.relatedArticles) {
+          console.log(
+            "✅ Found related articles (direct):",
+            response.relatedArticles.length
+          );
+          setRelatedArticles(response.relatedArticles);
+        } else {
+          console.log("❌ No related articles found in response");
+          console.log("Response structure:", Object.keys(response || {}));
+        }
+      } catch (error) {
+        console.error("❌ Error fetching related articles:", error);
+      } finally {
+        setRelatedLoading(false);
+      }
+    };
+
+    fetchRelatedArticles();
+  }, [article, slug, relatedArticles.length]);
 
   // Function to handle sharing - copies URL to clipboard and shows toast
   const handleShare = async () => {
@@ -705,6 +761,89 @@ export default function NewsArticleClient({ slug }: Props) {
             </aside>
           </div>
         </div>
+        {/* Related Articles Section - Full Width Horizontal */}
+        {relatedArticles.length > 0 && (
+          <section className="bg-gray-50 py-12 mt-16">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">
+                Related Articles
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {relatedArticles.slice(0, 4).map((relatedArticle) => (
+                  <div
+                    key={relatedArticle.id}
+                    className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer group transform hover:-translate-y-1"
+                    onClick={() =>
+                      window.open(
+                        `/newsarticle/${relatedArticle.slug}`,
+                        "_self"
+                      )
+                    }
+                  >
+                    <div className="aspect-video w-full relative overflow-hidden">
+                      <Image
+                        src={relatedArticle.coverImage}
+                        alt={relatedArticle.title}
+                        width={300}
+                        height={200}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                    </div>
+                    <div className="p-4">
+                      <h3 className="font-semibold text-gray-900 mb-2 line-clamp-3 text-sm leading-relaxed group-hover:text-blue-600 transition-colors duration-200">
+                        {relatedArticle.title}
+                      </h3>
+                      <div className="flex items-center justify-between mt-3">
+                        <span className="text-xs text-gray-500 font-medium">
+                          Read More
+                        </span>
+                        <svg
+                          className="w-4 h-4 text-blue-600 transform group-hover:translate-x-1 transition-transform duration-200"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M17 8l4 4m0 0l-4 4m4-4H3"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Loading state for related articles */}
+        {relatedLoading && (
+          <section className="bg-gray-50 py-12 mt-16">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">
+                Related Articles
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden animate-pulse"
+                  >
+                    <div className="aspect-video w-full bg-gray-200"></div>
+                    <div className="p-4">
+                      <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                      <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         <Footer />
 
