@@ -5,6 +5,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import Script from "next/script";
 import { GA_TRACKING_ID } from "@/lib/gtag";
 import Analytics from "@/components/common/Analytics";
+import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
@@ -36,6 +37,9 @@ export default function RootLayout({
           <Suspense fallback={null}>
             <Analytics />
           </Suspense>
+
+          {/* ✅ Vercel Analytics */}
+          <VercelAnalytics />
 
           {/* ✅ GA Scripts */}
           <Script
