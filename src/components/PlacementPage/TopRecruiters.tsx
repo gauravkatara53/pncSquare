@@ -94,6 +94,7 @@ export function TopRecruiters({ slug, year }: TopRecruitersProps) {
         const url = `/placement/get/${encodeURIComponent(
           slug
         )}/recruiters?year=${year}`;
+        console.log("Fetching recruiters from URL:", url);
         const response = await apiService.get<{ data: RecruitersApiResponse }>(
           url
         );
@@ -107,9 +108,21 @@ export function TopRecruiters({ slug, year }: TopRecruitersProps) {
           bannerImage: apiData.bannerImage,
         });
       } catch (err) {
+        // Handle 404 errors gracefully - this might be normal if no recruiter data exists
+        if (err && typeof err === "object" && "response" in err) {
+          const axiosError = err as { response?: { status?: number } };
+          if (axiosError.response?.status === 404) {
+            console.warn(
+              `No recruiter data found for slug: ${slug}, year: ${year}`
+            );
+          } else {
+            console.error("Error fetching recruiters:", err);
+          }
+        } else {
+          console.error("Error fetching recruiters:", err);
+        }
         setRecruiters([]);
         setSummaryStats({});
-        console.error("Error fetching recruiters:", err);
       } finally {
         setLoading(false);
       }

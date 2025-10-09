@@ -19,6 +19,7 @@ export interface CollegeData {
   state: string;
   country: string;
   pincode: string;
+  examType?: string | string[]; // Support both string and array of strings for exam types
   // ... any other fields
 }
 

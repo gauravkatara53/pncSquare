@@ -34,6 +34,7 @@ export type CollegeData = {
   placementRate?: number;
   image_url?: string;
   address?: string;
+  examType?: string | string[]; // Support both string and array of strings
   campusFacilities?: {
     name: string;
     available: boolean;
@@ -199,7 +200,13 @@ const CollegePageClient: React.FC<Props> = ({ slug }) => {
         <section id="cutoff">
           <Cutoffs
             college={slug}
-            examType={(college.examType as string) || ""}
+            examTypes={
+              Array.isArray(college.examType)
+                ? college.examType
+                : college.examType
+                ? [college.examType]
+                : []
+            }
           />
         </section>
 
