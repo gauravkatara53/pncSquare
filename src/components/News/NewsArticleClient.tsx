@@ -54,6 +54,18 @@ interface RelatedArticle {
   coverImage: string;
 }
 
+interface RelatedArticlesResponse {
+  statusCode: number;
+  data: {
+    relatedArticles: RelatedArticle[];
+    totalFound: number;
+  };
+  message: string;
+  success: boolean;
+  errors: null;
+  timestamp: string;
+}
+
 // import { useParams } from "next/navigation";
 import ScrollToTop from "@/components/ScrollToTop";
 import CollegeHeroSkeleton from "@/components/colleges/CollegeSkeleton";
