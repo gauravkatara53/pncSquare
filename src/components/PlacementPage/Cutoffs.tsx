@@ -3,8 +3,14 @@ import React, { useState, useEffect, useMemo } from "react";
 import { Trophy } from "lucide-react";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import { apiService } from "@/ApiService/apiService"; // Adjust import path
-import { motion, AnimatePresence } from "framer-motion"; // Animation for row entrance
+import { apiService } from "@/ApiService/apiService";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  getCollegeTagFromSlug,
+  getCompleteFilterOptions,
+  isIITCollege,
+  getDefaultQuota,
+} from "@/config/cutoffFilters";
 
 type CutoffDataRow = {
   branch: string;
@@ -12,43 +18,9 @@ type CutoffDataRow = {
   closingRank: number;
   round: string;
   seatType: string;
-  course: string; // e.g. "5 Years, Bachelor and Master of Technology (Dual Degree)" or "4 Years, Bachelor of Technology"
-  quota?: string; // Add quota field for NEET
+  course: string;
+  quota?: string;
 };
-
-type Year = "2025" | "2024";
-type SubCategory = "Gender-Neutral" | "Female-only (including Supernumerary)";
-
-const yearOptions: Year[] = ["2025", "2024"];
-const subCategoryOptions: SubCategory[] = [
-  "Gender-Neutral",
-  "Female-only (including Supernumerary)",
-];
-const quotaOptions = ["HS", "OS", "AI"];
-const seatTypeOptions = [
-  "SC (PwD)",
-  "ST (PwD)",
-  "OPEN",
-  "OBC-NCL (PwD)",
-  "EWS (PwD)",
-  "OPEN (PwD)",
-  "ST",
-  "EWS",
-  "OBC-NCL",
-];
-
-const neetSeatTypeOptions = [
-  "EWS",
-  "EWS PwD",
-  "General",
-  "General PwD",
-  "OBC",
-  "OBC PwD",
-  "SC",
-  "SC PwD",
-  "ST",
-  "ST PwD",
-];
 
 const skeletonRowsCount = 5;
 
@@ -64,23 +36,28 @@ export function Cutoffs({
   const [subCategory, setSubCategory] = useState("");
   const [quota, setQuota] = useState("");
   const [seatType, setSeatType] = useState("");
-  const [round, setRound] = useState(""); // selected round
+  const [round, setRound] = useState("");
 
   const [isMobile, setIsMobile] = useState(false);
-  const [loading, setLoading] = useState(false); // API loading
-  const [tableLoading, setTableLoading] = useState(false); // for round/tab switch animation
+  const [loading, setLoading] = useState(false);
+  const [tableLoading, setTableLoading] = useState(false);
 
   const [rows, setRows] = useState<CutoffDataRow[]>([]);
   const [rounds, setRounds] = useState<string[]>([]);
 
-  // Determine if college is IIT by checking if slug starts with "iit-" (case-insensitive)
-  const isIIT = college?.toLowerCase().startsWith("iit-") ?? false;
+  // Get college tag and filter options
+  const collegeTag = useMemo(() => getCollegeTagFromSlug(college), [college]);
+  const filterOptions = useMemo(() => {
+    return selectedExamType
+      ? getCompleteFilterOptions(college, selectedExamType)
+      : null;
+  }, [college, selectedExamType]);
+
+  // Determine if college is IIT
+  const isIIT = useMemo(() => isIITCollege(college), [college]);
 
   // Determine if exam type is NEET-UG
   const isNEET = selectedExamType === "NEET-UG";
-
-  // Get appropriate seat type options based on exam type
-  const currentSeatTypeOptions = isNEET ? neetSeatTypeOptions : seatTypeOptions;
 
   // Initialize selectedExamType with first exam type if available
   useEffect(() => {
@@ -88,6 +65,18 @@ export function Cutoffs({
       setSelectedExamType(examTypes[0]);
     }
   }, [examTypes, selectedExamType]);
+
+  // Set default quota for IIT colleges
+  useEffect(() => {
+    if (isIIT && selectedExamType) {
+      const defaultQuota = getDefaultQuota(collegeTag);
+      if (defaultQuota) {
+        setQuota(defaultQuota);
+      }
+    } else if (!isIIT) {
+      setQuota("");
+    }
+  }, [isIIT, selectedExamType, collegeTag]);
 
   // Responsive detection
   useEffect(() => {
@@ -121,56 +110,58 @@ export function Cutoffs({
 
   // Fetch cutoff data when filters change
   useEffect(() => {
-    // Don't fetch if no exam type is selected
-    if (!selectedExamType) {
+    // Don't fetch if no exam type is selected or no filter options available
+    if (!selectedExamType || !filterOptions) {
       setRows([]);
       setRounds([]);
       setRound("");
       return;
     }
 
-    // For NEET-UG, only require year and seatType
-    if (isNEET) {
-      if (!college || !year || !seatType) {
-        setRows([]);
-        setRounds([]);
-        setRound("");
-        return;
-      }
-    } else {
-      // For non-NEET colleges, use existing logic
-      if (!college || !year || !subCategory || !seatType) {
-        setRows([]);
-        setRounds([]);
-        setRound(""); // important reset here
-        return;
-      }
-      // For non-IIT quota must be selected
-      if (!isIIT && !quota) {
-        setRows([]);
-        setRounds([]);
-        setRound("");
-        return;
-      }
+    // Check required fields based on filter configuration
+    if (!college || !year || !seatType) {
+      setRows([]);
+      setRounds([]);
+      setRound("");
+      return;
+    }
+
+    // Check if sub category is required and not selected
+    if (filterOptions.requiresSubCategory && !subCategory) {
+      setRows([]);
+      setRounds([]);
+      setRound("");
+      return;
+    }
+
+    // Check if quota is required and not selected
+    if (filterOptions.requiresQuota && !quota) {
+      setRows([]);
+      setRounds([]);
+      setRound("");
+      return;
     }
 
     setLoading(true);
 
-    // Prepare API parameters based on exam type
+    // Prepare API parameters based on filter configuration
     const apiParams: Record<string, string> = {
       slug: college,
       year,
       seatType,
-      examType: selectedExamType, // Include the selected exam type
+      examType: selectedExamType,
     };
 
-    if (isNEET) {
-      // For NEET-UG, only send year and seatType
-      // No subCategory or quota needed
-    } else {
-      // For non-NEET colleges, include subCategory and quota
+    // Add optional parameters based on filter requirements
+    if (filterOptions.requiresSubCategory && subCategory) {
       apiParams.subCategory = subCategory;
-      apiParams.quota = isIIT ? "AI" : quota;
+    }
+
+    if (filterOptions.requiresQuota && quota) {
+      apiParams.quota = quota;
+    } else if (isIIT && filterOptions.quotaOptions.length > 0) {
+      // For IITs, use the first available quota option (usually "AI")
+      apiParams.quota = filterOptions.quotaOptions[0];
     }
 
     apiService
@@ -196,8 +187,8 @@ export function Cutoffs({
     quota,
     seatType,
     selectedExamType,
+    filterOptions,
     isIIT,
-    isNEET,
   ]);
 
   // Show skeleton animation on round switch only if data is loaded
@@ -301,7 +292,7 @@ export function Cutoffs({
                   disabled={!selectedExamType}
                 >
                   <option value="">Select Year</option>
-                  {yearOptions.map((y) => (
+                  {filterOptions?.years.map((y) => (
                     <option key={y} value={y}>
                       {y}
                     </option>
@@ -309,8 +300,8 @@ export function Cutoffs({
                 </select>
               </div>
 
-              {/* Sub Category - hidden for NEET-UG */}
-              {!isNEET && (
+              {/* Sub Category - show only if required */}
+              {filterOptions?.requiresSubCategory && (
                 <div className="flex-1">
                   <label className="block mb-2 font-semibold text-slate-700 text-left">
                     Sub Category
@@ -327,7 +318,7 @@ export function Cutoffs({
                     disabled={!year}
                   >
                     <option value="">Select</option>
-                    {subCategoryOptions.map((sub) => (
+                    {filterOptions?.subCategories.map((sub) => (
                       <option key={sub} value={sub}>
                         {sub}
                       </option>
@@ -336,8 +327,8 @@ export function Cutoffs({
                 </div>
               )}
 
-              {/* Quota — hidden if IIT or NEET-UG */}
-              {!isIIT && !isNEET && (
+              {/* Quota — show only if required */}
+              {filterOptions?.requiresQuota && (
                 <div className="flex-1">
                   <label className="block mb-2 font-semibold text-slate-700 text-left">
                     Quota
@@ -354,7 +345,7 @@ export function Cutoffs({
                     disabled={!year}
                   >
                     <option value="">Select Quota</option>
-                    {quotaOptions.map((q) => (
+                    {filterOptions?.quotaOptions.map((q) => (
                       <option key={q} value={q}>
                         {q}
                       </option>
@@ -380,7 +371,7 @@ export function Cutoffs({
                   disabled={!year}
                 >
                   <option value="">Select Seat Type</option>
-                  {currentSeatTypeOptions.map((s) => (
+                  {filterOptions?.seatTypeOptions.map((s) => (
                     <option key={s} value={s}>
                       {s}
                     </option>
@@ -395,7 +386,9 @@ export function Cutoffs({
             year &&
             seatType &&
             rounds.length > 0 &&
-            (isNEET || (subCategory && (isIIT || quota))) && (
+            filterOptions &&
+            (!filterOptions.requiresSubCategory || subCategory) &&
+            (!filterOptions.requiresQuota || quota) && (
               <div className="w-full md:max-w-8xl ">
                 {isMobile ? (
                   <div className="bg-white rounded-lg p-4 shadow border border-slate-200 mb-4">
@@ -443,7 +436,9 @@ export function Cutoffs({
           {selectedExamType &&
             year &&
             seatType &&
-            (isNEET || (subCategory && (isIIT || quota))) && (
+            filterOptions &&
+            (!filterOptions.requiresSubCategory || subCategory) &&
+            (!filterOptions.requiresQuota || quota) && (
               <div className="overflow-x-hidden mt-4 bg-white rounded-lg shadow-md border border-slate-200 px-0 py-6 w-full">
                 {loading || tableLoading ? (
                   // Skeleton table with wave animation

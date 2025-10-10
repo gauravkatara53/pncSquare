@@ -35,6 +35,7 @@ export type CollegeData = {
   image_url?: string;
   address?: string;
   examType?: string | string[]; // Support both string and array of strings
+  availablePlacementReports?: number[]; // Array of years for which placement data is available
   campusFacilities?: {
     name: string;
     available: boolean;
@@ -238,9 +239,13 @@ const CollegePageClient: React.FC<Props> = ({ slug }) => {
           />
         </section>
 
-        <section id="placements">
-          <PlacementPage college={college} />
-        </section>
+        {/* Only show placement section if availablePlacementReports exists and has data */}
+        {college.availablePlacementReports &&
+          college.availablePlacementReports.length > 0 && (
+            <section id="placements">
+              <PlacementPage college={college} />
+            </section>
+          )}
       </main>
 
       <Footer />

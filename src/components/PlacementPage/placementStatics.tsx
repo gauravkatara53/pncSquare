@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { StatsCards } from "../ui/StatsCards";
 import { Card } from "../ui/card";
 import { apiService } from "../../ApiService/apiService";
@@ -9,6 +9,7 @@ import { TopRecruiters } from "./TopRecruiters";
 interface College {
   slug?: string;
   name?: string;
+  availablePlacementReports?: number[];
   isPlacementRateAvailable?: boolean;
   isMedianPackageAvailable?: boolean;
   isHighestPackageAvailable?: boolean;
@@ -25,7 +26,21 @@ interface PlacementDataItem {
 }
 
 export function PlacementPage({ college }: { college: College }) {
-  const [year, setYear] = useState(2025); // default year
+  // Get available years from college data, fallback to empty array if not available
+  const availableYears = useMemo(
+    () => college.availablePlacementReports || [],
+    [college.availablePlacementReports]
+  );
+
+  // Set default year to the most recent year (first in the sorted array) or 2025 if no years available
+  const [year, setYear] = useState(() => {
+    if (availableYears.length > 0) {
+      // Sort years in descending order and pick the most recent
+      return Math.max(...availableYears);
+    }
+    return 2025; // fallback
+  });
+
   const [placementStats, setPlacementStats] = useState<{
     totalOffers?: number;
     highestPackage?: number;
@@ -38,13 +53,32 @@ export function PlacementPage({ college }: { college: College }) {
   const [placementData, setPlacementData] = useState<PlacementDataItem[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const years = [2025, 2024, 2023]; // example years
+  // Use dynamic years from college data
+  const years = availableYears.sort((a, b) => b - a); // Sort in descending order (newest first)
+
+  // Reset year when college changes and availablePlacementReports change
+  useEffect(() => {
+    if (availableYears.length > 0) {
+      const newDefaultYear = Math.max(...availableYears);
+      if (!availableYears.includes(year)) {
+        setYear(newDefaultYear);
+      }
+    }
+  }, [college?.availablePlacementReports, availableYears, year]);
 
   useEffect(() => {
     async function fetchPlacementData() {
       setLoading(true);
       try {
         const slug = college?.slug;
+        // Only fetch if the selected year is in the available years
+        if (!availableYears.includes(year)) {
+          setPlacementData([]);
+          setPlacementStats(null);
+          setLoading(false);
+          return;
+        }
+
         // Fetch detailed branch-wise placement data
         const url = `/placement/list?slug=${encodeURIComponent(
           slug ?? ""
@@ -96,10 +130,12 @@ export function PlacementPage({ college }: { college: College }) {
         setLoading(false);
       }
     }
-    if (college?.slug) {
+    if (college?.slug && availableYears.length > 0) {
       fetchPlacementData();
+    } else {
+      setLoading(false);
     }
-  }, [college?.slug, year]);
+  }, [college?.slug, year, availableYears]);
 
   // Filter out branches where all stats are zero or null/undefined
   const validData = placementData.filter(
@@ -174,26 +210,60 @@ export function PlacementPage({ college }: { college: College }) {
     (college.isHighestPackageAvailable && validHighestPackageData.length > 0) ||
     (college.isAveragePackageAvailable && validAveragePackageData.length > 0);
 
+  // Show fallback message if no placement years are available
+  if (availableYears.length === 0) {
+    return (
+      <div className="min-h-screen bg-white">
+        <section className="py-16 text-center">
+          <div className="max-w-md mx-auto">
+            <div className="bg-gray-50 rounded-lg p-8 border border-gray-200">
+              <h3 className="text-xl font-semibold text-gray-700 mb-4">
+                No Placement Data Available
+              </h3>
+              <p className="text-gray-600">
+                Placement reports are not currently available for this college.
+                Please check back later for updates.
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white">
-      {/* Year Selection Dropdown */}
-      <section className="mb-8 text-center">
-        <label htmlFor="year-select" className="mr-4 font-semibold">
-          Select Year:
-        </label>
-        <select
-          id="year-select"
-          value={year}
-          onChange={(e) => setYear(Number(e.target.value))}
-          className="border border-gray-300 rounded px-3 py-1"
-        >
-          {years.map((yr) => (
-            <option key={yr} value={yr}>
-              {yr}
-            </option>
-          ))}
-        </select>
-      </section>
+      {/* Year Selection Dropdown - only show if multiple years are available */}
+      {years.length > 1 && (
+        <section className="mb-8 text-center">
+          <label htmlFor="year-select" className="mr-4 font-semibold">
+            Select Year:
+          </label>
+          <select
+            id="year-select"
+            value={year}
+            onChange={(e) => setYear(Number(e.target.value))}
+            className="border border-gray-300 rounded px-3 py-1"
+          >
+            {years.map((yr) => (
+              <option key={yr} value={yr}>
+                {yr}
+              </option>
+            ))}
+          </select>
+        </section>
+      )}
+
+      {/* Show current selected year if only one year or no dropdown */}
+      {years.length === 1 && (
+        <section className="mb-8 text-center">
+          <div className="inline-block bg-blue-50 border border-blue-200 rounded-lg px-4 py-2">
+            <span className="font-semibold text-blue-900">
+              Placement Data for Year: {year}
+            </span>
+          </div>
+        </section>
+      )}
 
       {/* Placement Statistics - Overall cards */}
       {loading ? (
@@ -480,8 +550,10 @@ export function PlacementPage({ college }: { college: College }) {
         </div>
       </section>
 
-      {/* Top Recruiters Section */}
-      <TopRecruiters slug={college?.slug} year={year} />
+      {/* Top Recruiters Section - only show if year is available */}
+      {availableYears.includes(year) && (
+        <TopRecruiters slug={college?.slug} year={year} />
+      )}
     </div>
   );
 }
