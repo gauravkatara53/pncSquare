@@ -184,7 +184,7 @@ export const INDIVIDUAL_COLLEGE_CONFIGS: Record<
         requiresQuota: true,
         years: ["2025", "2024"],
         seatTypeOptions: ["General", "EWS", "OBC", "SC", "ST"],
-        quotaOptions: ["Delhi", "Outside Delhi"],
+        quotaOptions: [" Delhi Region", "Outside  Delhi Region"],
         subCategories: [
           "NONE",
           "DEFENCE",
@@ -215,74 +215,6 @@ export const INDIVIDUAL_COLLEGE_CONFIGS: Record<
       },
     },
     fallbackTag: "IIIT",
-  },
-  "jamia-millia-islamia": {
-    slug: "jamia-millia-islamia",
-    examConfigs: {
-      "JEE-Main": {
-        name: "JEE Main",
-        requiresSubCategory: true,
-        requiresQuota: true,
-        years: ["2025", "2024"],
-        seatTypeOptions: ["General", "EWS", "OBC", "SC", "ST"],
-        quotaOptions: ["Internal", "External"],
-        subCategories: ["NONE", "MINORITY", "PERSON WITH DISABILITIES"],
-      },
-    },
-    fallbackTag: "University",
-  },
-  "maulana-azad-national-institute-of-technology-bhopal": {
-    slug: "maulana-azad-national-institute-of-technology-bhopal",
-    examConfigs: {
-      "JEE-Main": {
-        name: "JEE Main",
-        requiresSubCategory: true,
-        requiresQuota: true,
-        years: ["2025", "2024"],
-        seatTypeOptions: [
-          "OPEN",
-          "OBC-NCL",
-          "SC",
-          "ST",
-          "EWS",
-          "OPEN (PwD)",
-          "OBC-NCL (PwD)",
-          "SC (PwD)",
-          "ST (PwD)",
-          "EWS (PwD)",
-        ],
-        quotaOptions: ["HS", "OS"], // Home State, Other State (no AI for this NIT)
-        subCategories: [
-          "Gender-Neutral",
-          "Female-only (including Supernumerary)",
-        ],
-      },
-    },
-    fallbackTag: "NIT",
-  },
-  "all-india-institute-of-medical-sciences-delhi": {
-    slug: "all-india-institute-of-medical-sciences-delhi",
-    examConfigs: {
-      "NEET-UG": {
-        name: "NEET UG",
-        requiresSubCategory: false,
-        requiresQuota: false,
-        years: ["2025", "2024"],
-        seatTypeOptions: [
-          "General",
-          "General PwD",
-          "OBC",
-          "OBC PwD",
-          "SC",
-          "SC PwD",
-          "ST",
-          "ST PwD",
-          "EWS",
-          "EWS PwD",
-        ],
-      },
-    },
-    fallbackTag: "AIIMS",
   },
 };
 
