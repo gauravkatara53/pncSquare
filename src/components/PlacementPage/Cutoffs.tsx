@@ -168,10 +168,12 @@ export function Cutoffs({
       .get<{ data: CutoffDataRow[] }>("/cutoff/all", apiParams)
       .then((res) => {
         const dataRows = res.data as CutoffDataRow[];
-        setRows(dataRows);
-        const uniqueRounds = [...new Set(dataRows.map((row) => row.round))];
+        setRows(dataRows || []);
+        const uniqueRounds = [
+          ...new Set((dataRows || []).map((row) => row.round)),
+        ];
         setRounds(uniqueRounds);
-        setRound(uniqueRounds.length ? uniqueRounds[0] : ""); // reset round safely here
+        setRound(uniqueRounds.length ? uniqueRounds[0] : "");
         setLoading(false);
       })
       .catch(() => {
@@ -237,6 +239,7 @@ export function Cutoffs({
         </div>
       )}
 
+      {/* Debug Panel - only in development */}
       {/* Show the rest only if exam types are available */}
       {examTypes.length > 0 && (
         <>
@@ -548,10 +551,10 @@ export function Cutoffs({
                                     </td>
                                   )}
                                   <td className="border-b px-6 py-3 text-center">
-                                    {row.openingRank}
+                                    {row.openingRank ? row.openingRank : "-"}
                                   </td>
                                   <td className="border-b px-6 py-3 text-center">
-                                    {row.closingRank}
+                                    {row.closingRank ? row.closingRank : "-"}
                                   </td>
                                 </motion.tr>
                               ))}
