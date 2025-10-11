@@ -196,6 +196,27 @@ export const INDIVIDUAL_COLLEGE_CONFIGS: Record<
     },
     fallbackTag: "University",
   },
+  "igdtuw-delhi": {
+    slug: "igdtuw-delhi",
+    examConfigs: {
+      "JEE-Main": {
+        name: "JEE Main",
+        requiresSubCategory: true,
+        requiresQuota: true,
+        years: ["2025", "2024"],
+        seatTypeOptions: ["General", "EWS", "OBC", "SC", "ST"],
+        quotaOptions: ["Delhi Region", "Outside Delhi Region"],
+        subCategories: [
+          "None",
+          "Defence",
+          "Kashmiri Migrant",
+          "Person with Disabilities",
+          "Sports",
+        ],
+      },
+    },
+    fallbackTag: "University",
+  },
   "iiit-delhi": {
     slug: "iiit-delhi",
     examConfigs: {
