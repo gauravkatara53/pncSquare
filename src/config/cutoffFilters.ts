@@ -226,16 +226,17 @@ export const INDIVIDUAL_COLLEGE_CONFIGS: Record<
         requiresQuota: true,
         years: ["2025", "2024"],
         seatTypeOptions: ["General", "EWS", "OBC", "SC", "ST"],
-        quotaOptions: ["Delhi", "Outside Delhi"],
+        quotaOptions: ["Delhi Region", "Outside Delhi Region"],
         subCategories: [
-          "NONE",
-          "DEFENCE",
-          "KASHMIRI MIGRANT",
-          "PERSON WITH DISABILITIES",
+          "None",
+          "Defence",
+          "Kashmiri Migrant",
+          "Person with Disabilities",
+          "Sports",
         ],
       },
     },
-    fallbackTag: "IIIT",
+    fallbackTag: "University",
   },
 };
 
