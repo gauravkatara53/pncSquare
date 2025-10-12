@@ -20,6 +20,7 @@ export function Header() {
   const [filteredSuggestions, setFilteredSuggestions] = useState<
     typeof collegeSearchSuggestions
   >([]);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   const searchRef = useRef<HTMLDivElement>(null);
   const { user } = useUser();
   const navItems = [
@@ -37,13 +38,12 @@ export function Header() {
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchTerm(value);
+    setSelectedSuggestionIndex(-1); // Reset selection when typing
 
     if (value.trim().length >= 2) {
       const filtered = collegeSearchSuggestions
-        .filter(
-          (college) =>
-            college.name.toLowerCase().includes(value.toLowerCase()) ||
-            college.type.toLowerCase().includes(value.toLowerCase())
+        .filter((college) =>
+          college.name.toLowerCase().includes(value.toLowerCase())
         )
         .slice(0, 4); // Limit to 4 suggestions
 
@@ -61,15 +61,53 @@ export function Header() {
   ) => {
     setSearchTerm(college.name);
     setShowSuggestions(false);
+    setSelectedSuggestionIndex(-1);
     const params = new URLSearchParams();
     params.append("searchTerm", college.name);
     router.push(`/colleges?${params.toString()}`);
+  };
+
+  // Handle keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showSuggestions || filteredSuggestions.length === 0) return;
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        setSelectedSuggestionIndex((prev) =>
+          prev < filteredSuggestions.length - 1 ? prev + 1 : 0
+        );
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setSelectedSuggestionIndex((prev) =>
+          prev > 0 ? prev - 1 : filteredSuggestions.length - 1
+        );
+        break;
+      case "Enter":
+        e.preventDefault();
+        if (selectedSuggestionIndex >= 0) {
+          // Select the highlighted suggestion
+          handleSuggestionClick(filteredSuggestions[selectedSuggestionIndex]);
+        } else {
+          // Perform normal search
+          handleSearch(e);
+        }
+        break;
+      case "Escape":
+        setShowSuggestions(false);
+        setSelectedSuggestionIndex(-1);
+        break;
+      default:
+        break;
+    }
   };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchTerm.trim()) {
       setShowSuggestions(false);
+      setSelectedSuggestionIndex(-1);
       const params = new URLSearchParams();
       params.append("searchTerm", searchTerm.trim());
       router.push(`/colleges?${params.toString()}`);
@@ -84,6 +122,7 @@ export function Header() {
         !searchRef.current.contains(event.target as Node)
       ) {
         setShowSuggestions(false);
+        setSelectedSuggestionIndex(-1);
       }
     };
 
@@ -139,7 +178,9 @@ export function Header() {
                 className="pl-10 pr-4 py-2 w-full bg-gray-50 border-gray-300 focus:border-blue-500"
                 value={searchTerm}
                 onChange={handleSearchChange}
+                onKeyDown={handleKeyDown}
                 aria-label="Search Colleges"
+                autoComplete="off"
                 onFocus={() => {
                   if (
                     searchTerm.length >= 2 &&
@@ -157,17 +198,31 @@ export function Header() {
                     <div
                       key={`${college.id}-${index}`}
                       onClick={() => handleSuggestionClick(college)}
-                      className="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0 flex items-center justify-between"
+                      onMouseEnter={() => setSelectedSuggestionIndex(index)}
+                      className={`px-4 py-3 cursor-pointer border-b border-gray-100 last:border-b-0 flex items-center justify-between transition-colors ${
+                        index === selectedSuggestionIndex
+                          ? "bg-blue-50 border-blue-200"
+                          : "hover:bg-gray-50"
+                      }`}
                     >
                       <div className="flex flex-col">
-                        <span className="text-sm font-medium text-gray-900">
+                        <span
+                          className={`text-sm font-medium ${
+                            index === selectedSuggestionIndex
+                              ? "text-blue-900"
+                              : "text-gray-900"
+                          }`}
+                        >
                           {college.name}
                         </span>
-                        <span className="text-xs text-gray-500">
-                          {college.type}
-                        </span>
                       </div>
-                      <Search className="w-4 h-4 text-gray-400" />
+                      <Search
+                        className={`w-4 h-4 ${
+                          index === selectedSuggestionIndex
+                            ? "text-blue-500"
+                            : "text-gray-400"
+                        }`}
+                      />
                     </div>
                   ))}
                 </div>

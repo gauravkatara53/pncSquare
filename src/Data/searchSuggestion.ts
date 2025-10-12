@@ -138,4 +138,17 @@ export const collegeSearchSuggestions = [
 
   // Other Institutes
   { id: "xlri-jamshedpur", name: "XLRI Jamshedpur", type: "Management" },
+  { id: "aiims-raebareli", name: "AIIMS Raebareli", type: "AIIMS" },
+  { id: "aiims-jammu", name: "AIIMS Jammu", type: "AIIMS" },
+  { id: "gkv-haridwar", name: "GKV Haridwar", type: "University" },
+  { id: "jkiapt-allahabad", name: "JKIAPT Allahabad", type: "Institute" },
+  { id: "iet-lucknow", name: "IET Lucknow", type: "Institute" },
+  { id: "hbtu-kanpur", name: "HBTU Kanpur", type: "Institute" },
+  { id: "rgipt-amethi", name: "RGIPT Amethi", type: "Institute" },
+  { id: "knit-sultanpur", name: "KNIT Sultanpur", type: "Institute" },
+  { id: "biet-jhansi", name: "BIET Jhansi", type: "Institute" },
+  { id: "mmmut-gorakhpur", name: "MMMUT Gorakhpur", type: "University" },
+  { id: "upes-dehradun", name: "UPES Dehradun", type: "University" },
+  { id: "hit-kolkata", name: "HIT Kolkata", type: "Institute" },
+  { id: "ju-kolkata", name: "JU Kolkata", type: "University" },
 ];
