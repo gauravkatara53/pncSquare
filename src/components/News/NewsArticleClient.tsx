@@ -635,6 +635,19 @@ export default function NewsArticleClient({ slug }: Props) {
                     <Button
                       variant="ghost"
                       size="sm"
+                      className="w-full justify-start text-left bg-white/70 hover:bg-white border border-purple-200 text-purple-700 text-sm"
+                      onClick={() =>
+                        window.open(
+                          "https://pncsquare.in/college/iit-varanasi#placements",
+                          "_blank"
+                        )
+                      }
+                    >
+                      IIT BHU
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       className=" w-full justify-start text-left bg-white/70 hover:bg-white border border-purple-200 text-purple-700 text-sm"
                       onClick={() =>
                         window.open(
@@ -671,19 +684,7 @@ export default function NewsArticleClient({ slug }: Props) {
                     >
                       NIT Jaipur
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="w-full justify-start text-left bg-white/70 hover:bg-white border border-purple-200 text-purple-700 text-sm"
-                      onClick={() =>
-                        window.open(
-                          "https://pncsquare.in/college/nit-kurukshetra#placements",
-                          "_blank"
-                        )
-                      }
-                    >
-                      NIT Kurukshetra
-                    </Button>
+                    
                   </div>
                 </div>
 
