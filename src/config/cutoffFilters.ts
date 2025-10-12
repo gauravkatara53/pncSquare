@@ -155,26 +155,6 @@ export const INDIVIDUAL_COLLEGE_CONFIGS: Record<
   string,
   IndividualCollegeConfig
 > = {
-  "nsut-delhi": {
-    slug: "nsut-delhi",
-    examConfigs: {
-      "JEE-Main": {
-        name: "JEE Main",
-        requiresSubCategory: true,
-        requiresQuota: true,
-        years: ["2025"], // Only 2025 available
-        seatTypeOptions: ["General", "EWS", "OBC", "SC", "ST"],
-        quotaOptions: ["Delhi", "Outside Delhi"],
-        subCategories: [
-          "NONE",
-          "DEFENCE",
-          "KASHMIRI MIGRANT",
-          "PERSON WITH DISABILITIES",
-        ],
-      },
-    },
-    fallbackTag: "University",
-  },
   "dtu-delhi": {
     slug: "dtu-delhi",
     examConfigs: {
@@ -219,6 +199,48 @@ export const INDIVIDUAL_COLLEGE_CONFIGS: Record<
   },
   "iiit-delhi": {
     slug: "iiit-delhi",
+    examConfigs: {
+      "JEE-Main": {
+        name: "JEE Main",
+        requiresSubCategory: true,
+        requiresQuota: true,
+        years: ["2025", "2024"],
+        seatTypeOptions: ["General", "EWS", "OBC", "SC", "ST"],
+        quotaOptions: ["Delhi Region", "Outside Delhi Region"],
+        subCategories: [
+          "None",
+          "Defence",
+          "Kashmiri Migrant",
+          "Person with Disabilities",
+          "Sports",
+        ],
+      },
+    },
+    fallbackTag: "University",
+  },
+  "nsut-east-delhi": {
+    slug: "nsut-east-delhi",
+    examConfigs: {
+      "JEE-Main": {
+        name: "JEE Main",
+        requiresSubCategory: true,
+        requiresQuota: true,
+        years: ["2025", "2024"],
+        seatTypeOptions: ["General", "EWS", "OBC", "SC", "ST"],
+        quotaOptions: ["Delhi Region", "Outside Delhi Region"],
+        subCategories: [
+          "None",
+          "Defence",
+          "Kashmiri Migrant",
+          "Person with Disabilities",
+          "Sports",
+        ],
+      },
+    },
+    fallbackTag: "University",
+  },
+  "nsut-delhi": {
+    slug: "nsut-delhi",
     examConfigs: {
       "JEE-Main": {
         name: "JEE Main",
