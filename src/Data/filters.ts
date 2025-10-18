@@ -49,7 +49,7 @@ export const streams = [
 export const instituteTypes = ["Private", "Govt", "Deemed"];
 
 export const heroImages = [
-  "https://pbs.twimg.com/media/ElO-XOfU0AEeZi6?format=jpg&name=4096x4096",
-  "https://image-static.collegedunia.com/public/asset/img/homepage/banner/MIT1747200012.webp",
-  "https://image-static.collegedunia.com/public/asset/img/homepage/banner/LPU,1747200012.webp",
+  "/nit-jsr.jpeg",
+  "/iit-roorke.jpg",
+  "/nit-srinagar.jpeg",
 ];

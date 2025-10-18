@@ -3,12 +3,11 @@ import {
   Twitter,
   Instagram,
   Linkedin,
-  Youtube,
   Mail,
-  Phone,
   MapPin,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 export function Footer() {
   const quickLinks = [
     { name: "About Us", href: "/aboutus" },
@@ -61,10 +60,16 @@ export function Footer() {
           <div className="lg:col-span-1">
             <div className="flex items-center gap-2 mb-4 sm:mb-6">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">P&C</span>
+                <Image
+                  src="/image/logo.png"
+                  alt="Pncsquare Logo"
+                  width={40}
+                  height={40}
+                  className="w-10 h-10 rounded-lg"
+                />
               </div>
               <div>
-                <div className="font-bold text-white text-lg">P&C Square</div>
+                <div className="font-bold text-white text-lg">Pncsquare</div>
                 <div className="text-xs text-gray-400">
                   Find Your Dream College
                 </div>
@@ -79,12 +84,8 @@ export function Footer() {
 
             <div className="space-y-2 sm:space-y-3 text-sm text-gray-300">
               <div className="flex items-center gap-2 sm:gap-3">
-                <Phone className="w-4 h-4 text-yellow-400" />
-                <span>6200284909</span>
-              </div>
-              <div className="flex items-center gap-2 sm:gap-3">
                 <Mail className="w-4 h-4 text-yellow-400" />
-                <span>info@p&csquare.com</span>
+                <span>info@pncsquare.in</span>
               </div>
               <div className="flex items-center gap-2 sm:gap-3">
                 <MapPin className="w-4 h-4 text-yellow-400" />
@@ -164,7 +165,7 @@ export function Footer() {
                   <Facebook className="w-5 h-5" />
                 </a>
                 <a
-                  href="#"
+                  href="https://x.com/pncsquare"
                   className="text-gray-400 hover:text-yellow-400 transition-colors"
                 >
                   <Twitter className="w-5 h-5" />
