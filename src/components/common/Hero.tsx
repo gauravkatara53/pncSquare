@@ -310,7 +310,7 @@ export default function HeroSection() {
           <span className="text-white">Find</span>{" "}
           <span className="text-yellow-400">
             <Typewriter
-              words={["2500+ Colleges", "250+ Courses", "110+ Exams"]}
+              words={["1500+ Colleges", "500+ Courses", "100+ Exams"]}
               loop
               cursor
               typeSpeed={70}
