@@ -193,7 +193,7 @@ export function Footer() {
 
             <div className="text-gray-400 text-sm text-center sm:text-right mt-2 sm:mt-0">
               <p>© 2025 Pncsquare. All rights reserved.</p>
-              <p className="mt-1">Made with ❤️ for students across India</p>
+              <p className="mt-1">Made for students across India</p>
             </div>
           </div>
         </div>
