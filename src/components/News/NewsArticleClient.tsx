@@ -420,7 +420,7 @@ export default function NewsArticleClient({ slug }: Props) {
                       size="sm"
                       className="flex items-center gap-2 text-blue-400 border border-blue-200 hover:bg-blue-50"
                       onClick={() =>
-                        window.open("https://twitter.com", "_blank")
+                        window.open("https://x.com/pncsquare", "_blank")
                       }
                     >
                       <svg
@@ -437,7 +437,10 @@ export default function NewsArticleClient({ slug }: Props) {
                       size="sm"
                       className="flex items-center gap-2 text-blue-700 border border-blue-200 hover:bg-blue-50"
                       onClick={() =>
-                        window.open("https://linkedin.com", "_blank")
+                        window.open(
+                          "https://www.linkedin.com/company/pncsquare/",
+                          "_blank"
+                        )
                       }
                     >
                       <svg
@@ -684,7 +687,6 @@ export default function NewsArticleClient({ slug }: Props) {
                     >
                       NIT Jaipur
                     </Button>
-                    
                   </div>
                 </div>
 
