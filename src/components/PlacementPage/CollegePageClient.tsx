@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import CollegeHeader from "@/components/PlacementPage/HeroSection";
 import InfoBar from "@/components/PlacementPage/InfoBar";
 import Overview from "@/components/PlacementPage/overviewSection";
@@ -243,14 +244,6 @@ const CollegePageClient: React.FC<Props> = ({ slug }) => {
                 }}
               />
             </section>
-
-            {/* Only show placement section if availablePlacementReports exists and has data */}
-            {college.availablePlacementReports &&
-              college.availablePlacementReports.length > 0 && (
-                <section id="placements">
-                  <PlacementPage college={college} />
-                </section>
-              )}
           </div>
 
           {/* Sidebar for desktop */}
@@ -390,7 +383,7 @@ const CollegePageClient: React.FC<Props> = ({ slug }) => {
             </div>
 
             {/* Exam Links Section */}
-            <div className=" mt-10 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg border border-blue-200 p-6 shadow-sm">
+            <div className="mt-10 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg border border-blue-200 p-6 shadow-sm">
               <div className="mb-4">
                 <h3 className="font-semibold text-gray-800 mb-2">
                   Popular Exams
@@ -563,8 +556,281 @@ const CollegePageClient: React.FC<Props> = ({ slug }) => {
                 </Button>
               </div>
             </div>
+            {/* College Suggestion Box */}
+            {/* Featured Colleges */}
+            <div className="mt-10 bg-gradient-to-br from-teal-50 to-emerald-100 rounded-lg border border-teal-200 p-6 px-3 shadow-sm">
+              <div className="mb-4">
+                <h3 className="font-semibold text-gray-800 mb-2">
+                  Featured Colleges
+                </h3>
+                <p className="text-sm text-gray-600">
+                  Top engineering institutions in India
+                </p>
+              </div>
+              <div className="space-y-3">
+                {/* IIT Bombay */}
+                <div
+                  className="flex items-center gap-4 p-3 bg-white rounded-lg border border-teal-200 hover:shadow-md transition-all cursor-pointer"
+                  onClick={() =>
+                    window.open(
+                      "https://pncsquare.in/college/iit-bombay",
+                      "_blank"
+                    )
+                  }
+                >
+                  <Image
+                    src="https://ik.imagekit.io/ak2ol9uti/college-profiles/Screenshot%202025-10-19%20at%2010.59.05%E2%80%AFAM.png"
+                    alt="IIT Bombay Logo"
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 object-contain"
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900">IIT Bombay</h4>
+                    <p className="text-xs text-gray-500">Mumbai, Maharashtra</p>
+                  </div>
+                </div>
+
+                {/* IIT Delhi */}
+                <div
+                  className="flex items-center gap-4 p-3 bg-white rounded-lg border border-teal-200 hover:shadow-md transition-all cursor-pointer"
+                  onClick={() =>
+                    window.open(
+                      "https://pncsquare.in/college/iit-delhi",
+                      "_blank"
+                    )
+                  }
+                >
+                  <Image
+                    src="https://ik.imagekit.io/ak2ol9uti/college-profiles/logo-iit-delhi.png"
+                    alt="IIT Delhi Logo"
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 object-contain"
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900">IIT Delhi</h4>
+                    <p className="text-xs text-gray-500">New Delhi</p>
+                  </div>
+                </div>
+
+                {/* IIT Madras */}
+                <div
+                  className="flex items-center gap-4 p-3 bg-white rounded-lg border border-teal-200 hover:shadow-md transition-all cursor-pointer"
+                  onClick={() =>
+                    window.open(
+                      "https://pncsquare.in/college/iit-madras",
+                      "_blank"
+                    )
+                  }
+                >
+                  <Image
+                    src="https://ik.imagekit.io/ak2ol9uti/college-profiles/iit-madras.png"
+                    alt="IIT Madras Logo"
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 object-contain"
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900">IIT Madras</h4>
+                    <p className="text-xs text-gray-500">Chennai, Tamil Nadu</p>
+                  </div>
+                </div>
+
+                {/* IIT Kanpur */}
+                <div
+                  className="flex items-center gap-4 p-3 bg-white rounded-lg border border-teal-200 hover:shadow-md transition-all cursor-pointer"
+                  onClick={() =>
+                    window.open(
+                      "https://pncsquare.in/college/iit-kanpur",
+                      "_blank"
+                    )
+                  }
+                >
+                  <Image
+                    src="https://ik.imagekit.io/ak2ol9uti/college-profiles/iitkanpur.png"
+                    alt="IIT Kanpur Logo"
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 object-contain"
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900">IIT Kanpur</h4>
+                    <p className="text-xs text-gray-500">
+                      Kanpur, Uttar Pradesh
+                    </p>
+                  </div>
+                </div>
+
+                {/* IIT Kharagpur */}
+                <div
+                  className="flex items-center gap-4 p-3 bg-white rounded-lg border border-teal-200 hover:shadow-md transition-all cursor-pointer"
+                  onClick={() =>
+                    window.open(
+                      "https://pncsquare.in/college/iit-kharagpur",
+                      "_blank"
+                    )
+                  }
+                >
+                  <Image
+                    src="https://upload.wikimedia.org/wikipedia/en/thumb/1/1c/IIT_Kharagpur_Logo.svg/240px-IIT_Kharagpur_Logo.svg.png"
+                    alt="IIT Kharagpur Logo"
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 object-contain"
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900">IIT Kharagpur</h4>
+                    <p className="text-xs text-gray-500">
+                      Kharagpur, West Bengal
+                    </p>
+                  </div>
+                </div>
+
+                {/* IIT Roorkee */}
+                <div
+                  className="flex items-center gap-4 p-3 bg-white rounded-lg border border-teal-200 hover:shadow-md transition-all cursor-pointer"
+                  onClick={() =>
+                    window.open(
+                      "https://pncsquare.in/college/iit-roorkee",
+                      "_blank"
+                    )
+                  }
+                >
+                  <Image
+                    src="https://ik.imagekit.io/ak2ol9uti/college-profiles/logo-roorke.png"
+                    alt="IIT Roorkee Logo"
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 object-contain"
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900">IIT Roorkee</h4>
+                    <p className="text-xs text-gray-500">
+                      Roorkee, Uttarakhand
+                    </p>
+                  </div>
+                </div>
+
+                {/* IIT Guwahati */}
+                <div
+                  className="flex items-center gap-4 p-3 bg-white rounded-lg border border-teal-200 hover:shadow-md transition-all cursor-pointer"
+                  onClick={() =>
+                    window.open(
+                      "https://pncsquare.in/college/iit-guwahati",
+                      "_blank"
+                    )
+                  }
+                >
+                  <Image
+                    src="https://ik.imagekit.io/ak2ol9uti/college-profiles/logo-iit-guhwati.png"
+                    alt="IIT Guwahati Logo"
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 object-contain"
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900">IIT Guwahati</h4>
+                    <p className="text-xs text-gray-500">Guwahati, Assam</p>
+                  </div>
+                </div>
+
+                {/* IIT Hyderabad */}
+                <div
+                  className="flex items-center gap-4 p-3 bg-white rounded-lg border border-teal-200 hover:shadow-md transition-all cursor-pointer"
+                  onClick={() =>
+                    window.open(
+                      "https://pncsquare.in/college/iit-hyderabad",
+                      "_blank"
+                    )
+                  }
+                >
+                  <Image
+                    src="https://ik.imagekit.io/ak2ol9uti/college-profiles/logo-hyderbad.png"
+                    alt="IIT Hyderabad Logo"
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 object-contain"
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900">IIT Hyderabad</h4>
+                    <p className="text-xs text-gray-500">
+                      Hyderabad, Telangana
+                    </p>
+                  </div>
+                </div>
+
+                {/* IIT BHU */}
+                <div
+                  className="flex items-center gap-4 p-3 bg-white rounded-lg border border-teal-200 hover:shadow-md transition-all cursor-pointer"
+                  onClick={() =>
+                    window.open(
+                      "https://pncsquare.in/college/iit-bhu",
+                      "_blank"
+                    )
+                  }
+                >
+                  <Image
+                    src="https://ik.imagekit.io/ak2ol9uti/college-profiles/Screenshot%202025-10-19%20at%2011.37.44%E2%80%AFAM.png"
+                    alt="IIT BHU Logo"
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 object-contain"
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900">IIT BHU</h4>
+                    <p className="text-xs text-gray-500">
+                      Varanasi, Uttar Pradesh
+                    </p>
+                  </div>
+                </div>
+
+                {/* IIT Indore */}
+                <div
+                  className="flex items-center gap-4 p-3 bg-white rounded-lg border border-teal-200 hover:shadow-md transition-all cursor-pointer"
+                  onClick={() =>
+                    window.open(
+                      "https://pncsquare.in/college/iit-indore",
+                      "_blank"
+                    )
+                  }
+                >
+                  <Image
+                    src="https://ik.imagekit.io/ak2ol9uti/college-profiles/indore.png"
+                    alt="IIT Indore Logo"
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 object-contain"
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900">IIT Indore</h4>
+                    <p className="text-xs text-gray-500">
+                      Indore, Madhya Pradesh
+                    </p>
+                  </div>
+                </div>
+
+                {/* See All Button */}
+                <button
+                  className="w-full mt-2 px-4 py-2 text-teal-700 bg-teal-50 hover:bg-teal-100 border border-teal-200 rounded-md transition-all text-sm font-medium"
+                  onClick={() => window.open("/colleges", "_self")}
+                >
+                  See All Colleges →
+                </button>
+              </div>
+            </div>
           </aside>
         </div>
+
+        {/* Placement section - Full width and centered */}
+        {college.availablePlacementReports &&
+          college.availablePlacementReports.length > 0 && (
+            <div className="mt-16 max-w-6xl mx-auto">
+              <section id="placements">
+                <PlacementPage college={college} />
+              </section>
+            </div>
+          )}
       </main>
 
       <Footer />
