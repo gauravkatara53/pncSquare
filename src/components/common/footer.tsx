@@ -15,7 +15,7 @@ export function Footer() {
     { name: "Privacy Policy", href: "/privacy-policy" },
     { name: "Terms of Service", href: "/terms-of-service" },
     { name: "Careers", href: "/careers" },
-    { name: "Help Center", href: "/help-center" },
+    { name: "Help Center", href: "/contact" },
   ];
 
   const examLinks = [
