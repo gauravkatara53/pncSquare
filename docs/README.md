@@ -1,6 +1,6 @@
 # Cutoff Filter System Documentation
 
-This directory contains comprehensive documentation for the dynamic cutoff filter system implemented in the PNC Square platform.
+This directory contains comprehensive documentation for the dynamic cutoff filter system implemented in the Pncsquare platform.
 
 ## 📚 Documentation Files
 

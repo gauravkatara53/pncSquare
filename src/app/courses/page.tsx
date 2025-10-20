@@ -3,7 +3,7 @@ import CoursesClient from "./CoursesClient";
 export const metadata = {
   title: "Courses | Pncsquare",
   description:
-    "Explore a wide range of courses on PNC Square. Filter by category, duration, and degree. Find the perfect course tailored to your career goals.",
+    "Explore a wide range of courses on Pncsquare. Filter by category, duration, and degree. Find the perfect course tailored to your career goals.",
   keywords: [
     "courses",
     "online courses",
@@ -22,7 +22,7 @@ export const metadata = {
         url: "https://pncsquare.in/og-image.png",
         width: 1200,
         height: 630,
-        alt: "PNC Square Courses",
+        alt: "Pncsquare Courses",
       },
     ],
     type: "website",

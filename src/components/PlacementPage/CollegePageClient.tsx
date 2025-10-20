@@ -357,29 +357,6 @@ const CollegePageClient: React.FC<Props> = ({ slug }) => {
                   </button>
                 </div>
               </div>
-
-              {/* Need Help Section */}
-              <div className="mt-10 bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
-                <h3 className="font-bold text-gray-900 mb-2">Need Help?</h3>
-                <p className="text-gray-600 text-sm mb-4">
-                  Have questions about colleges or admissions? Our experts are
-                  here to help.
-                </p>
-                <div className="space-y-2">
-                  <button
-                    className="w-full px-4 py-2 text-gray-700 border border-gray-200 hover:bg-gray-50 rounded-md transition-all text-sm"
-                    onClick={() => window.open("/help-center", "_self")}
-                  >
-                    Help Center
-                  </button>
-                  <button
-                    className="w-full px-4 py-2 text-gray-700 border border-gray-200 hover:bg-gray-50 rounded-md transition-all text-sm"
-                    onClick={() => window.open("/aboutus", "_self")}
-                  >
-                    About Us
-                  </button>
-                </div>
-              </div>
             </div>
 
             {/* Exam Links Section */}
@@ -556,16 +533,13 @@ const CollegePageClient: React.FC<Props> = ({ slug }) => {
                 </Button>
               </div>
             </div>
-            {/* College Suggestion Box */}
+
             {/* Featured Colleges */}
             <div className="mt-10 bg-gradient-to-br from-teal-50 to-emerald-100 rounded-lg border border-teal-200 p-6 px-3 shadow-sm">
               <div className="mb-4">
                 <h3 className="font-semibold text-gray-800 mb-2">
                   Featured Colleges
                 </h3>
-                <p className="text-sm text-gray-600">
-                  Top engineering institutions in India
-                </p>
               </div>
               <div className="space-y-3">
                 {/* IIT Bombay */}
@@ -809,13 +783,277 @@ const CollegePageClient: React.FC<Props> = ({ slug }) => {
                     </p>
                   </div>
                 </div>
+                {/* NIT Trichy */}
+                <div
+                  className="flex items-center gap-4 p-3 bg-white rounded-lg border border-teal-200 hover:shadow-md transition-all cursor-pointer"
+                  onClick={() =>
+                    window.open(
+                      "https://pncsquare.in/college/nit-trichy",
+                      "_blank"
+                    )
+                  }
+                >
+                  <Image
+                    src="https://ik.imagekit.io/ak2ol9uti/logo/nit-trichy.png"
+                    alt="NIT Trichy Logo"
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 object-contain"
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900">NIT Trichy</h4>
+                    <p className="text-xs text-gray-500">
+                      Tiruchirappalli, Tamil Nadu
+                    </p>
+                  </div>
+                </div>
 
+                {/* NIT Surathkal */}
+                <div
+                  className="flex items-center gap-4 p-3 bg-white rounded-lg border border-teal-200 hover:shadow-md transition-all cursor-pointer"
+                  onClick={() =>
+                    window.open(
+                      "https://pncsquare.in/college/nit-surathkal",
+                      "_blank"
+                    )
+                  }
+                >
+                  <Image
+                    src="https://ik.imagekit.io/ak2ol9uti/logo/imgi_23_NIT-SURATHKAL-LOGO.png?updatedAt=1760938202237"
+                    alt="NIT Surathkal Logo"
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 object-contain"
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900">NIT Surathkal</h4>
+                    <p className="text-xs text-gray-500">
+                      Mangalore, Karnataka
+                    </p>
+                  </div>
+                </div>
+
+                {/* NIT Warangal */}
+                <div
+                  className="flex items-center gap-4 p-3 bg-white rounded-lg border border-teal-200 hover:shadow-md transition-all cursor-pointer"
+                  onClick={() =>
+                    window.open(
+                      "https://pncsquare.in/college/nit-warangal",
+                      "_blank"
+                    )
+                  }
+                >
+                  <Image
+                    src="https://ik.imagekit.io/ak2ol9uti/logo/imgi_57_NIT-Warangal-Logo.png?updatedAt=1760938201626"
+                    alt="NIT Warangal Logo"
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 object-contain"
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900">NIT Warangal</h4>
+                    <p className="text-xs text-gray-500">Warangal, Telangana</p>
+                  </div>
+                </div>
+
+                {/* NIT Calicut */}
+                <div
+                  className="flex items-center gap-4 p-3 bg-white rounded-lg border border-teal-200 hover:shadow-md transition-all cursor-pointer"
+                  onClick={() =>
+                    window.open(
+                      "https://pncsquare.in/college/nit-calicut",
+                      "_blank"
+                    )
+                  }
+                >
+                  <Image
+                    src="https://ik.imagekit.io/ak2ol9uti/logo/imgi_13_NIT-Calicut-Logo.png?updatedAt=1760938201349"
+                    alt="NIT Calicut Logo"
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 object-contain"
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900">NIT Calicut</h4>
+                    <p className="text-xs text-gray-500">Kozhikode, Kerala</p>
+                  </div>
+                </div>
+
+                {/* NIT Rourkela */}
+                <div
+                  className="flex items-center gap-4 p-3 bg-white rounded-lg border border-teal-200 hover:shadow-md transition-all cursor-pointer"
+                  onClick={() =>
+                    window.open(
+                      "https://pncsquare.in/college/nit-rourkela",
+                      "_blank"
+                    )
+                  }
+                >
+                  <Image
+                    src="https://ik.imagekit.io/ak2ol9uti/logo/imgi_47_NIT-ROURKELA-LOGO.jpg?updatedAt=1760938200852"
+                    alt="NIT Rourkela Logo"
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 object-contain"
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900">NIT Rourkela</h4>
+                    <p className="text-xs text-gray-500">Rourkela, Odisha</p>
+                  </div>
+                </div>
+
+                {/* MNNIT Allahabad */}
+                <div
+                  className="flex items-center gap-4 p-3 bg-white rounded-lg border border-teal-200 hover:shadow-md transition-all cursor-pointer"
+                  onClick={() =>
+                    window.open(
+                      "https://pncsquare.in/college/mnnit-allahabad",
+                      "_blank"
+                    )
+                  }
+                >
+                  <Image
+                    src="https://ik.imagekit.io/ak2ol9uti/logo/imgi_9_MNNIT-Allahabad-Logo.png?updatedAt=1760938202287"
+                    alt="MNNIT Allahabad Logo"
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 object-contain"
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900">
+                      MNNIT Allahabad
+                    </h4>
+                    <p className="text-xs text-gray-500">
+                      Prayagraj, Uttar Pradesh
+                    </p>
+                  </div>
+                </div>
+
+                {/* NIT Kurukshetra */}
+                <div
+                  className="flex items-center gap-4 p-3 bg-white rounded-lg border border-teal-200 hover:shadow-md transition-all cursor-pointer"
+                  onClick={() =>
+                    window.open(
+                      "https://pncsquare.in/college/nit-kurukshetra",
+                      "_blank"
+                    )
+                  }
+                >
+                  <Image
+                    src="https://ik.imagekit.io/ak2ol9uti/logo/imgi_41_NIT-Kurukshetra-Logo.png?updatedAt=1760938202053"
+                    alt="NIT Kurukshetra Logo"
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 object-contain"
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900">
+                      NIT Kurukshetra
+                    </h4>
+                    <p className="text-xs text-gray-500">
+                      Kurukshetra, Haryana
+                    </p>
+                  </div>
+                </div>
+
+                {/* NIT Durgapur */}
+                <div
+                  className="flex items-center gap-4 p-3 bg-white rounded-lg border border-teal-200 hover:shadow-md transition-all cursor-pointer"
+                  onClick={() =>
+                    window.open(
+                      "https://pncsquare.in/college/nit-durgapur",
+                      "_blank"
+                    )
+                  }
+                >
+                  <Image
+                    src="https://ik.imagekit.io/ak2ol9uti/logo/imgi_17_NIT-Durgapur-Logo.png?updatedAt=1760938201933"
+                    alt="NIT Durgapur Logo"
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 object-contain"
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900">NIT Durgapur</h4>
+                    <p className="text-xs text-gray-500">
+                      Durgapur, West Bengal
+                    </p>
+                  </div>
+                </div>
+
+                {/* VNIT Nagpur */}
+                <div
+                  className="flex items-center gap-4 p-3 bg-white rounded-lg border border-teal-200 hover:shadow-md transition-all cursor-pointer"
+                  onClick={() =>
+                    window.open(
+                      "https://pncsquare.in/college/vnit-nagpur",
+                      "_blank"
+                    )
+                  }
+                >
+                  <Image
+                    src="https://ik.imagekit.io/ak2ol9uti/logo/imgi_61_VNIT-Nagpur-Logo.png?updatedAt=1760938201604"
+                    alt="VNIT Nagpur Logo"
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 object-contain"
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900">VNIT Nagpur</h4>
+                    <p className="text-xs text-gray-500">Nagpur, Maharashtra</p>
+                  </div>
+                </div>
+
+                {/* MNIT Jaipur */}
+                <div
+                  className="flex items-center gap-4 p-3 bg-white rounded-lg border border-teal-200 hover:shadow-md transition-all cursor-pointer"
+                  onClick={() =>
+                    window.open(
+                      "https://pncsquare.in/college/mnit-jaipur",
+                      "_blank"
+                    )
+                  }
+                >
+                  <Image
+                    src="https://ik.imagekit.io/ak2ol9uti/logo/imgi_5_MNIT-Jaipur-Logo.png?updatedAt=1760938202220"
+                    alt="MNIT Jaipur Logo"
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 object-contain"
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900">MNIT Jaipur</h4>
+                    <p className="text-xs text-gray-500">Jaipur, Rajasthan</p>
+                  </div>
+                </div>
                 {/* See All Button */}
                 <button
                   className="w-full mt-2 px-4 py-2 text-teal-700 bg-teal-50 hover:bg-teal-100 border border-teal-200 rounded-md transition-all text-sm font-medium"
                   onClick={() => window.open("/colleges", "_self")}
                 >
                   See All Colleges →
+                </button>
+              </div>
+            </div>
+            {/* Need Help Section */}
+            <div className="mt-10 bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+              <h3 className="font-bold text-gray-900 mb-2">Need Help?</h3>
+              <p className="text-gray-600 text-sm mb-4">
+                Have questions about colleges or admissions? Our experts are
+                here to help.
+              </p>
+              <div className="space-y-2">
+                <button
+                  className="w-full px-4 py-2 text-gray-700 border border-gray-200 hover:bg-gray-50 rounded-md transition-all text-sm"
+                  onClick={() => window.open("/help-center", "_self")}
+                >
+                  Help Center
+                </button>
+                <button
+                  className="w-full px-4 py-2 text-gray-700 border border-gray-200 hover:bg-gray-50 rounded-md transition-all text-sm"
+                  onClick={() => window.open("/aboutus", "_self")}
+                >
+                  About Us
                 </button>
               </div>
             </div>
