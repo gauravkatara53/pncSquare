@@ -27,6 +27,7 @@ export interface ExamFilterConfig {
   quotaOptions?: string[];
   subCategories?: SubCategory[] | string[]; // Allow custom strings for individual colleges
   years?: Year[]; // College-specific available years
+  collegeSlugs?: string[]; // List of college slugs that share this configuration
 }
 
 // Individual college configuration (overrides tag-based config)
@@ -155,6 +156,39 @@ export const INDIVIDUAL_COLLEGE_CONFIGS: Record<
   string,
   IndividualCollegeConfig
 > = {
+  colleges: {
+    slug: "colleges",
+    examConfigs: {
+      "JEE-Main": {
+        name: "JEE Main",
+        requiresSubCategory: true,
+        requiresQuota: true,
+        seatTypeOptions: [
+          "General",
+          "OBC-NCL",
+          "SC",
+          "ST",
+          "EWS",
+          "OPEN (PwD)",
+          "OBC-NCL (PwD)",
+          "SC (PwD)",
+          "ST (PwD)",
+          "EWS (PwD)",
+        ],
+        quotaOptions: ["HS", "OS", "AI"],
+        subCategories: ["Gender Neutral", "Female Only", "Both"],
+        collegeSlugs: [
+          "bit-mesra",
+          "gkv-haridwar",
+          "jkiapt-allahabad",
+          "soe-jnu-delhi",
+          "spa-delhi",
+          "tssot-aus",
+        ],
+      },
+    },
+    fallbackTag: "University",
+  },
   "dtu-delhi": {
     slug: "dtu-delhi",
     examConfigs: {
@@ -391,6 +425,14 @@ export function getExamConfigForCollege(
   const individualConfig = INDIVIDUAL_COLLEGE_CONFIGS[collegeSlug];
   if (individualConfig?.examConfigs[examType]) {
     return individualConfig.examConfigs[examType];
+  }
+
+  // Check if this college is part of the common colleges configuration
+  const commonConfig = INDIVIDUAL_COLLEGE_CONFIGS["colleges"];
+  if (
+    commonConfig?.examConfigs[examType]?.collegeSlugs?.includes(collegeSlug)
+  ) {
+    return commonConfig.examConfigs[examType];
   }
 
   // Fallback to tag-based configuration
