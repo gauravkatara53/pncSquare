@@ -46,7 +46,7 @@ export const colleges: College[] = [
   },
   {
     id: "iim-ahmedabad",
-    name: "Indian Institute of Management Ahmedabad",
+    name: "Indian Institute of Management ",
     location: "Ahmedabad, Gujarat",
     type: "Public Management",
     rank: "1",

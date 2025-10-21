@@ -68,7 +68,7 @@ interface RelatedArticlesResponse {
 
 // import { useParams } from "next/navigation";
 import ScrollToTop from "@/components/ScrollToTop";
-import CollegeHeroSkeleton from "@/components/colleges/CollegeSkeleton";
+import NewsArticleSkeleton from "./NewsArticleSkeleton";
 interface Props {
   slug: string;
 }
@@ -192,12 +192,7 @@ export default function NewsArticleClient({ slug }: Props) {
     }
   };
 
-  if (loading)
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <CollegeHeroSkeleton />
-      </div>
-    );
+  if (loading) return <NewsArticleSkeleton />;
 
   if (error)
     return (
