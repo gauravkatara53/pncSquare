@@ -4,9 +4,7 @@
  */
 
 export type Year = "2025" | "2024";
-export type SubCategory =
-  | "Gender-Neutral"
-  | "Female-only (including Supernumerary)";
+export type SubCategory = "Gender-Neutral" | "Female-only";
 
 // Base interface for filter options
 export interface FilterOptions {
@@ -51,7 +49,7 @@ export const AVAILABLE_YEARS: Year[] = ["2025", "2024"];
 // Common sub-categories
 export const COMMON_SUB_CATEGORIES: SubCategory[] = [
   "Gender-Neutral",
-  "Female-only (including Supernumerary)",
+  "Female-only",
 ];
 
 // Exam configurations
@@ -176,7 +174,7 @@ export const INDIVIDUAL_COLLEGE_CONFIGS: Record<
           "EWS (PwD)",
         ],
         quotaOptions: ["HS", "OS", "AI"],
-        subCategories: ["Gender Neutral", "Female Only", "Both"],
+        subCategories: ["Gender-Neutral", "Female-only", "Both"],
         collegeSlugs: [
           "bit-mesra",
           "gkv-haridwar",

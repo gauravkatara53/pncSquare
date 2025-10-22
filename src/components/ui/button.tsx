@@ -1,7 +1,7 @@
 import React from "react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "default" | "ghost";
+  variant?: "default" | "ghost" | "secondary" | "outline";
   size?: "default" | "sm";
   children: React.ReactNode;
 }
@@ -19,6 +19,10 @@ export function Button({
   const variantClasses = {
     default: "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500",
     ghost: "text-gray-700 hover:bg-gray-100 focus:ring-gray-500",
+    secondary:
+      "bg-white text-purple-600 hover:bg-gray-100 focus:ring-purple-500",
+    outline:
+      "border border-gray-200 text-gray-700 hover:bg-gray-50 focus:ring-gray-500",
   };
 
   const sizeClasses = {
