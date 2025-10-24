@@ -38,226 +38,7 @@ import {
   BookOpen,
   CheckCircle2,
 } from "lucide-react";
-
-// Mock data with historical cutoffs
-const mockColleges = [
-  {
-    id: 1,
-    name: "IIT Delhi",
-    location: "New Delhi, Delhi",
-    branch: "B.Tech in Computer Science Engineering",
-    type: "Government",
-    quota: "All India",
-    fees: "₹2.2L/year",
-    avgFees: 220000,
-    avgPackage: "₹18.5L",
-    nirf: 2,
-    cutoffs: {
-      2023: { general: 67, obc: 120, sc: 450, st: 780 },
-      2022: { general: 63, obc: 115, sc: 420, st: 750 },
-      2021: { general: 71, obc: 125, sc: 470, st: 800 },
-    },
-    tags: ["Placement", "Cutoff"],
-  },
-  {
-    id: 2,
-    name: "IIT Bombay",
-    location: "Mumbai, Maharashtra",
-    branch: "B.Tech in Computer Science Engineering",
-    type: "Government",
-    quota: "All India",
-    fees: "₹2.2L/year",
-    avgFees: 220000,
-    avgPackage: "₹21.8L",
-    nirf: 1,
-    cutoffs: {
-      2023: { general: 41, obc: 85, sc: 320, st: 550 },
-      2022: { general: 38, obc: 80, sc: 310, st: 520 },
-      2021: { general: 45, obc: 90, sc: 340, st: 570 },
-    },
-    tags: ["Placement", "Cutoff"],
-  },
-  {
-    id: 3,
-    name: "NIT Trichy",
-    location: "Tiruchirappalli, Tamil Nadu",
-    branch: "B.Tech in Computer Science Engineering",
-    type: "Government",
-    quota: "All India",
-    fees: "₹1.5L/year",
-    avgFees: 150000,
-    avgPackage: "₹14.2L",
-    nirf: 9,
-    cutoffs: {
-      2023: { general: 1250, obc: 2100, sc: 5200, st: 7800 },
-      2022: { general: 1180, obc: 2050, sc: 5100, st: 7500 },
-      2021: { general: 1320, obc: 2200, sc: 5400, st: 8100 },
-    },
-    tags: ["Placement", "Cutoff"],
-  },
-  {
-    id: 4,
-    name: "IIIT Hyderabad",
-    location: "Hyderabad, Telangana",
-    branch: "B.Tech in Computer Science Engineering",
-    type: "Government",
-    quota: "All India",
-    fees: "₹2.0L/year",
-    avgFees: 200000,
-    avgPackage: "₹22.5L",
-    nirf: 62,
-    cutoffs: {
-      2023: { general: 650, obc: 1200, sc: 3800, st: 6200 },
-      2022: { general: 620, obc: 1150, sc: 3700, st: 6000 },
-      2021: { general: 680, obc: 1250, sc: 3900, st: 6400 },
-    },
-    tags: ["Placement", "Cutoff"],
-  },
-  {
-    id: 5,
-    name: "DTU Delhi",
-    location: "New Delhi, Delhi",
-    branch: "B.Tech in Information Technology",
-    type: "Government",
-    quota: "All India",
-    fees: "₹1.8L/year",
-    avgFees: 180000,
-    avgPackage: "₹12.5L",
-    nirf: 36,
-    cutoffs: {
-      2023: { general: 2500, obc: 4200, sc: 9800, st: 15200 },
-      2022: { general: 2400, obc: 4100, sc: 9600, st: 15000 },
-      2021: { general: 2600, obc: 4300, sc: 10000, st: 15500 },
-    },
-    tags: ["Placement", "Cutoff"],
-  },
-  {
-    id: 6,
-    name: "BITS Pilani",
-    location: "Pilani, Rajasthan",
-    branch: "B.Tech in Computer Science Engineering",
-    type: "Private",
-    quota: "All India",
-    fees: "₹4.5L/year",
-    avgFees: 450000,
-    avgPackage: "₹15.3L",
-    nirf: 25,
-    cutoffs: {
-      2023: { general: 1800, obc: 1800, sc: 1800, st: 1800 },
-      2022: { general: 1750, obc: 1750, sc: 1750, st: 1750 },
-      2021: { general: 1850, obc: 1850, sc: 1850, st: 1850 },
-    },
-    tags: ["Placement", "Cutoff"],
-  },
-  {
-    id: 7,
-    name: "NIT Surathkal",
-    location: "Mangalore, Karnataka",
-    branch: "B.Tech in Electronics and Communication",
-    type: "Government",
-    quota: "All India",
-    fees: "₹1.5L/year",
-    avgFees: 150000,
-    avgPackage: "₹11.8L",
-    nirf: 13,
-    cutoffs: {
-      2023: { general: 3200, obc: 5400, sc: 12000, st: 18500 },
-      2022: { general: 3100, obc: 5300, sc: 11800, st: 18200 },
-      2021: { general: 3300, obc: 5500, sc: 12200, st: 18800 },
-    },
-    tags: ["Placement", "Cutoff"],
-  },
-  {
-    id: 8,
-    name: "VIT Vellore",
-    location: "Vellore, Tamil Nadu",
-    branch: "B.Tech in Computer Science Engineering",
-    type: "Private",
-    quota: "All India",
-    fees: "₹2.0L/year",
-    avgFees: 200000,
-    avgPackage: "₹7.5L",
-    nirf: 11,
-    cutoffs: {
-      2023: { general: 8500, obc: 8500, sc: 8500, st: 8500 },
-      2022: { general: 8200, obc: 8200, sc: 8200, st: 8200 },
-      2021: { general: 8800, obc: 8800, sc: 8800, st: 8800 },
-    },
-    tags: ["Placement", "Cutoff"],
-  },
-  {
-    id: 9,
-    name: "NIT Warangal",
-    location: "Warangal, Telangana",
-    branch: "B.Tech in Computer Science Engineering",
-    type: "Government",
-    quota: "All India",
-    fees: "₹1.5L/year",
-    avgFees: 150000,
-    avgPackage: "₹13.1L",
-    nirf: 46,
-    cutoffs: {
-      2023: { general: 1680, obc: 2850, sc: 6800, st: 10200 },
-      2022: { general: 1620, obc: 2780, sc: 6700, st: 10000 },
-      2021: { general: 1740, obc: 2920, sc: 6900, st: 10400 },
-    },
-    tags: ["Placement", "Cutoff"],
-  },
-  {
-    id: 10,
-    name: "IIIT Delhi",
-    location: "New Delhi, Delhi",
-    branch: "B.Tech in Computer Science Engineering",
-    type: "Government",
-    quota: "All India",
-    fees: "₹1.6L/year",
-    avgFees: 160000,
-    avgPackage: "₹17.4L",
-    nirf: 66,
-    cutoffs: {
-      2023: { general: 1200, obc: 2000, sc: 5500, st: 8800 },
-      2022: { general: 1150, obc: 1950, sc: 5400, st: 8600 },
-      2021: { general: 1250, obc: 2050, sc: 5600, st: 9000 },
-    },
-    tags: ["Placement", "Cutoff"],
-  },
-  {
-    id: 11,
-    name: "SRM University",
-    location: "Chennai, Tamil Nadu",
-    branch: "B.Tech in Information Technology",
-    type: "Private",
-    quota: "All India",
-    fees: "₹2.5L/year",
-    avgFees: 250000,
-    avgPackage: "₹6.8L",
-    nirf: 41,
-    cutoffs: {
-      2023: { general: 15000, obc: 15000, sc: 15000, st: 15000 },
-      2022: { general: 14500, obc: 14500, sc: 14500, st: 14500 },
-      2021: { general: 15500, obc: 15500, sc: 15500, st: 15500 },
-    },
-    tags: ["Placement", "Cutoff"],
-  },
-  {
-    id: 12,
-    name: "NIT Calicut",
-    location: "Calicut, Kerala",
-    branch: "B.Tech in Mechanical Engineering",
-    type: "Government",
-    quota: "All India",
-    fees: "₹1.5L/year",
-    avgFees: 150000,
-    avgPackage: "₹9.2L",
-    nirf: 23,
-    cutoffs: {
-      2023: { general: 8200, obc: 13800, sc: 28000, st: 42000 },
-      2022: { general: 8000, obc: 13500, sc: 27500, st: 41000 },
-      2021: { general: 8400, obc: 14100, sc: 28500, st: 43000 },
-    },
-    tags: ["Placement", "Cutoff"],
-  },
-];
+import { predictCollegesTable } from "@/components/college-predictor/function/predictionClient";
 
 const cities = [
   "Delhi/NCR",
@@ -346,8 +127,30 @@ export default function CollegePredictorClientPage() {
   const [showResults, setShowResults] = useState(false);
   const [selectedExam, setSelectedExam] = useState("");
   const [inputRank, setInputRank] = useState("");
-  const [homeState, setHomeState] = useState("");
-  const [inputCategory, setInputCategory] = useState("General");
+  const [seatType, setSeatType] = useState("OPEN");
+  const [subCategory, setSubCategory] = useState("Gender-Neutral");
+  const [userState, setUserState] = useState("");
+  const [predictedColleges, setPredictedColleges] = useState<
+    Array<{
+      College: string;
+      College_Name: string;
+      State: string;
+      nirfRank: string;
+      fees: string;
+      avgSalary: string;
+      Course: string;
+      Branch: string;
+      Quota: string;
+      SeatType: string;
+      SubCategory: string;
+      PriorityScore: number;
+      Weight: number;
+      RankScore: number;
+      FinalScore: number;
+      AllRoundsCutoff: string;
+    }>
+  >([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Main page state
   const [percentile, setPercentile] = useState("98.5");
@@ -378,41 +181,103 @@ export default function CollegePredictorClientPage() {
     const state = searchParams.get("state");
     const cat = searchParams.get("category");
 
-    if (exam && rank && state && cat) {
-      setSelectedExam(exam);
-      setInputRank(rank);
-      setHomeState(state);
-      setInputCategory(cat);
-      setPredictedRank(rank);
-      setCategory(cat);
-      const calculatedPercentile = (
-        100 -
-        (parseInt(rank) / 1000000) * 100
-      ).toFixed(2);
-      setPercentile(calculatedPercentile);
-      setShowResults(true);
+    async function runPredictionFromUrl() {
+      if (exam && rank && state && cat) {
+        setIsLoading(true);
+        setSelectedExam(exam);
+        setInputRank(rank);
+        setUserState(state);
+        setSubCategory(cat);
+        setPredictedRank(rank);
+        setCategory(cat);
+        const calculatedPercentile = (
+          100 -
+          (parseInt(rank) / 1000000) * 100
+        ).toFixed(2);
+        setPercentile(calculatedPercentile);
+        setShowResults(true);
+
+        try {
+          const examTypeMap = {
+            "jee-main": "JEE-Main",
+            "jee-advanced": "JEE-Advanced",
+            neet: "NEET",
+            bitsat: "BITSAT",
+            viteee: "VITEEE",
+            comedk: "COMEDK",
+          };
+          const examType =
+            examTypeMap[exam as keyof typeof examTypeMap] || "JEE-Main";
+          const results = await predictCollegesTable(
+            examType,
+            parseInt(rank),
+            seatType,
+            cat,
+            state
+          );
+          setPredictedColleges(results);
+        } catch (error) {
+          console.error("Error predicting colleges:", error);
+          setPredictedColleges([]);
+        } finally {
+          setIsLoading(false);
+        }
+      }
     }
+    runPredictionFromUrl();
   }, [searchParams]);
 
-  const handleStartPrediction = () => {
-    if (selectedExam && inputRank && homeState) {
-      // Update URL
-      const params = new URLSearchParams();
-      params.set("exam", selectedExam);
-      params.set("rank", inputRank);
-      params.set("state", homeState);
-      params.set("category", inputCategory);
-      router.push(`/college-predictor?${params.toString()}`);
+  const handleStartPrediction = async () => {
+    if (selectedExam && inputRank && userState) {
+      setIsLoading(true);
 
-      setPredictedRank(inputRank);
-      setCategory(inputCategory);
-      // Calculate percentile based on rank (simplified)
-      const calculatedPercentile = (
-        100 -
-        (parseInt(inputRank) / 1000000) * 100
-      ).toFixed(2);
-      setPercentile(calculatedPercentile);
-      setShowResults(true);
+      try {
+        // Map exam selection to exam type format
+        const examTypeMap: Record<string, string> = {
+          "jee-main": "JEE-Main",
+          "jee-advanced": "JEE-Advanced",
+          neet: "NEET",
+          bitsat: "BITSAT",
+          viteee: "VITEEE",
+          comedk: "COMEDK",
+        };
+
+        const examType = examTypeMap[selectedExam] || "JEE-Main";
+
+        // Call client-side prediction function
+        const results = await predictCollegesTable(
+          examType,
+          parseInt(inputRank),
+          seatType,
+          subCategory,
+          userState
+        );
+
+        setPredictedColleges(results);
+
+        // Update URL
+        const params = new URLSearchParams();
+        params.set("exam", selectedExam);
+        params.set("rank", inputRank);
+        params.set("state", userState);
+        params.set("category", subCategory);
+        router.push(`/college-predictor?${params.toString()}`);
+
+        setPredictedRank(inputRank);
+        setCategory(subCategory);
+        // Calculate percentile based on rank (simplified)
+        const calculatedPercentile = (
+          100 -
+          (parseInt(inputRank) / 1000000) * 100
+        ).toFixed(2);
+        setPercentile(calculatedPercentile);
+        setShowResults(true);
+      } catch (error) {
+        console.error("Error predicting colleges:", error);
+        alert("Failed to predict colleges. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -424,8 +289,9 @@ export default function CollegePredictorClientPage() {
     setShowResults(false);
     setSelectedExam("");
     setInputRank("");
-    setHomeState("");
-    setInputCategory("General");
+    setSeatType("OPEN");
+    setSubCategory("Gender-Neutral");
+    setUserState("");
     setPercentile("98.5");
     setPredictedRank("60001");
     setCategory("General");
@@ -434,6 +300,8 @@ export default function CollegePredictorClientPage() {
     setFeesRange([0, 500000]);
     setSelectedSpecializations([]);
     setSelectedOwnership([]);
+    setPredictedColleges([]);
+    setIsLoading(false);
   };
 
   const toggleCity = (city: string) => {
@@ -455,16 +323,66 @@ export default function CollegePredictorClientPage() {
   };
 
   const filteredColleges = useMemo(() => {
-    const rank = parseInt(predictedRank);
+    if (predictedColleges.length === 0) return [];
 
-    return mockColleges.filter((college) => {
-      // Rank filter
-      const cutoff =
-        college.cutoffs[2023][
-          category.toLowerCase() as keyof (typeof college.cutoffs)[2023]
-        ];
-      if (rank > cutoff * 2) return false;
+    // Map predicted colleges to UI format
+    const collegesToDisplay = predictedColleges.map((college, index) => {
+      // Parse fees to number
+      const feesNum = parseFloat(college.fees) || 0;
+      const avgSalaryNum = parseFloat(college.avgSalary) || 0;
 
+      // Parse AllRoundsCutoff to create a structured table
+      const cutoffPairs = college.AllRoundsCutoff.split(", ");
+      const cutoffsTable: Record<string, Record<string, number | string>> = {};
+
+      // Track the pattern of rounds to identify years
+      const years = ["2025", "2024"];
+      let currentYearIndex = 0;
+      let lastRoundNum = 0;
+
+      cutoffPairs.forEach((pair: string) => {
+        const [round, rank] = pair.split(": ");
+        const roundNum =
+          parseInt(round.replace("Round-", "").replace("CSAB-", "")) || 0;
+        // If rank is not a number, display '-'
+        const rankNum = isNaN(parseInt(rank)) ? "-" : parseInt(rank);
+
+        // If round number decreased, move to next year
+        if (roundNum < lastRoundNum && lastRoundNum > 0) {
+          currentYearIndex++;
+        }
+
+        const year = years[currentYearIndex] || years[years.length - 1];
+
+        if (!cutoffsTable[year]) {
+          cutoffsTable[year] = {};
+        }
+        cutoffsTable[year][`Round-${roundNum}`] = rankNum;
+
+        lastRoundNum = roundNum;
+      });
+
+      return {
+        id: index + 1,
+        name: college.College_Name || college.College || "-",
+        location: `${college.State || "-"}, India`,
+        branch: `${college.Course || "-"} - ${college.Branch || "-"}`,
+        type: "Government",
+        quota: college.Quota || "All India",
+        fees: feesNum ? `₹${(feesNum / 100000).toFixed(1)}L/year` : "-",
+        avgFees: feesNum,
+        avgPackage: avgSalaryNum
+          ? `₹${(avgSalaryNum / 100000).toFixed(1)}L`
+          : college.avgSalary || "N/A",
+        nirf: college.nirfRank ? parseInt(college.nirfRank) : "-",
+        cutoffs: cutoffsTable,
+        allRoundsCutoff: college.AllRoundsCutoff, // Keep original for reference
+        tags: ["Placement", "Cutoff"],
+      };
+    });
+
+    // Apply filters
+    return collegesToDisplay.filter((college) => {
       // City filter
       if (selectedCities.length > 0) {
         const matchesCity = selectedCities.some((city) =>
@@ -482,7 +400,9 @@ export default function CollegePredictorClientPage() {
       // Specialization filter
       if (
         selectedSpecializations.length > 0 &&
-        !selectedSpecializations.includes(college.branch)
+        !selectedSpecializations.some((spec) =>
+          college.branch.toLowerCase().includes(spec.toLowerCase())
+        )
       ) {
         return false;
       }
@@ -498,8 +418,7 @@ export default function CollegePredictorClientPage() {
       return true;
     });
   }, [
-    predictedRank,
-    category,
+    predictedColleges,
     selectedCities,
     feesRange,
     selectedSpecializations,
@@ -597,59 +516,51 @@ export default function CollegePredictorClientPage() {
                     </Select>
                   </div>
 
-                  {/* {gender} */}
+                  {/* Sub Category Selection */}
                   <div>
                     <label className="block text-sm mb-2 text-gray-700">
-                      Gender <span className="text-red-500">*</span>
+                      Sub Category <span className="text-red-500">*</span>
                     </label>
-                    <Select
-                      value={inputCategory}
-                      onValueChange={setInputCategory}
-                    >
+                    <Select value={subCategory} onValueChange={setSubCategory}>
                       <SelectTrigger className="h-12">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="bg-white">
-                        <SelectItem value="General">Gender-Neutral</SelectItem>
-                        <SelectItem value="OBC">Female-only</SelectItem>
+                        <SelectItem value="Gender-Neutral">
+                          Gender-Neutral
+                        </SelectItem>
+                        <SelectItem value="Female-only">Female-only</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
-                  {/* Category Selection */}
+                  {/* Seat Type Selection */}
                   <div>
                     <label className="block text-sm mb-2 text-gray-700">
-                      Category <span className="text-red-500">*</span>
+                      Seat Type <span className="text-red-500">*</span>
                     </label>
-                    <Select
-                      value={inputCategory}
-                      onValueChange={setInputCategory}
-                    >
+                    <Select value={seatType} onValueChange={setSeatType}>
                       <SelectTrigger className="h-12">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="bg-white">
-                        <SelectItem value="General">General</SelectItem>
-                        <SelectItem value="OBC">
-                          OBC (Non-Creamy Layer)
-                        </SelectItem>
-                        <SelectItem value="SC">SC (Scheduled Caste)</SelectItem>
-                        <SelectItem value="ST">ST (Scheduled Tribe)</SelectItem>
-                        <SelectItem value="EWS">
-                          EWS (Economically Weaker Section)
-                        </SelectItem>
+                        <SelectItem value="OPEN">OPEN</SelectItem>
+                        <SelectItem value="OBC">OBC</SelectItem>
+                        <SelectItem value="SC">SC</SelectItem>
+                        <SelectItem value="ST">ST</SelectItem>
+                        <SelectItem value="EWS">EWS</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
-                  {/* Home State Selection */}
+                  {/* User State Selection */}
                   <div>
                     <label className="block text-sm mb-2 text-gray-700">
-                      Home State <span className="text-red-500">*</span>
+                      Your State <span className="text-red-500">*</span>
                     </label>
-                    <Select value={homeState} onValueChange={setHomeState}>
+                    <Select value={userState} onValueChange={setUserState}>
                       <SelectTrigger className="h-12">
-                        <SelectValue placeholder="Select your home state" />
+                        <SelectValue placeholder="Select your state" />
                       </SelectTrigger>
                       <SelectContent className="bg-white">
                         {indianStates.map((state) => (
@@ -668,11 +579,13 @@ export default function CollegePredictorClientPage() {
                 {/* Submit Button */}
                 <Button
                   onClick={handleStartPrediction}
-                  disabled={!selectedExam || !inputRank || !homeState}
+                  disabled={
+                    !selectedExam || !inputRank || !userState || isLoading
+                  }
                   className="w-full h-12 bg-gradient-to-r  from-slate-900 via-blue-900 to-slate-800 text-white text-lg"
                 >
-                  Predict My Colleges
-                  <ArrowRight className="w-5 h-5 ml-2" />
+                  {isLoading ? "Predicting..." : "Predict My Colleges"}
+                  {!isLoading && <ArrowRight className="w-5 h-5 ml-2" />}
                 </Button>
               </div>
             </Card>
@@ -788,9 +701,7 @@ export default function CollegePredictorClientPage() {
                 </span>{" "}
                 found for Rank{" "}
                 <span className="text-[#2a53e2]">{predictedRank}</span> AIR (
-                <span className="text-[#2a53e2]">{percentile}%</span>{" "}
-                Percentile),
-                {category} Category
+                {category} Category)
               </p>
             </div>
 
@@ -1194,28 +1105,6 @@ export default function CollegePredictorClientPage() {
                     </div>
                   </div>
 
-                  {/* Specialization Filter */}
-                  <div>
-                    <h3 className="text-slate-900 mb-3">Specialization</h3>
-                    <div className="space-y-2 max-h-48 overflow-y-auto">
-                      {specializations.map((spec) => (
-                        <div key={spec} className="flex items-center gap-2">
-                          <Checkbox
-                            id={spec}
-                            checked={selectedSpecializations.includes(spec)}
-                            onCheckedChange={() => toggleSpecialization(spec)}
-                          />
-                          <label
-                            htmlFor={spec}
-                            className="text-sm text-gray-700 cursor-pointer"
-                          >
-                            {spec}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
                   {/* Ownership Filter */}
                   <div>
                     <h3 className="text-slate-900 mb-3">Ownership</h3>
@@ -1255,12 +1144,22 @@ export default function CollegePredictorClientPage() {
 
           {/* Results Area */}
           <div className="flex-1">
-            <div className="space-y-3 md:space-y-4">
-              {filteredColleges.length > 0 ? (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {isLoading ? (
+                <Card className="p-12 text-center bg-white border border-gray-200 col-span-1 lg:col-span-2">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2a53e2] mx-auto mb-4"></div>
+                  <h3 className="text-slate-900 mb-2">
+                    Loading Predictions...
+                  </h3>
+                  <p className="text-gray-600 text-sm">
+                    Analyzing data and finding best colleges for you
+                  </p>
+                </Card>
+              ) : filteredColleges.length > 0 ? (
                 filteredColleges.map((college) => (
                   <Card
                     key={college.id}
-                    className="bg-white border border-gray-200 hover:shadow-lg transition-shadow"
+                    className="bg-white border border-gray-200 "
                   >
                     <div className="p-4 md:p-6">
                       {/* College Header */}
@@ -1272,31 +1171,38 @@ export default function CollegePredictorClientPage() {
                             </div>
                             <div className="flex-1 min-w-0">
                               <h3 className="text-slate-900 mb-1 text-base md:text-lg">
-                                {college.name}
+                                {college.name
+                                  .split("-")
+                                  .map((word) => word.toUpperCase())
+                                  .join(" ")}
                               </h3>
                               <div className="flex flex-wrap items-center gap-1 md:gap-2 text-xs md:text-sm text-gray-600 mb-2">
-                                <MapPin className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0" />
-                                <span className="truncate">
-                                  {college.location}
-                                </span>
-                                <span className="text-gray-400 hidden sm:inline">
-                                  •
-                                </span>
-                                <Badge
-                                  variant="outline"
-                                  className="text-xs border-[#2a53e2] text-[#2a53e2]"
-                                >
-                                  NIRF #{college.nirf}
-                                </Badge>
-                                {college.tags.map((tag) => (
-                                  <Badge
-                                    key={tag}
-                                    variant="secondary"
-                                    className="text-xs bg-gray-100"
-                                  >
-                                    {tag}
-                                  </Badge>
-                                ))}
+                                {college.tags.map((tag) => {
+                                  let href = `/college/${college.name}`;
+                                  if (tag.toLowerCase() === "cutoff") {
+                                    href += "#cutoff";
+                                  } else if (
+                                    tag.toLowerCase() === "placement"
+                                  ) {
+                                    href += "#placements";
+                                  }
+                                  return (
+                                    <a
+                                      key={tag}
+                                      href={href}
+                                      className="no-underline"
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                    >
+                                      <Badge
+                                        variant="secondary"
+                                        className="text-xs bg-gray-100"
+                                      >
+                                        {tag}
+                                      </Badge>
+                                    </a>
+                                  );
+                                })}
                               </div>
                             </div>
                           </div>
@@ -1304,7 +1210,9 @@ export default function CollegePredictorClientPage() {
                         <Button
                           variant="outline"
                           className="border-[#2a53e2] text-[#2a53e2] hover:bg-[#2a53e2]/5 w-full sm:w-auto text-sm"
-                          onClick={() => router.push(`/college/${college.id}`)}
+                          onClick={() =>
+                            router.push(`/college/${college.name}`)
+                          }
                         >
                           View Details
                           <ArrowRight className="w-4 h-4 ml-1" />
@@ -1313,29 +1221,15 @@ export default function CollegePredictorClientPage() {
 
                       {/* Branch Info */}
                       <div className="bg-gradient-to-r from-[#2a53e2]/5 to-[#7C5EFF]/5 rounded-lg p-3 md:p-4 mb-4">
-                        <p className="text-slate-900 mb-2 text-sm md:text-base">
+                        <p className="text-slate-900 mb-2 text-sm">
                           {college.branch}
                         </p>
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-6">
-                          <div className="text-xs md:text-sm">
-                            <span className="text-gray-600">Avg Package:</span>
-                            <span className="text-[#2a53e2] ml-2">
-                              {college.avgPackage}
-                            </span>
-                          </div>
-                          <div className="text-xs md:text-sm">
-                            <span className="text-gray-600">Avg Fees:</span>
-                            <span className="text-[#2a53e2] ml-2">
-                              {college.fees}
-                            </span>
-                          </div>
-                        </div>
                       </div>
 
-                      {/* Closing Ranks Table */}
+                      {/* All Rounds Cutoff Data */}
                       <div>
                         <h4 className="text-slate-900 mb-2 md:mb-3 text-sm md:text-base">
-                          Category: {category}
+                          Closing Ranks -
                         </h4>
                         <div className="overflow-x-auto border border-gray-200 rounded-lg">
                           <table className="w-full text-xs md:text-sm">
@@ -1345,60 +1239,49 @@ export default function CollegePredictorClientPage() {
                                   Round
                                 </th>
                                 {Object.keys(college.cutoffs)
+                                  .sort()
                                   .reverse()
                                   .map((year) => (
                                     <th
                                       key={year}
                                       className="text-center py-2 md:py-3 px-2 md:px-4 text-gray-700 whitespace-nowrap"
                                     >
-                                      CR {year}
+                                      {year}
                                     </th>
                                   ))}
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200">
-                              <tr className="hover:bg-gray-50">
-                                <td className="py-2 md:py-3 px-2 md:px-4 text-gray-900 whitespace-nowrap">
-                                  Round 1
-                                </td>
-                                {Object.entries(college.cutoffs)
-                                  .reverse()
-                                  .map(([year, cutoffs]) => {
-                                    const categoryRank =
-                                      cutoffs[
-                                        category.toLowerCase() as keyof typeof cutoffs
-                                      ];
-                                    return (
-                                      <td
-                                        key={year}
-                                        className="text-center py-2 md:py-3 px-2 md:px-4 text-gray-600 whitespace-nowrap"
-                                      >
-                                        {Math.floor(categoryRank * 0.95)}
-                                      </td>
-                                    );
-                                  })}
-                              </tr>
-                              <tr className="hover:bg-gray-50">
-                                <td className="py-2 md:py-3 px-2 md:px-4 text-gray-900 whitespace-nowrap">
-                                  Round 2
-                                </td>
-                                {Object.entries(college.cutoffs)
-                                  .reverse()
-                                  .map(([year, cutoffs]) => {
-                                    const categoryRank =
-                                      cutoffs[
-                                        category.toLowerCase() as keyof typeof cutoffs
-                                      ];
-                                    return (
-                                      <td
-                                        key={year}
-                                        className="text-center py-2 md:py-3 px-2 md:px-4 text-gray-600 whitespace-nowrap"
-                                      >
-                                        {Math.floor(categoryRank * 0.98)}
-                                      </td>
-                                    );
-                                  })}
-                              </tr>
+                              {Array.from({ length: 6 }, (_, i) => i + 1).map(
+                                (roundNum) => (
+                                  <tr
+                                    key={roundNum}
+                                    className="hover:bg-gray-50"
+                                  >
+                                    <td className="py-2 md:py-3 px-2 md:px-4 text-gray-900 whitespace-nowrap font-medium">
+                                      {roundNum}
+                                    </td>
+                                    {Object.keys(college.cutoffs)
+                                      .sort()
+                                      .reverse()
+                                      .map((year) => {
+                                        const roundKey = `Round-${roundNum}`;
+                                        const cutoffValue =
+                                          college.cutoffs[year]?.[roundKey];
+                                        return (
+                                          <td
+                                            key={year}
+                                            className="text-center py-2 md:py-3 px-2 md:px-4 text-gray-600 whitespace-nowrap"
+                                          >
+                                            {cutoffValue
+                                              ? cutoffValue.toLocaleString()
+                                              : "-"}
+                                          </td>
+                                        );
+                                      })}
+                                  </tr>
+                                )
+                              )}
                             </tbody>
                           </table>
                         </div>
@@ -1407,7 +1290,7 @@ export default function CollegePredictorClientPage() {
                   </Card>
                 ))
               ) : (
-                <Card className="p-6 md:p-12 text-center bg-white border border-gray-200">
+                <Card className="p-6 md:p-12 text-center bg-white border border-gray-200 col-span-1 lg:col-span-2">
                   <Award className="w-12 h-12 md:w-16 md:h-16 text-gray-300 mx-auto mb-3 md:mb-4" />
                   <h3 className="text-slate-900 mb-2 text-base md:text-lg">
                     No Colleges Found
