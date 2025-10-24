@@ -30,6 +30,11 @@ export function Header() {
     { name: "Reviews", id: "reviews", href: "/review" },
     { name: "Cutoffs", id: "cutoff", href: "/cutoff" },
     { name: "News", id: "news", href: "/news" },
+    {
+      name: "College Predictor",
+      id: "college-predictor",
+      href: "/college-predictor",
+    },
   ];
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<"signIn" | "signUp">("signIn");
