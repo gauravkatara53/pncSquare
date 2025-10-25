@@ -1,6 +1,6 @@
 import Papa from "papaparse";
 
-interface CollegeData {
+interface FinalMainData {
   slug: string;
   name: string;
   state: string;
@@ -13,20 +13,11 @@ interface CollegeData {
   seatType: string;
   subCategory: string;
   examType: string;
+  year: string;
   closingRank: number | string;
-  round: number | string;
-  Weight?: number;
+  round: string;
+  branch_weight?: number;
   weight?: number;
-}
-
-interface BranchWeight {
-  Branch: string;
-  Weight: number;
-}
-
-interface CollegeWeight {
-  slug: string;
-  weight: number;
 }
 
 interface PredictionResult {
@@ -41,76 +32,51 @@ interface PredictionResult {
   Quota: string;
   SeatType: string;
   SubCategory: string;
+  BranchWeight: number;
+  CollegeWeight: number;
+  RankScore: number;
   PriorityScore: number;
   Weight: number;
-  RankScore: number;
   FinalScore: number;
   AllRoundsCutoff: string;
 }
 
-// Lazy load CSV data
-let cutoffsData: CollegeData[] | null = null;
-let branchWeightsData: BranchWeight[] | null = null;
-let collegeWeightsData: CollegeWeight[] | null = null;
+let finalMainData: FinalMainData[] | null = null;
 
-async function loadCutoffsData(): Promise<CollegeData[]> {
-  if (cutoffsData) return cutoffsData;
+async function loadFinalMainData(): Promise<FinalMainData[]> {
+  if (finalMainData) {
+    console.log("✅ Using cached data:", finalMainData.length, "rows");
+    return finalMainData;
+  }
 
-  const response = await fetch("/college-predictor-data/PNC_DB.cutoffs.csv");
-  const text = await response.text();
+  try {
+    const response = await fetch(
+      "/college-predictor-data/final_main_college_predictor.csv"
+    );
 
-  return new Promise((resolve, reject) => {
-    Papa.parse(text, {
-      header: true,
-      dynamicTyping: true,
-      complete: (results: Papa.ParseResult<CollegeData>) => {
-        cutoffsData = results.data as CollegeData[];
-        resolve(cutoffsData);
-      },
-      error: reject,
+    if (!response.ok) {
+      throw new Error(`Failed to fetch CSV: ${response.statusText}`);
+    }
+
+    const text = await response.text();
+
+    return new Promise((resolve, reject) => {
+      Papa.parse<FinalMainData>(text, {
+        header: true,
+        dynamicTyping: true,
+        skipEmptyLines: true,
+        transformHeader: (header) => header.trim(),
+        complete: (results: Papa.ParseResult<FinalMainData>) => {
+          console.log(`✅ Loaded ${results.data.length} rows from CSV`);
+          finalMainData = results.data as FinalMainData[];
+          resolve(finalMainData);
+        },
+      });
     });
-  });
-}
-
-async function loadBranchWeights(): Promise<BranchWeight[]> {
-  if (branchWeightsData) return branchWeightsData;
-
-  const response = await fetch("/college-predictor-data/BRANCH%20WEIGHT.csv");
-  const text = await response.text();
-
-  return new Promise((resolve, reject) => {
-    Papa.parse(text, {
-      header: true,
-      dynamicTyping: true,
-      complete: (results: Papa.ParseResult<BranchWeight>) => {
-        branchWeightsData = results.data as BranchWeight[];
-        resolve(branchWeightsData);
-      },
-      error: reject,
-    });
-  });
-}
-
-async function loadCollegeWeights(): Promise<CollegeWeight[]> {
-  if (collegeWeightsData) return collegeWeightsData;
-
-  const response = await fetch(
-    "/college-predictor-data/college_weight_scores_with_stateCopy-CollegeDatawithweight.csv"
-  );
-  const text = await response.text();
-
-  return new Promise((resolve, reject) => {
-    Papa.parse(text, {
-      header: true,
-      dynamicTyping: true,
-      complete: (results: Papa.ParseResult<CollegeWeight>) => {
-        collegeWeightsData = results.data as CollegeWeight[];
-        console.log(collegeWeightsData);
-        resolve(collegeWeightsData);
-      },
-      error: reject,
-    });
-  });
+  } catch (error) {
+    console.error("❌ Error loading CSV:", error);
+    throw error;
+  }
 }
 
 export async function predictCollegesTable(
@@ -120,37 +86,31 @@ export async function predictCollegesTable(
   subCategory: string,
   user_state: string
 ): Promise<PredictionResult[]> {
-  // Load all data
-  const [cutoffs, branchWeights, collegeWeights] = await Promise.all([
-    loadCutoffsData(),
-    loadBranchWeights(),
-    loadCollegeWeights(),
-  ]);
+  // === Load Combined Data ===
+  const data = await loadFinalMainData();
 
-  // Create lookup maps for merging
-  const branchWeightMap = new Map<string, number>();
-  branchWeights.forEach((bw) => {
-    branchWeightMap.set(bw.Branch, bw.Weight || 70);
-  });
+  // === Normalize input parameters ===
+  const normalizedExamType = examType.trim().toLowerCase();
+  const normalizedSeatType = seatType.trim().toLowerCase();
+  const normalizedSubCategory = subCategory.trim().toLowerCase();
+  const normalizedUserState = user_state.trim().toLowerCase();
 
-  const collegeWeightMap = new Map<string, number>();
-  collegeWeights.forEach((cw) => {
-    collegeWeightMap.set(cw.slug, cw.weight);
-  });
+  // === Filter by Input Parameters ===
+  let filtered = data.filter((row) => {
+    const rowExamType = String(row.examType || "")
+      .trim()
+      .toLowerCase();
+    const rowSeatType = String(row.seatType || "")
+      .trim()
+      .toLowerCase();
+    const rowSubCategory = String(row.subCategory || "")
+      .trim()
+      .toLowerCase();
 
-  // Merge data: Add Weight and weight columns to cutoffs
-  const merged = cutoffs.map((row) => ({
-    ...row,
-    Weight: branchWeightMap.get(row.branch) || 70,
-    weight: collegeWeightMap.get(row.slug) || 70,
-  }));
-
-  // Filter by input parameters
-  let filtered = merged.filter((row) => {
     return (
-      String(row.examType || "").toLowerCase() === examType.toLowerCase() &&
-      String(row.seatType || "").toLowerCase() === seatType.toLowerCase() &&
-      String(row.subCategory || "").toLowerCase() === subCategory.toLowerCase()
+      rowExamType === normalizedExamType &&
+      rowSeatType === normalizedSeatType &&
+      rowSubCategory === normalizedSubCategory
     );
   });
 
@@ -159,7 +119,7 @@ export async function predictCollegesTable(
     return [];
   }
 
-  // HS quota filtering logic (exactly like Python)
+  // === HS quota filtering ===
   filtered = filtered.filter((row) => {
     const quota_value = String(row.quota || "")
       .trim()
@@ -167,29 +127,39 @@ export async function predictCollegesTable(
     const college_state = String(row.state || "")
       .trim()
       .toLowerCase();
+
     if (quota_value === "HS") {
-      return college_state === user_state.toLowerCase();
+      return college_state === normalizedUserState;
     }
-    return true; // keep all other quotas (OPEN, AI, etc.)
+    return true; // Keep others (AI, OPEN, etc.)
   });
 
-  // Convert closing rank and clean
+  // === Convert closingRank to numeric ===
   filtered = filtered
     .map((row) => ({
       ...row,
-      closingRank: parseFloat(String(row.closingRank)) || NaN,
+      closingRank:
+        typeof row.closingRank === "number"
+          ? row.closingRank
+          : parseFloat(String(row.closingRank || "0")),
     }))
-    .filter((row) => !isNaN(row.closingRank) && row.closingRank > 0);
+    .filter(
+      (row) =>
+        !isNaN(row.closingRank as number) && (row.closingRank as number) > 0
+    );
 
-  // Fill missing weights (already done in merge, but ensure)
+  // === Fill missing weights ===
   filtered = filtered.map((row) => ({
     ...row,
-    Weight: row.Weight || 70,
-    weight: row.weight || 70,
+    branch_weight:
+      row.branch_weight !== undefined && row.branch_weight !== null
+        ? row.branch_weight
+        : 70,
+    weight: row.weight !== undefined && row.weight !== null ? row.weight : 70,
   }));
 
-  // Compute Results
-  const groupedMap = new Map<string, CollegeData[]>();
+  // === Compute Results ===
+  const groupedMap = new Map<string, FinalMainData[]>();
 
   filtered.forEach((row) => {
     const key = `${row.slug}-${row.course}-${row.branch}`;
@@ -201,41 +171,79 @@ export async function predictCollegesTable(
 
   const tableRows: PredictionResult[] = [];
 
-  for (const [key, groupData] of groupedMap) {
-    // Filter eligible rounds (closingRank >= rank) - exactly like Python
-    const eligibleRounds = groupData.filter(
-      (row) => parseFloat(String(row.closingRank)) >= rank
-    );
+  for (const [, group] of groupedMap) {
+    // Eligible rounds (closingRank >= rank)
+    const eligibleRounds = group.filter((row) => {
+      const closingRankNum =
+        typeof row.closingRank === "number"
+          ? row.closingRank
+          : parseFloat(String(row.closingRank));
+      return !isNaN(closingRankNum) && closingRankNum >= rank;
+    });
 
     if (eligibleRounds.length === 0) continue;
 
     // Sort by round and get first
-    const sortedRounds = eligibleRounds.sort(
-      (a, b) => parseFloat(String(a.round)) - parseFloat(String(b.round))
-    );
+    const sortedRounds = eligibleRounds.sort((a, b) => {
+      const aNum = parseInt(String(a.round).replace(/[^\d]/g, "")) || 0;
+      const bNum = parseInt(String(b.round).replace(/[^\d]/g, "")) || 0;
+      return aNum - bNum;
+    });
+
     const firstRound = sortedRounds[0];
-    const closingRank = parseFloat(String(firstRound.closingRank));
-    const rankScore = Math.max(
-      0,
-      1 - Math.abs(rank - closingRank) / closingRank
-    );
+    const closingRank =
+      typeof firstRound.closingRank === "number"
+        ? firstRound.closingRank
+        : parseFloat(String(firstRound.closingRank));
 
-    // Use Weight and weight from merged data
-    const branchWeight = firstRound.Weight || 70;
-    const collegeWeight = firstRound.weight || 70;
+    // Compute score
+    const rankScore =
+      !isNaN(closingRank) && closingRank !== 0
+        ? Math.max(0, 1 - Math.abs(rank - closingRank) / closingRank)
+        : 0;
 
+    const branchWeight = firstRound.branch_weight ?? 70;
+    const collegeWeight = firstRound.weight ?? 70;
     const finalScore =
       rankScore * 0.4 +
       (branchWeight / 100) * 0.3 +
       (collegeWeight / 100) * 0.3;
 
-    // Create cutoff string - exactly like Python (includes ALL rounds from ALL years)
-    const sortedAllRounds = groupData.sort(
-      (a, b) => parseFloat(String(a.round)) - parseFloat(String(b.round))
+    // ✅ Group by year and create cutoff string
+    const yearGroups = new Map<string, FinalMainData[]>();
+
+    group.forEach((row) => {
+      const year = String(row.year || "2025");
+      if (!yearGroups.has(year)) {
+        yearGroups.set(year, []);
+      }
+      yearGroups.get(year)!.push(row);
+    });
+
+    // Sort years in descending order (2025, 2024, etc.)
+    const sortedYears = Array.from(yearGroups.keys()).sort(
+      (a, b) => parseInt(b) - parseInt(a)
     );
-    const cutoffStr = sortedAllRounds
-      .map((row) => `${row.round}: ${parseInt(String(row.closingRank))}`)
-      .join(", ");
+
+    const cutoffParts: string[] = [];
+
+    sortedYears.forEach((year) => {
+      const yearData = yearGroups.get(year)!;
+      const sortedYearData = yearData.sort((a, b) => {
+        const aNum = parseInt(String(a.round).replace(/[^\d]/g, "")) || 0;
+        const bNum = parseInt(String(b.round).replace(/[^\d]/g, "")) || 0;
+        return aNum - bNum;
+      });
+
+      const yearCutoffs = sortedYearData
+        .map((row) => `${row.round}: ${Math.round(row.closingRank as number)}`)
+        .join(", ");
+
+      cutoffParts.push(yearCutoffs);
+    });
+
+    // Join years with " | " separator
+    const cutoffStr = cutoffParts.join(" | ");
 
     tableRows.push({
       College: firstRound.slug,
@@ -249,9 +257,11 @@ export async function predictCollegesTable(
       Quota: firstRound.quota || "",
       SeatType: firstRound.seatType,
       SubCategory: firstRound.subCategory,
-      PriorityScore: branchWeight,
-      Weight: collegeWeight,
+      BranchWeight: branchWeight,
+      CollegeWeight: collegeWeight,
       RankScore: rankScore,
+      PriorityScore: 0, // Add a computed value if needed
+      Weight: collegeWeight, // Added missing property
       FinalScore: finalScore,
       AllRoundsCutoff: cutoffStr,
     });
@@ -262,8 +272,10 @@ export async function predictCollegesTable(
     return [];
   }
 
-  // Sort by FinalScore
+  // === Sort by FinalScore ===
   tableRows.sort((a, b) => b.FinalScore - a.FinalScore);
 
+  console.log(`✅ Found ${tableRows.length} eligible colleges`);
+  console.log("result:________", tableRows.slice(0, 5)); // Log top 5 results for verification
   return tableRows;
 }

@@ -122,6 +122,25 @@ const indianStates = [
   "West Bengal",
 ];
 
+type PredictionResult = {
+  College: string;
+  College_Name: string;
+  State: string;
+  nirfRank: string;
+  fees: string;
+  avgSalary: string;
+  Course: string;
+  Branch: string;
+  Quota: string;
+  SeatType: string;
+  SubCategory: string;
+  PriorityScore?: number;
+  Weight?: number;
+  RankScore?: number;
+  FinalScore?: number;
+  AllRoundsCutoff: string;
+};
+
 export default function CollegePredictorClientPage() {
   // Initial form state
   const [showResults, setShowResults] = useState(false);
@@ -130,25 +149,9 @@ export default function CollegePredictorClientPage() {
   const [seatType, setSeatType] = useState("OPEN");
   const [subCategory, setSubCategory] = useState("Gender-Neutral");
   const [userState, setUserState] = useState("");
+
   const [predictedColleges, setPredictedColleges] = useState<
-    Array<{
-      College: string;
-      College_Name: string;
-      State: string;
-      nirfRank: string;
-      fees: string;
-      avgSalary: string;
-      Course: string;
-      Branch: string;
-      Quota: string;
-      SeatType: string;
-      SubCategory: string;
-      PriorityScore: number;
-      Weight: number;
-      RankScore: number;
-      FinalScore: number;
-      AllRoundsCutoff: string;
-    }>
+    PredictionResult[]
   >([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -164,7 +167,7 @@ export default function CollegePredictorClientPage() {
   const [searchLocation, setSearchLocation] = useState("");
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
   const [selectedQuota, setSelectedQuota] = useState("All India");
-  const [feesRange, setFeesRange] = useState([0, 500000]);
+  const [feesRange, setFeesRange] = useState([0, 5000000]);
   const [selectedSpecializations, setSelectedSpecializations] = useState<
     string[]
   >([]);
@@ -215,7 +218,15 @@ export default function CollegePredictorClientPage() {
             cat,
             state
           );
-          setPredictedColleges(results);
+          setPredictedColleges(
+            results.map((item) => ({
+              ...item,
+              PriorityScore: item.PriorityScore ?? 0,
+              Weight: item.Weight ?? 0,
+              RankScore: item.RankScore ?? 0,
+              FinalScore: item.FinalScore ?? 0,
+            }))
+          );
         } catch (error) {
           console.error("Error predicting colleges:", error);
           setPredictedColleges([]);
@@ -241,9 +252,8 @@ export default function CollegePredictorClientPage() {
           viteee: "VITEEE",
           comedk: "COMEDK",
         };
-
-        const examType = examTypeMap[selectedExam] || "JEE-Main";
-
+        const examType =
+          examTypeMap[selectedExam as keyof typeof examTypeMap] || "JEE-Main";
         // Call client-side prediction function
         const results = await predictCollegesTable(
           examType,
@@ -253,7 +263,20 @@ export default function CollegePredictorClientPage() {
           userState
         );
 
-        setPredictedColleges(results);
+        setPredictedColleges(
+          results.map((item) => ({
+            ...item,
+            PriorityScore: item.PriorityScore ?? 0,
+            Weight: item.Weight ?? 0,
+            RankScore: item.RankScore ?? 0,
+            FinalScore: item.FinalScore ?? 0,
+          }))
+        );
+
+        // ✅ ADD THESE LINES:
+        console.log("✅ SET PREDICTED COLLEGES:", results.length);
+        console.log("📋 First result structure:", results[0]);
+        console.log("🔍 showResults state:", showResults);
 
         // Update URL
         const params = new URLSearchParams();
@@ -323,46 +346,105 @@ export default function CollegePredictorClientPage() {
   };
 
   const filteredColleges = useMemo(() => {
-    if (predictedColleges.length === 0) return [];
+    if (predictedColleges.length === 0) {
+      console.log("⚠️ No predicted colleges to display");
+      return [];
+    }
+
+    console.log("🎨 MAPPING PREDICTED COLLEGES TO UI FORMAT");
+    console.log("📊 Raw predicted colleges count:", predictedColleges.length);
+    console.log("📋 First predicted college:", predictedColleges[0]);
 
     // Map predicted colleges to UI format
     const collegesToDisplay = predictedColleges.map((college, index) => {
       // Parse fees to number
-      const feesNum = parseFloat(college.fees) || 0;
-      const avgSalaryNum = parseFloat(college.avgSalary) || 0;
+      const feesNum = parseFloat(college.fees || "0");
+      const avgSalaryNum = parseFloat(college.avgSalary || "0");
 
-      // Parse AllRoundsCutoff to create a structured table
-      const cutoffPairs = college.AllRoundsCutoff.split(", ");
+      console.log(
+        `\n🏫 Processing college ${index + 1}:`,
+        college.College_Name
+      );
+      console.log(`   Fees: ${college.fees} → ${feesNum}`);
+      console.log(`   Avg Salary: ${college.avgSalary} → ${avgSalaryNum}`);
+      console.log(`   Raw AllRoundsCutoff:`, college.AllRoundsCutoff);
+
+      // ✅ NEW: Parse AllRoundsCutoff with " | " separator for years
       const cutoffsTable: Record<string, Record<string, number | string>> = {};
 
-      // Track the pattern of rounds to identify years
+      // Split by " | " to separate years (2025 | 2024)
+      const yearParts = (college.AllRoundsCutoff || "").split(" | ");
+
+      console.log(`   📅 Split into ${yearParts.length} year parts`);
+
+      // Expected years in descending order
       const years = ["2025", "2024"];
-      let currentYearIndex = 0;
-      let lastRoundNum = 0;
 
-      cutoffPairs.forEach((pair: string) => {
-        const [round, rank] = pair.split(": ");
-        const roundNum =
-          parseInt(round.replace("Round-", "").replace("CSAB-", "")) || 0;
-        // If rank is not a number, display '-'
-        const rankNum = isNaN(parseInt(rank)) ? "-" : parseInt(rank);
-
-        // If round number decreased, move to next year
-        if (roundNum < lastRoundNum && lastRoundNum > 0) {
-          currentYearIndex++;
+      yearParts.forEach((yearPart, yearIndex) => {
+        const year = years[yearIndex];
+        if (!year) {
+          console.log(`   ⚠️ Skipping extra year part at index ${yearIndex}`);
+          return;
         }
 
-        const year = years[currentYearIndex] || years[years.length - 1];
+        console.log(`\n   📊 Processing ${year}:`);
+        console.log(`      Raw data: "${yearPart.substring(0, 80)}..."`);
 
+        // Initialize year object
         if (!cutoffsTable[year]) {
           cutoffsTable[year] = {};
         }
-        cutoffsTable[year][`Round-${roundNum}`] = rankNum;
 
-        lastRoundNum = roundNum;
+        // Split by comma to get individual round:rank pairs
+        const cutoffPairs = yearPart.split(",").map((s) => s.trim());
+
+        console.log(`      Found ${cutoffPairs.length} pairs for ${year}`);
+
+        cutoffPairs.forEach((pair: string) => {
+          if (!pair) return;
+
+          const colonIndex = pair.indexOf(":");
+          if (colonIndex === -1) {
+            console.log(`      ⚠️ Invalid pair format: "${pair}"`);
+            return;
+          }
+
+          const roundPart = pair.substring(0, colonIndex).trim();
+          const rankPart = pair.substring(colonIndex + 1).trim();
+
+          // Extract round number from "Round-1" -> 1
+          const roundNum = parseInt(
+            roundPart
+              .replace("Round-", "")
+              .replace("CSAB-", "")
+              .replace(/\D/g, "")
+          );
+
+          const rankNum = parseInt(rankPart);
+
+          if (isNaN(roundNum)) {
+            console.log(`      ⚠️ Invalid round: "${roundPart}"`);
+            return;
+          }
+
+          if (isNaN(rankNum)) {
+            console.log(`      ⚠️ Invalid rank: "${rankPart}"`);
+            cutoffsTable[year][`Round-${roundNum}`] = "-";
+          } else {
+            cutoffsTable[year][`Round-${roundNum}`] = rankNum;
+            console.log(`      ✅ ${year} Round-${roundNum} = ${rankNum}`);
+          }
+        });
+
+        console.log(
+          `      ${year} final rounds:`,
+          Object.keys(cutoffsTable[year]).sort()
+        );
       });
 
-      return {
+      console.log(`   📊 Complete cutoffs structure:`, cutoffsTable);
+
+      const mappedCollege = {
         id: index + 1,
         name: college.College_Name || college.College || "-",
         location: `${college.State || "-"}, India`,
@@ -376,13 +458,34 @@ export default function CollegePredictorClientPage() {
           : college.avgSalary || "N/A",
         nirf: college.nirfRank ? parseInt(college.nirfRank) : "-",
         cutoffs: cutoffsTable,
-        allRoundsCutoff: college.AllRoundsCutoff, // Keep original for reference
+        allRoundsCutoff: college.AllRoundsCutoff,
         tags: ["Placement", "Cutoff"],
       };
+
+      console.log(`   ✅ Mapped successfully:`, {
+        name: mappedCollege.name,
+        location: mappedCollege.location,
+        fees: mappedCollege.fees,
+        avgFees: mappedCollege.avgFees,
+        cutoffs2025Rounds: Object.keys(cutoffsTable["2025"] || {}),
+        cutoffs2024Rounds: Object.keys(cutoffsTable["2024"] || {}),
+      });
+
+      return mappedCollege;
     });
 
+    console.log("\n📊 TOTAL MAPPED COLLEGES:", collegesToDisplay.length);
+
     // Apply filters
-    return collegesToDisplay.filter((college) => {
+    console.log("\n🔍 APPLYING FILTERS:");
+    console.log(`   Selected Cities: [${selectedCities.join(", ")}]`);
+    console.log(`   Fees Range: ₹${feesRange[0]} - ₹${feesRange[1]}`);
+    console.log(
+      `   Selected Specializations: [${selectedSpecializations.join(", ")}]`
+    );
+    console.log(`   Selected Ownership: [${selectedOwnership.join(", ")}]`);
+
+    const filtered = collegesToDisplay.filter((college) => {
       // City filter
       if (selectedCities.length > 0) {
         const matchesCity = selectedCities.some((city) =>
@@ -390,12 +493,15 @@ export default function CollegePredictorClientPage() {
             .toLowerCase()
             .includes(city.toLowerCase().split("/")[0])
         );
-        if (!matchesCity) return false;
+        if (!matchesCity) {
+          return false;
+        }
       }
 
       // Fees filter
-      if (college.avgFees < feesRange[0] || college.avgFees > feesRange[1])
+      if (college.avgFees < feesRange[0] || college.avgFees > feesRange[1]) {
         return false;
+      }
 
       // Specialization filter
       if (
@@ -417,6 +523,14 @@ export default function CollegePredictorClientPage() {
 
       return true;
     });
+
+    console.log("\n✅ FINAL FILTERED COLLEGES:", filtered.length);
+    console.log("🎉 Filter summary:");
+    console.log(`   Started with: ${collegesToDisplay.length}`);
+    console.log(`   After filters: ${filtered.length}`);
+    console.log(`   Removed: ${collegesToDisplay.length - filtered.length}`);
+
+    return filtered;
   }, [
     predictedColleges,
     selectedCities,
@@ -1047,8 +1161,8 @@ export default function CollegePredictorClientPage() {
                         value={feesRange}
                         onValueChange={setFeesRange}
                         min={0}
-                        max={500000}
-                        step={10000}
+                        max={5000000}
+                        step={100000}
                         className="mb-2"
                       />
                       <div className="flex items-center justify-between text-sm text-gray-600">
@@ -1177,46 +1291,76 @@ export default function CollegePredictorClientPage() {
                                   .join(" ")}
                               </h3>
                               <div className="flex flex-wrap items-center gap-1 md:gap-2 text-xs md:text-sm text-gray-600 mb-2">
-                                {college.tags.map((tag) => {
-                                  let href = `/college/${college.name}`;
-                                  if (tag.toLowerCase() === "cutoff") {
-                                    href += "#cutoff";
-                                  } else if (
-                                    tag.toLowerCase() === "placement"
-                                  ) {
-                                    href += "#placements";
-                                  }
-                                  return (
-                                    <a
-                                      key={tag}
-                                      href={href}
-                                      className="no-underline"
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                    >
-                                      <Badge
-                                        variant="secondary"
-                                        className="text-xs bg-gray-100"
-                                      >
-                                        {tag}
-                                      </Badge>
-                                    </a>
-                                  );
-                                })}
+                                <MapPin className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0" />
+                                <span className="truncate">
+                                  {college.location}
+                                </span>
                               </div>
                             </div>
                           </div>
                         </div>
                         <Button
                           variant="outline"
-                          className="border-[#2a53e2] text-[#2a53e2] hover:bg-[#2a53e2]/5 w-full sm:w-auto text-sm"
+                          size="sm"
+                          className="border-[#2a53e2] text-[#2a53e2] hover:bg-[#2a53e2]/5 w-full sm:w-auto text-xs"
                           onClick={() =>
                             router.push(`/college/${college.name}`)
                           }
                         >
                           View Details
-                          <ArrowRight className="w-4 h-4 ml-1" />
+                          <ArrowRight className="w-3 h-3 ml-1" />
                         </Button>
+                      </div>
+
+                      {/* College Meta Row */}
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge
+                          variant="outline"
+                          className="text-xs border-[#2a53e2] text-[#2a53e2]"
+                        >
+                          NIRF #{college.nirf !== "-" ? college.nirf : "N/A"}
+                        </Badge>
+                        <div className="flex flex-wrap items-center gap-1 md:gap-2 text-xs md:text-sm text-gray-600 mb-2">
+                          {college.tags.map((tag) => {
+                            let href = `/college/${college.name}`;
+                            if (tag.toLowerCase() === "cutoff") {
+                              href += "#cutoff";
+                            } else if (tag.toLowerCase() === "placement") {
+                              href += "#placements";
+                            }
+                            return (
+                              <a
+                                key={tag}
+                                href={href}
+                                className="no-underline"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                <Badge
+                                  variant="secondary"
+                                  className="text-xs bg-gray-100"
+                                >
+                                  {tag}
+                                </Badge>
+                              </a>
+                            );
+                          })}
+                        </div>
+                      </div>
+                      {/* Placement & Fees Row */}
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-6 mb-4">
+                        <div className="text-xs md:text-sm">
+                          <span className="text-gray-600">Avg Package:</span>
+                          <span className="text-[#2a53e2] ml-2">
+                            {college.avgPackage}
+                          </span>
+                        </div>
+                        <div className="text-xs md:text-sm">
+                          <span className="text-gray-600">Avg Fees:</span>
+                          <span className="text-[#2a53e2] ml-2">
+                            {college.fees.replace("/year", "")}
+                          </span>
+                        </div>
                       </div>
 
                       {/* Branch Info */}
