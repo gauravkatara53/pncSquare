@@ -28,6 +28,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { apiService } from "@/ApiService/apiService";
+import GenZAILoader from "@/components/loading/GenZAILoader";
 
 const cities = [
   "Delhi/NCR",
@@ -764,7 +765,10 @@ export default function CollegePredictorResultPage() {
                     Analyzing data and finding best colleges for you
                   </p>
                 </Card>
-              ) : error ? (
+              ) : // <div className="p-12 text-center bg-white border border-gray-200 col-span-1 lg:col-span-2">
+              //   <GenZAILoader />
+              // </div>
+              error ? (
                 <Card className="p-12 text-center bg-white border border-gray-200 col-span-1 lg:col-span-2">
                   <Award className="w-16 h-16 text-red-300 mx-auto mb-4" />
                   <h3 className="text-slate-900 mb-2 font-semibold">
