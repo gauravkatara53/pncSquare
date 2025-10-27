@@ -28,6 +28,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { apiService } from "@/ApiService/apiService";
+import GenZAILoader from "@/components/loading/GenZAILoader";
 
 const cities = [
   "Delhi/NCR",
@@ -764,7 +765,10 @@ export default function CollegePredictorResultPage() {
                     Analyzing data and finding best colleges for you
                   </p>
                 </Card>
-              ) : error ? (
+              ) : // <div className="p-12 text-center bg-white border border-gray-200 col-span-1 lg:col-span-2">
+              //   <GenZAILoader />
+              // </div>
+              error ? (
                 <Card className="p-12 text-center bg-white border border-gray-200 col-span-1 lg:col-span-2">
                   <Award className="w-16 h-16 text-red-300 mx-auto mb-4" />
                   <h3 className="text-slate-900 mb-2 font-semibold">
@@ -784,7 +788,7 @@ export default function CollegePredictorResultPage() {
                   {filteredColleges.map((college) => (
                     <Card
                       key={college.id}
-                      className="bg-white border border-gray-200 hover:shadow-lg transition-shadow"
+                      className="bg-white border border-gray-200  "
                     >
                       <div className="p-4 md:p-6">
                         {/* College Header */}
@@ -957,16 +961,10 @@ export default function CollegePredictorResultPage() {
                                   });
 
                                   return allRounds.map((roundKey) => {
-                                    const isClosest =
-                                      college.closestRound === roundKey;
                                     return (
                                       <tr
                                         key={roundKey}
-                                        className={
-                                          isClosest
-                                            ? "bg-gradient-to-r from-[#FACC15]/10 to-[#FDE047]/10"
-                                            : "hover:bg-gray-50"
-                                        }
+                                        className="hover:bg-gray-50"
                                       >
                                         <td className="py-2 md:py-3 px-2 md:px-4 text-gray-900 whitespace-nowrap font-medium">
                                           {roundKey}
@@ -995,14 +993,14 @@ export default function CollegePredictorResultPage() {
                               </tbody>
                             </table>
                           </div>
-                          <p className="text-xs text-gray-500 mt-2">
+                          {/* <p className="text-xs text-gray-500 mt-2">
                             Closest Round:{" "}
                             <span className="font-semibold">
                               {college.closestRound}
                             </span>{" "}
-                            {/* • Match Score:{" "}
-                            {(college.finalScore * 100).toFixed(1)}% */}
-                          </p>
+                            • Match Score:{" "}
+                            {(college.finalScore * 100).toFixed(1)}%
+                          </p> */}
                         </div>
                       </div>
                     </Card>
