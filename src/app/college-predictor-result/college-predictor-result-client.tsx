@@ -412,7 +412,7 @@ export default function CollegePredictorResultPage() {
         collegeWeight: college.CollegeWeight || 0,
         rankScore: college.RankScore || 0,
         finalScore: college.FinalScore || 0,
-        tags: ["Placement", "Cutoff"],
+        tags: ["Cutoff", "Placement"],
       };
     });
 
@@ -527,7 +527,7 @@ export default function CollegePredictorResultPage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-4 md:py-8">
+      <div className="max-w-[1400px] mx-auto px-2 md:px-6 py-4 md:py-8">
         {/* Mobile Filter Button */}
         <div className="mb-4 lg:hidden">
           <Sheet>
@@ -820,7 +820,7 @@ export default function CollegePredictorResultPage() {
                           </Button>
                         </div>
                         {/* College Meta */}
-                        <div className="flex items-center gap-2 mb-4">
+                        <div className="flex flex-wrap items-center gap-2 mb-4">
                           <Badge
                             variant="outline"
                             className="text-xs border-[#2a53e2] text-[#2a53e2]"
@@ -843,7 +843,7 @@ export default function CollegePredictorResultPage() {
                             <a
                               key={tag}
                               href={
-                                tag.toLowerCase() === "cutoff"
+                                tag.toLowerCase() === ""
                                   ? `/college/${college.slug}#cutoff`
                                   : `/college/${college.slug}#placements`
                               }
@@ -859,6 +859,7 @@ export default function CollegePredictorResultPage() {
                             </a>
                           ))}
                         </div>
+
                         {/* Branch Info */}
                         <div className="bg-gradient-to-r from-[#2a53e2]/5 to-[#7C5EFF]/5 rounded-lg p-3 md:p-4 mb-4">
                           <p className="text-xs text-gray-600 mb-1">
@@ -1008,33 +1009,41 @@ export default function CollegePredictorResultPage() {
                   ))}
 
                   {/* Pagination */}
+                  {/* Pagination */}
                   {totalPages > 1 && (
                     <div className="col-span-1 lg:col-span-2 flex flex-col items-center gap-4 mt-6">
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center justify-center gap-2">
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => handlePageChange(currentPage - 1)}
                           disabled={currentPage === 1 || isLoading}
-                          className="border-gray-300"
+                          className="border-gray-300 min-w-[44px] h-[44px] sm:min-w-0 sm:h-auto"
                         >
                           <ChevronLeft className="w-4 h-4" />
-                          Previous
+                          <span className="hidden sm:inline ml-1">
+                            Previous
+                          </span>
                         </Button>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1 sm:gap-2">
                           {Array.from(
-                            { length: Math.min(5, totalPages) },
+                            {
+                              length: Math.min(
+                                totalPages <= 5 ? totalPages : 3,
+                                totalPages
+                              ),
+                            },
                             (_, i) => {
                               let pageNum;
                               if (totalPages <= 5) {
                                 pageNum = i + 1;
-                              } else if (currentPage <= 3) {
+                              } else if (currentPage <= 2) {
                                 pageNum = i + 1;
-                              } else if (currentPage >= totalPages - 2) {
-                                pageNum = totalPages - 4 + i;
+                              } else if (currentPage >= totalPages - 1) {
+                                pageNum = totalPages - 2 + i;
                               } else {
-                                pageNum = currentPage - 2 + i;
+                                pageNum = currentPage - 1 + i;
                               }
 
                               return (
@@ -1048,16 +1057,33 @@ export default function CollegePredictorResultPage() {
                                   size="sm"
                                   onClick={() => handlePageChange(pageNum)}
                                   disabled={isLoading}
-                                  className={
+                                  className={`min-w-[44px] h-[44px] sm:min-w-[36px] sm:h-auto ${
                                     currentPage === pageNum
                                       ? "bg-[#2a53e2] text-white hover:bg-[#2a53e2]/90"
                                       : "border-gray-300"
-                                  }
+                                  }`}
                                 >
                                   {pageNum}
                                 </Button>
                               );
                             }
+                          )}
+
+                          {totalPages > 5 && currentPage < totalPages - 2 && (
+                            <>
+                              <span className="hidden md:inline px-2 text-gray-500">
+                                ...
+                              </span>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handlePageChange(totalPages)}
+                                disabled={isLoading}
+                                className="hidden md:inline-flex border-gray-300"
+                              >
+                                {totalPages}
+                              </Button>
+                            </>
                           )}
                         </div>
 
@@ -1066,14 +1092,14 @@ export default function CollegePredictorResultPage() {
                           size="sm"
                           onClick={() => handlePageChange(currentPage + 1)}
                           disabled={currentPage === totalPages || isLoading}
-                          className="border-gray-300"
+                          className="border-gray-300 min-w-[44px] h-[44px] sm:min-w-0 sm:h-auto"
                         >
-                          Next
+                          <span className="hidden sm:inline mr-1">Next</span>
                           <ChevronRight className="w-4 h-4" />
                         </Button>
                       </div>
 
-                      <p className="text-sm text-gray-600">
+                      <p className="text-xs sm:text-sm text-gray-600 text-center px-4">
                         Page {currentPage} of {totalPages} • Showing{" "}
                         {filteredColleges.length} of {totalResults} results
                       </p>
