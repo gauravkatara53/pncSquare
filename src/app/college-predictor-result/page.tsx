@@ -1,10 +1,9 @@
 import { Metadata } from "next";
 import { Suspense } from "react";
-import dynamic from "next/dynamic";
 import CollegePredictorResultPage from "./college-predictor-result-client";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const baseUrl = "https://pncsquare.in/college-predictor";
+  const baseUrl = "https://pncsquare.in/college-predictor-result";
 
   return {
     title:
