@@ -62,10 +62,12 @@ export function FeeStructure({
                         .map((fee) => (
                           <div
                             key={fee._id || fee.title}
-                            className="flex justify-between items-center py-3 border-b border-slate-100 last:border-b-0"
+                            className="flex justify-between items-start py-3 border-b border-slate-100 last:border-b-0"
                           >
-                            <span className="text-slate-700">{fee.title}</span>
-                            <span className="font-medium text-slate-900">
+                            <span className="text-slate-700 max-w-[60%] break-words">
+                              {fee.title}
+                            </span>
+                            <span className="font-medium text-slate-900 text-right min-w-[90px] break-words">
                               ₹{fee.amount.toLocaleString("en-IN")}
                             </span>
                           </div>
@@ -105,10 +107,12 @@ export function FeeStructure({
                         .map((fee) => (
                           <div
                             key={fee._id || fee.title}
-                            className="flex justify-between items-center py-3 border-b border-slate-100 last:border-b-0"
+                            className="flex justify-between items-start py-3 border-b border-slate-100 last:border-b-0"
                           >
-                            <span className="text-slate-700">{fee.title}</span>
-                            <span className="font-medium text-slate-900">
+                            <span className="text-slate-700 max-w-[60%] break-words">
+                              {fee.title}
+                            </span>
+                            <span className="font-medium text-slate-900 text-right min-w-[90px] break-words">
                               ₹{fee.amount.toLocaleString("en-IN")}
                             </span>
                           </div>

@@ -14,7 +14,6 @@ export function Admission({ college }: { college: AdmissionCriteria }) {
 
   if (!criteria) return null;
 
-  // Colors for variety (like your original design)
   const colors = [
     { border: "border-blue-500", bg: "bg-blue-100" },
     { border: "border-green-500", bg: "bg-green-100" },
@@ -23,31 +22,31 @@ export function Admission({ college }: { college: AdmissionCriteria }) {
   ];
 
   return (
-    <div>
-      <section className="mb-16">
+    <div className="w-full">
+      <section className="mb-10 md:mb-16 px-0 md:px-0">
         {/* Heading */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-3">
+        <div className="mb-6 md:mb-8">
+          <div className="flex items-center gap-2 mb-2 md:mb-3">
             <Target className="h-5 w-5 text-slate-600" />
-            <h2 className="text-2xl  font-semibold text-slate-900">
+            <h2 className="text-xl md:text-2xl font-semibold text-slate-900">
               Admission Requirements
             </h2>
           </div>
-          <p className="text-slate-600">
+          <p className="text-slate-600 text-sm md:text-base">
             Eligibility criteria and admission process
           </p>
         </div>
 
         {/* Admission Criteria */}
         <Card className="border border-slate-200 shadow-sm">
-          <div className="p-8">
-            <div className="space-y-6 text-md">
+          <div className="p-4 md:p-8">
+            <div className="space-y-4 md:space-y-6 text-sm md:text-md">
               {criteria.criteriaList?.map((item, idx) => {
                 const colorSet = colors[idx % colors.length];
                 return (
                   <div
                     key={idx}
-                    className={`border-l-4 ${colorSet.border} pl-6 py-2 ${colorSet.bg} p-2 rounded-lg`}
+                    className={`border-l-4 ${colorSet.border} pl-4 md:pl-6 py-2 ${colorSet.bg} p-2 rounded-lg`}
                   >
                     <p className="text-slate-700 leading-relaxed">
                       {item.point}
@@ -58,9 +57,9 @@ export function Admission({ college }: { college: AdmissionCriteria }) {
 
               {/* Extra Info */}
               {(criteria.forMoreDetails || criteria.detailsUrl) && (
-                <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 flex items-start gap-2">
+                <div className="bg-slate-50 p-3 md:p-4 rounded-lg border border-slate-200 flex items-start gap-2">
                   <Info className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
-                  <p className="text-slate-600 text-sm">
+                  <p className="text-slate-600 text-xs md:text-sm">
                     {criteria.forMoreDetails}{" "}
                     {criteria.detailsUrl && (
                       <a

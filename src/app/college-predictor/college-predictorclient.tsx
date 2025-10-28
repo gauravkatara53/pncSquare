@@ -20,6 +20,7 @@ import {
   BookOpen,
   CheckCircle2,
 } from "lucide-react";
+import { Footer } from "@/components/common/footer";
 
 const examOptions = [
   {
@@ -124,7 +125,8 @@ export default function CollegePredictorClientPage() {
               <span className="text-yellow-400">Predictor</span>
             </h1>
             <p className="text-xl text-white/90 max-w-2xl mx-auto">
-              Find the best colleges based on your exam rank and preferences
+              Get personalized college predictions driven by advanced AI
+              analytics.
             </p>
           </div>
 
@@ -299,6 +301,7 @@ export default function CollegePredictorClientPage() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

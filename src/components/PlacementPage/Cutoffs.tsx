@@ -45,6 +45,39 @@ export function Cutoffs({
   const [rows, setRows] = useState<CutoffDataRow[]>([]);
   const [rounds, setRounds] = useState<string[]>([]);
 
+  // Custom round display order (memoized)
+  const roundDisplayOrder = useMemo(
+    () => [
+      "Round-1",
+      "Round-2",
+      "Round-3",
+      "Round-4",
+      "Round-5",
+      "Round-6",
+      "CSAB-1",
+      "CSAB-2",
+      "CSAB-3",
+      "Upgradation-Round",
+      "Upgradation-Round-2",
+      "Spot-Round",
+      "Special-Spot-Round",
+    ],
+    []
+  );
+
+  // Sort rounds according to display order
+  const sortedRounds = useMemo(() => {
+    if (!rounds || rounds.length === 0) return [];
+    const orderMap = Object.fromEntries(
+      roundDisplayOrder.map((r, i) => [r, i])
+    );
+    return [...rounds].sort((a, b) => {
+      const aIdx = orderMap[a] !== undefined ? orderMap[a] : 999;
+      const bIdx = orderMap[b] !== undefined ? orderMap[b] : 999;
+      return aIdx - bIdx;
+    });
+  }, [rounds, roundDisplayOrder]);
+
   // Get college tag and filter options
   const collegeTag = useMemo(() => getCollegeTagFromSlug(college), [college]);
   const filterOptions = useMemo(() => {
@@ -65,8 +98,6 @@ export function Cutoffs({
       setSelectedExamType(examTypes[0]);
     }
   }, [examTypes, selectedExamType]);
-
-  // Set default quota for IIT colleges
   useEffect(() => {
     if (isIIT && selectedExamType) {
       const defaultQuota = getDefaultQuota(collegeTag);
@@ -172,15 +203,18 @@ export function Cutoffs({
         const uniqueRounds = [
           ...new Set((dataRows || []).map((row) => row.round)),
         ];
+        // Sort rounds according to display order
+        const orderMap = Object.fromEntries(
+          roundDisplayOrder.map((r, i) => [r, i])
+        );
+        const sortedRounds = [...uniqueRounds].sort((a, b) => {
+          const aIdx = orderMap[a] !== undefined ? orderMap[a] : 999;
+          const bIdx = orderMap[b] !== undefined ? orderMap[b] : 999;
+          return aIdx - bIdx;
+        });
         setRounds(uniqueRounds);
-        setRound(uniqueRounds.length ? uniqueRounds[0] : "");
+        setRound(sortedRounds.length ? sortedRounds[0] : "");
         setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
-        setRows([]);
-        setRounds([]);
-        setRound("");
       });
   }, [
     college,
@@ -191,6 +225,7 @@ export function Cutoffs({
     selectedExamType,
     filterOptions,
     isIIT,
+    roundDisplayOrder,
   ]);
 
   // Show skeleton animation on round switch only if data is loaded
@@ -388,7 +423,7 @@ export function Cutoffs({
           {selectedExamType &&
             year &&
             seatType &&
-            rounds.length > 0 &&
+            sortedRounds.length > 0 &&
             filterOptions &&
             (!filterOptions.requiresSubCategory || subCategory) &&
             (!filterOptions.requiresQuota || quota) && (
@@ -403,7 +438,7 @@ export function Cutoffs({
                       value={round}
                       onChange={(e) => setRound(e.target.value)}
                     >
-                      {rounds.map((r) => (
+                      {sortedRounds.map((r) => (
                         <option key={r} value={r}>
                           {r}
                         </option>
@@ -412,7 +447,7 @@ export function Cutoffs({
                   </div>
                 ) : (
                   <div className="flex bg-slate-100 rounded-lg mb-4 border border-slate-200">
-                    {rounds.map((r) => (
+                    {sortedRounds.map((r) => (
                       <button
                         key={r}
                         className={[

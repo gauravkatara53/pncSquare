@@ -274,13 +274,18 @@ export function Header() {
                 <Link
                   key={item.id}
                   href={item.href}
-                  className={`text-sm font-medium whitespace-nowrap px-3 py-2 rounded-md transition-colors ${
+                  className={`relative text-sm font-medium whitespace-nowrap px-3 py-2 rounded-md transition-colors ${
                     isActive
-                      ? "text-yellow-400 bg-white/10"
+                      ? "text-yellow-400 "
                       : "text-gray-300 hover:text-white hover:bg-white/5"
                   }`}
                 >
                   {item.name}
+                  {item.id === "college-predictor" && (
+                    <span className="absolute -top-1 -right-2 bg-red-500 text-white text-[10px] font-bold px-1 py-0.5 rounded-full leading-none">
+                      New
+                    </span>
+                  )}
                 </Link>
               );
             })}

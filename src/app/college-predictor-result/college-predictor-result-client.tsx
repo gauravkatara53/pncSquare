@@ -28,7 +28,6 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { apiService } from "@/ApiService/apiService";
-import GenZAILoader from "@/components/loading/GenZAILoader";
 
 const cities = [
   "Delhi/NCR",
@@ -59,17 +58,17 @@ const collegeTags = [
 
 const examOptions = [
   {
-    id: "jee-main",
+    id: "JEE-Main",
     name: "JEE Main",
     description: "Joint Entrance Examination - Main",
   },
   {
-    id: "jee-advanced",
+    id: "JEE-Advanced",
     name: "JEE Advanced",
     description: "For IIT admissions",
   },
-  { id: "neet", name: "NEET UG", description: "Medical entrance exam" },
-  { id: "bitsat", name: "BITSAT", description: "BITS Pilani entrance" },
+  { id: "NEET-UG", name: "NEET UG", description: "Medical entrance exam" },
+  { id: "BITSAT", name: "BITSAT", description: "BITS Pilani entrance" },
   { id: "viteee", name: "VITEEE", description: "VIT Engineering entrance" },
   {
     id: "comedk",
@@ -582,9 +581,7 @@ export default function CollegePredictorResultPage() {
 
                 {/* Max Fees Filter */}
                 <div>
-                  <h3 className="font-semibold mb-3 text-sm">
-                    Maximum Annual Fees
-                  </h3>
+                  <h3 className="font-semibold mb-3 text-sm">Maximum Fees</h3>
                   <Slider
                     value={[maxFees]}
                     onValueChange={handleMaxFeesChange}
@@ -699,9 +696,7 @@ export default function CollegePredictorResultPage() {
 
                   {/* Max Fees Filter */}
                   <div>
-                    <h3 className="font-semibold mb-3 text-sm">
-                      Maximum Annual Fees
-                    </h3>
+                    <h3 className="font-semibold mb-3 text-sm">Maximum Fees</h3>
                     <Slider
                       value={[maxFees]}
                       onValueChange={handleMaxFeesChange}
@@ -758,17 +753,14 @@ export default function CollegePredictorResultPage() {
               {isLoading ? (
                 <Card className="p-12 text-center bg-white border border-gray-200 col-span-1 lg:col-span-2">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2a53e2] mx-auto mb-4"></div>
-                  <h3 className="text-slate-900 mb-2 font-semibold">
-                    Loading Predictions...
-                  </h3>
-                  <p className="text-gray-600 text-sm">
-                    Analyzing data and finding best colleges for you
+                  {/* <h3 className="text-slate-900 mb-2 font-semibold">
+                    Smart AI matching you to the right college...
+                  </h3> */}
+                  <p className="text-gray-600 text-sm font-mono bg-gray-50 rounded px-3 py-2">
+                    Please wait while our AI analyzes your data...
                   </p>
                 </Card>
-              ) : // <div className="p-12 text-center bg-white border border-gray-200 col-span-1 lg:col-span-2">
-              //   <GenZAILoader />
-              // </div>
-              error ? (
+              ) : error ? (
                 <Card className="p-12 text-center bg-white border border-gray-200 col-span-1 lg:col-span-2">
                   <Award className="w-16 h-16 text-red-300 mx-auto mb-4" />
                   <h3 className="text-slate-900 mb-2 font-semibold">
@@ -1007,7 +999,7 @@ export default function CollegePredictorResultPage() {
                   ))}
 
                   {/* Pagination */}
-                  {/* Pagination */}
+
                   {totalPages > 1 && (
                     <div className="col-span-1 lg:col-span-2 flex flex-col items-center gap-4 mt-6">
                       <div className="flex flex-wrap items-center justify-center gap-2">

@@ -93,7 +93,7 @@ export default function CollegeHeader({ college }: CollegeHeaderProps) {
                 <div>
                   <div className="text-sm text-blue-200">NIRF</div>
                   <div className="font-semibold text-md sm:text-lg">
-                    {college.nirf}
+                    {college.nirf === 0 ? "NA" : college.nirf}
                   </div>
                 </div>
               </div>
