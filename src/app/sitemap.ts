@@ -480,6 +480,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         url: `${baseUrl}/colleges?location=Chennai&amp;page=1&amp;limit=9`,
         lastModified: new Date(),
       },
+      {
+        url: `${baseUrl}/college-predictor`,
+        lastModified: new Date(),
+      },
     ];
   }
 }
