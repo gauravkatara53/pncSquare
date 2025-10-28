@@ -177,7 +177,9 @@ export default function CollegePredictorResultPage() {
     const state = searchParams.get("state") || "";
     const seat = searchParams.get("seatType") || "OPEN";
     const sub = searchParams.get("subCategory") || "Gender-Neutral";
-    const mode = (searchParams.get("mode") as "safe" | "risk") || "safe";
+    const modeParam = searchParams.get("mode");
+    const mode: "safe" | "risk" = modeParam === "risk" ? "risk" : "safe";
+    setViewMode(mode);
     const page = parseInt(searchParams.get("page") || "1");
     const tags = searchParams.get("tag")?.split(",").filter(Boolean) || [];
     const fees = parseInt(searchParams.get("maxFees") || "5000000");
@@ -269,7 +271,6 @@ export default function CollegePredictorResultPage() {
             : [];
 
           setPredictedColleges(collegeData);
-
           // Update pagination info from response
           setTotalResults(response.data.totalResults || collegeData.length);
           setPageSize(response.data.pageSize || 20);
@@ -458,28 +459,59 @@ export default function CollegePredictorResultPage() {
     city.toLowerCase().includes(searchLocation.toLowerCase())
   );
 
-  // Get unique specializations from results
+  // Dynamic theme classes based on viewMode
+  const isDarkMode = viewMode === "risk";
 
   return (
-    <div className="min-h-screen bg-[#F2F4F7]">
+    <div
+      className={`min-h-screen transition-all duration-400 ease-in-out ${
+        isDarkMode
+          ? "bg-gradient-to-br from-slate-950 via-gray-900 to-slate-900"
+          : "bg-[#F2F4F7]"
+      }`}
+    >
       {/* Header Section */}
-      <div className="bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 border-b border-gray-200">
+      <div
+        className={`border-b transition-all duration-400 ease-in-out ${
+          isDarkMode
+            ? "bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 border-amber-900/20"
+            : "bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 border-gray-200"
+        }`}
+      >
         <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-4 md:pt-10">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4 md:mb-6">
             <div className="flex-1">
-              <h1 className="text-white mb-1 md:mb-2 text-xl md:text-2xl">
+              <h1
+                className={`mb-1 md:mb-2 text-xl md:text-2xl transition-all duration-400 ${
+                  isDarkMode ? "text-amber-500" : "text-white"
+                }`}
+              >
                 {examOptions.find((e) => e.id === selectedExam)?.name}{" "}
-                <span className="text-yellow-400">College Predictor</span>
+                <span
+                  className={`transition-all duration-400 ${
+                    isDarkMode ? "text-white" : "text-yellow-400"
+                  }`}
+                >
+                  College Predictor
+                </span>
               </h1>
-              <p className="text-white text-sm md:text-base">
-                Find the best colleges based on your rank and preferences
-                according to previous year trends.
+              <p
+                className={`text-sm md:text-base transition-all duration-400 ${
+                  isDarkMode ? "text-gray-300" : "text-white"
+                }`}
+              >
+                Get personalized college predictions driven by advanced AI
+                analytics.
               </p>
             </div>
             <Button
               onClick={handleReset}
               variant="outline"
-              className="border-gray-300 text-white hover:bg-gray-50 hover:text-slate-900 w-full sm:w-auto"
+              className={`w-full sm:w-auto transition-all duration-400 ${
+                isDarkMode
+                  ? "border-amber-600/50 text-white hover:bg-amber-950/30 hover:text-amber-400"
+                  : "border-gray-300 text-white hover:bg-gray-50 hover:text-slate-900"
+              }`}
             >
               <RotateCcw className="w-4 h-4 mr-2" />
               Start Over
@@ -489,15 +521,41 @@ export default function CollegePredictorResultPage() {
       </div>
 
       {/* Summary Bar */}
-      <div className="bg-white border-b border-gray-200">
+      <div
+        className={`border-b transition-all duration-400 ease-in-out ${
+          isDarkMode
+            ? "bg-slate-900/50 border-slate-800 backdrop-blur-sm"
+            : "bg-white border-gray-200"
+        }`}
+      >
         <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-3 md:py-4">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
             <div className="flex items-center gap-4">
-              <p className="text-gray-900 text-sm md:text-base">
-                <span className="text-[#2a53e2]">{totalResults} Results</span>{" "}
+              <p
+                className={`text-sm md:text-base transition-all duration-400 ${
+                  isDarkMode ? "text-gray-200" : "text-gray-900"
+                }`}
+              >
+                <span
+                  className={`transition-all duration-400 ${
+                    isDarkMode
+                      ? "text-amber-500 font-semibold"
+                      : "text-[#2a53e2]"
+                  }`}
+                >
+                  {totalResults} Results
+                </span>{" "}
                 found for Rank{" "}
-                <span className="text-[#2a53e2]">{inputRank}</span> AIR (
-                {seatType} Category)
+                <span
+                  className={`transition-all duration-400 ${
+                    isDarkMode
+                      ? "text-amber-500 font-semibold"
+                      : "text-[#2a53e2]"
+                  }`}
+                >
+                  {inputRank}
+                </span>{" "}
+                AIR ({seatType} Category)
               </p>
             </div>
             <Tabs
@@ -505,17 +563,37 @@ export default function CollegePredictorResultPage() {
               onValueChange={(v) => handleViewModeChange(v as "safe" | "risk")}
               className="w-full md:w-auto"
             >
-              <TabsList className="bg-gray-100 w-full md:w-auto grid grid-cols-2">
+              <TabsList
+                className={`w-full md:w-auto grid grid-cols-2 transition-all duration-400 ${
+                  isDarkMode ? "bg-slate-800/50" : "bg-gray-100"
+                }`}
+              >
                 <TabsTrigger
                   value="safe"
-                  className="data-[state=active]:bg-white data-[state=active]:text-[#2a53e2] text-xs md:text-sm"
+                  className={`text-xs md:text-sm transition-all duration-400 ${
+                    viewMode === "safe" && isDarkMode
+                      ? "bg-slate-700 text-white"
+                      : viewMode === "safe"
+                      ? "bg-white text-[#2a53e2]"
+                      : isDarkMode
+                      ? "text-gray-400"
+                      : ""
+                  }`}
                 >
                   <Building2 className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
                   Safe
                 </TabsTrigger>
                 <TabsTrigger
                   value="risk"
-                  className="data-[state=active]:bg-white data-[state=active]:text-[#2a53e2] text-xs md:text-sm"
+                  className={`text-xs md:text-sm transition-all duration-400 ${
+                    viewMode === "risk"
+                      ? isDarkMode
+                        ? "bg-amber-600/20 text-amber-400 font-semibold shadow-lg shadow-amber-900/30 border border-amber-600/30"
+                        : "bg-white text-[#2a53e2]"
+                      : isDarkMode
+                      ? "text-gray-400"
+                      : ""
+                  }`}
                 >
                   <GraduationCap className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
                   Risk
@@ -534,7 +612,11 @@ export default function CollegePredictorResultPage() {
             <SheetTrigger asChild>
               <Button
                 variant="outline"
-                className="w-full border-[#2a53e2] text-[#2a53e2]"
+                className={`w-full transition-all duration-400 ${
+                  isDarkMode
+                    ? "border-amber-600/50 text-amber-500 bg-slate-900/50 hover:bg-amber-950/30"
+                    : "border-[#2a53e2] text-[#2a53e2]"
+                }`}
               >
                 <Filter className="w-4 h-4 mr-2" />
                 Filters (
@@ -546,18 +628,34 @@ export default function CollegePredictorResultPage() {
             </SheetTrigger>
             <SheetContent
               side="left"
-              className="w-[85vw] sm:w-[350px] overflow-y-auto"
+              className={`w-[85vw] sm:w-[350px] overflow-y-auto transition-all duration-400 ${
+                isDarkMode ? "bg-slate-900 border-slate-800" : ""
+              }`}
             >
               <SheetHeader>
-                <SheetTitle className="flex items-center gap-2">
-                  <Filter className="w-5 h-5 text-[#2a53e2]" />
+                <SheetTitle
+                  className={`flex items-center gap-2 transition-all duration-400 ${
+                    isDarkMode ? "text-amber-500" : ""
+                  }`}
+                >
+                  <Filter
+                    className={`w-5 h-5 transition-all duration-400 ${
+                      isDarkMode ? "text-amber-500" : "text-[#2a53e2]"
+                    }`}
+                  />
                   Filters
                 </SheetTitle>
               </SheetHeader>
               <div className="mt-6 space-y-6">
                 {/* College Tags Filter */}
                 <div>
-                  <h3 className="font-semibold mb-3 text-sm">College Type</h3>
+                  <h3
+                    className={`font-semibold mb-3 text-sm transition-all duration-400 ${
+                      isDarkMode ? "text-gray-200" : ""
+                    }`}
+                  >
+                    College Type
+                  </h3>
                   <div className="space-y-2">
                     {collegeTags.map((tag) => (
                       <div key={tag.id} className="flex items-center space-x-2">
@@ -565,10 +663,15 @@ export default function CollegePredictorResultPage() {
                           id={`mobile-tag-${tag.id}`}
                           checked={selectedTags.includes(tag.id)}
                           onCheckedChange={() => toggleTag(tag.id)}
+                          className={
+                            isDarkMode ? "border-amber-600/50 text-white" : ""
+                          }
                         />
                         <label
                           htmlFor={`mobile-tag-${tag.id}`}
-                          className="text-sm cursor-pointer flex-1"
+                          className={`text-sm cursor-pointer flex-1 transition-all duration-400 ${
+                            isDarkMode ? "text-gray-300" : ""
+                          }`}
                         >
                           <div>
                             <span className="font-medium">{tag.name}</span>
@@ -581,7 +684,13 @@ export default function CollegePredictorResultPage() {
 
                 {/* Max Fees Filter */}
                 <div>
-                  <h3 className="font-semibold mb-3 text-sm">Maximum Fees</h3>
+                  <h3
+                    className={`font-semibold mb-3 text-sm transition-all duration-400 ${
+                      isDarkMode ? "text-gray-200" : ""
+                    }`}
+                  >
+                    Maximum Fees
+                  </h3>
                   <Slider
                     value={[maxFees]}
                     onValueChange={handleMaxFeesChange}
@@ -590,8 +699,14 @@ export default function CollegePredictorResultPage() {
                     className="mb-2"
                   />
                   <div className="flex justify-between text-xs text-gray-600">
-                    <span>₹0L</span>
-                    <span className="font-semibold text-[#2a53e2]">
+                    <span className={isDarkMode ? "text-gray-400" : ""}>
+                      ₹0L
+                    </span>
+                    <span
+                      className={`font-semibold transition-all duration-400 ${
+                        isDarkMode ? "text-amber-500" : "text-[#2a53e2]"
+                      }`}
+                    >
                       ₹{(maxFees / 100000).toFixed(1)}L
                     </span>
                   </div>
@@ -599,14 +714,28 @@ export default function CollegePredictorResultPage() {
 
                 {/* Location Filter */}
                 <div>
-                  <h3 className="font-semibold mb-3 text-sm">Location</h3>
+                  <h3
+                    className={`font-semibold mb-3 text-sm transition-all duration-400 ${
+                      isDarkMode ? "text-gray-200" : ""
+                    }`}
+                  >
+                    Location
+                  </h3>
                   <div className="relative mb-3">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Search
+                      className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 transition-all duration-400 ${
+                        isDarkMode ? "text-gray-500" : "text-gray-400"
+                      }`}
+                    />
                     <Input
                       placeholder="Search cities..."
                       value={searchLocation}
                       onChange={(e) => setSearchLocation(e.target.value)}
-                      className="pl-10"
+                      className={`pl-10 transition-all duration-400 ${
+                        isDarkMode
+                          ? "bg-slate-800 border-slate-700 text-gray-200"
+                          : ""
+                      }`}
                     />
                   </div>
                   <div className="space-y-2 max-h-48 overflow-y-auto">
@@ -616,10 +745,15 @@ export default function CollegePredictorResultPage() {
                           id={`mobile-${city}`}
                           checked={selectedCities.includes(city)}
                           onCheckedChange={() => toggleCity(city)}
+                          className={
+                            isDarkMode ? "border-amber-600/50 text-white" : ""
+                          }
                         />
                         <label
                           htmlFor={`mobile-${city}`}
-                          className="text-sm cursor-pointer"
+                          className={`text-sm cursor-pointer transition-all duration-400 ${
+                            isDarkMode ? "text-gray-300" : ""
+                          }`}
                         >
                           {city}
                         </label>
@@ -635,11 +769,25 @@ export default function CollegePredictorResultPage() {
         <div className="flex gap-6">
           {/* Desktop Filter Sidebar */}
           <div className="hidden lg:block w-80 flex-shrink-0">
-            <Card className="bg-white border border-gray-200 sticky top-4">
+            <Card
+              className={`border sticky top-4 transition-all duration-400 ${
+                isDarkMode
+                  ? "bg-slate-900/50 border-slate-800 backdrop-blur-sm"
+                  : "bg-white border-gray-200"
+              }`}
+            >
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-lg font-semibold flex items-center gap-2">
-                    <Filter className="w-5 h-5 text-[#2a53e2]" />
+                  <h2
+                    className={`text-lg font-semibold flex items-center gap-2 transition-all duration-400 ${
+                      isDarkMode ? "text-gray-200" : ""
+                    }`}
+                  >
+                    <Filter
+                      className={`w-5 h-5 transition-all duration-400 ${
+                        isDarkMode ? "text-amber-500" : "text-[#2a53e2]"
+                      }`}
+                    />
                     Filters
                   </h2>
                   <Button
@@ -659,7 +807,11 @@ export default function CollegePredictorResultPage() {
                         page: "1",
                       });
                     }}
-                    className="text-[#2a53e2] hover:text-[#2a53e2]/80"
+                    className={`transition-all duration-400 ${
+                      isDarkMode
+                        ? "text-white hover:text-amber-400 hover:bg-amber-950/30 border border-amber-600/30"
+                        : "text-[#2a53e2] hover:text-[#2a53e2]/80"
+                    }`}
                   >
                     Clear All
                   </Button>
@@ -668,7 +820,13 @@ export default function CollegePredictorResultPage() {
                 <div className="space-y-6">
                   {/* College Tags Filter */}
                   <div>
-                    <h3 className="font-semibold mb-3 text-sm">College Type</h3>
+                    <h3
+                      className={`font-semibold mb-3 text-sm transition-all duration-400 ${
+                        isDarkMode ? "text-gray-200" : ""
+                      }`}
+                    >
+                      College Type
+                    </h3>
                     <div className="space-y-3">
                       {collegeTags.map((tag) => (
                         <div
@@ -679,11 +837,15 @@ export default function CollegePredictorResultPage() {
                             id={`tag-${tag.id}`}
                             checked={selectedTags.includes(tag.id)}
                             onCheckedChange={() => toggleTag(tag.id)}
-                            className="mt-1"
+                            className={`mt-1 ${
+                              isDarkMode ? "border-amber-600/50 text-white" : ""
+                            }`}
                           />
                           <label
                             htmlFor={`tag-${tag.id}`}
-                            className="text-sm cursor-pointer flex-1"
+                            className={`text-sm cursor-pointer flex-1 transition-all duration-400 ${
+                              isDarkMode ? "text-gray-300" : ""
+                            }`}
                           >
                             <div>
                               <span className="font-medium">{tag.name}</span>
@@ -696,7 +858,13 @@ export default function CollegePredictorResultPage() {
 
                   {/* Max Fees Filter */}
                   <div>
-                    <h3 className="font-semibold mb-3 text-sm">Maximum Fees</h3>
+                    <h3
+                      className={`font-semibold mb-3 text-sm transition-all duration-400 ${
+                        isDarkMode ? "text-gray-200" : ""
+                      }`}
+                    >
+                      Maximum Fees
+                    </h3>
                     <Slider
                       value={[maxFees]}
                       onValueChange={handleMaxFeesChange}
@@ -705,8 +873,14 @@ export default function CollegePredictorResultPage() {
                       className="mb-2"
                     />
                     <div className="flex justify-between text-xs text-gray-600">
-                      <span>₹0L</span>
-                      <span className="font-semibold text-[#2a53e2]">
+                      <span className={isDarkMode ? "text-gray-400" : ""}>
+                        ₹0L
+                      </span>
+                      <span
+                        className={`font-semibold transition-all duration-400 ${
+                          isDarkMode ? "text-amber-500" : "text-[#2a53e2]"
+                        }`}
+                      >
                         ₹{(maxFees / 100000).toFixed(1)}L
                       </span>
                     </div>
@@ -714,14 +888,28 @@ export default function CollegePredictorResultPage() {
 
                   {/* Location Filter */}
                   <div>
-                    <h3 className="font-semibold mb-3 text-sm">Location</h3>
+                    <h3
+                      className={`font-semibold mb-3 text-sm transition-all duration-400 ${
+                        isDarkMode ? "text-gray-200" : ""
+                      }`}
+                    >
+                      Location
+                    </h3>
                     <div className="relative mb-3">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <Search
+                        className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 transition-all duration-400 ${
+                          isDarkMode ? "text-gray-500" : "text-gray-400"
+                        }`}
+                      />
                       <Input
                         placeholder="Search cities..."
                         value={searchLocation}
                         onChange={(e) => setSearchLocation(e.target.value)}
-                        className="pl-10"
+                        className={`pl-10 transition-all duration-400 ${
+                          isDarkMode
+                            ? "bg-slate-800 border-slate-700 text-gray-200 placeholder:text-gray-500"
+                            : ""
+                        }`}
                       />
                     </div>
                     <div className="space-y-2 max-h-48 overflow-y-auto">
@@ -731,10 +919,15 @@ export default function CollegePredictorResultPage() {
                             id={city}
                             checked={selectedCities.includes(city)}
                             onCheckedChange={() => toggleCity(city)}
+                            className={
+                              isDarkMode ? "border-amber-600/50 text-white" : ""
+                            }
                           />
                           <label
                             htmlFor={city}
-                            className="text-sm cursor-pointer"
+                            className={`text-sm cursor-pointer transition-all duration-400 ${
+                              isDarkMode ? "text-gray-300" : ""
+                            }`}
                           >
                             {city}
                           </label>
@@ -751,26 +944,63 @@ export default function CollegePredictorResultPage() {
           <div className="flex-1">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {isLoading ? (
-                <Card className="p-12 text-center bg-white border border-gray-200 col-span-1 lg:col-span-2">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2a53e2] mx-auto mb-4"></div>
-                  {/* <h3 className="text-slate-900 mb-2 font-semibold">
-                    Smart AI matching you to the right college...
-                  </h3> */}
-                  <p className="text-gray-600 text-sm font-mono bg-gray-50 rounded px-3 py-2">
+                <Card
+                  className={`p-12 text-center col-span-1 lg:col-span-2 border transition-all duration-400 ${
+                    isDarkMode
+                      ? "bg-slate-900/50 border-slate-800 backdrop-blur-sm"
+                      : "bg-white border-gray-200"
+                  }`}
+                >
+                  <div
+                    className={`animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4 transition-all duration-400 ${
+                      isDarkMode ? "border-amber-500" : "border-[#2a53e2]"
+                    }`}
+                  ></div>
+                  <p
+                    className={`text-sm font-mono rounded px-3 py-2 transition-all duration-400 ${
+                      isDarkMode
+                        ? "text-gray-300 bg-slate-800/50"
+                        : "text-gray-600 bg-gray-50"
+                    }`}
+                  >
                     Please wait while our AI analyzes your data...
                   </p>
                 </Card>
               ) : error ? (
-                <Card className="p-12 text-center bg-white border border-gray-200 col-span-1 lg:col-span-2">
-                  <Award className="w-16 h-16 text-red-300 mx-auto mb-4" />
-                  <h3 className="text-slate-900 mb-2 font-semibold">
+                <Card
+                  className={`p-12 text-center col-span-1 lg:col-span-2 border transition-all duration-400 ${
+                    isDarkMode
+                      ? "bg-slate-900/50 border-slate-800 backdrop-blur-sm"
+                      : "bg-white border-gray-200"
+                  }`}
+                >
+                  <Award
+                    className={`w-16 h-16 mx-auto mb-4 transition-all duration-400 ${
+                      isDarkMode ? "text-amber-900/50" : "text-red-300"
+                    }`}
+                  />
+                  <h3
+                    className={`mb-2 font-semibold transition-all duration-400 ${
+                      isDarkMode ? "text-gray-200" : "text-slate-900"
+                    }`}
+                  >
                     Error Loading Data
                   </h3>
-                  <p className="text-gray-600 mb-4">{error}</p>
+                  <p
+                    className={`mb-4 transition-all duration-400 ${
+                      isDarkMode ? "text-gray-400" : "text-gray-600"
+                    }`}
+                  >
+                    {error}
+                  </p>
                   <Button
                     onClick={handleReset}
                     variant="outline"
-                    className="border-[#2a53e2] text-[#2a53e2]"
+                    className={`transition-all duration-400 ${
+                      isDarkMode
+                        ? "border-amber-600/50 text-amber-500 hover:bg-amber-950/30"
+                        : "border-[#2a53e2] text-[#2a53e2]"
+                    }`}
                   >
                     Try Again
                   </Button>
@@ -780,21 +1010,49 @@ export default function CollegePredictorResultPage() {
                   {filteredColleges.map((college) => (
                     <Card
                       key={college.id}
-                      className="bg-white border border-gray-200  "
+                      className={`border   ${
+                        isDarkMode
+                          ? "bg-gradient-to-br from-slate-900/80 via-gray-900/80 to-slate-800/80 border-slate-800  "
+                          : "bg-white border-gray-200"
+                      }`}
                     >
                       <div className="p-4 md:p-6">
                         {/* College Header */}
                         <div className="flex flex-col sm:flex-row items-start justify-between gap-3 mb-4">
                           <div className="flex-1 w-full">
                             <div className="flex items-start gap-3 mb-2">
-                              <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-[#2a53e2]/10 to-[#7C5EFF]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <GraduationCap className="w-6 h-6 md:w-8 md:h-8 text-[#2a53e2]" />
+                              <div
+                                className={`w-12 h-12 md:w-16 md:h-16 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-400 ${
+                                  isDarkMode
+                                    ? "bg-gradient-to-br from-amber-950/30 to-slate-800/50 border border-amber-600/20"
+                                    : "bg-gradient-to-br from-[#2a53e2]/10 to-[#7C5EFF]/10"
+                                }`}
+                              >
+                                <GraduationCap
+                                  className={`w-6 h-6 md:w-8 md:h-8 transition-all duration-400 ${
+                                    isDarkMode
+                                      ? "text-amber-500"
+                                      : "text-[#2a53e2]"
+                                  }`}
+                                />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <h3 className="text-slate-900 mb-1 text-base md:text-lg font-semibold">
+                                <h3
+                                  className={`mb-1 text-base md:text-lg font-semibold transition-all duration-400 ${
+                                    isDarkMode
+                                      ? "text-gray-100"
+                                      : "text-slate-900"
+                                  }`}
+                                >
                                   {college.name}
                                 </h3>
-                                <div className="flex flex-wrap items-center gap-1 md:gap-2 text-xs md:text-sm text-gray-600 mb-2">
+                                <div
+                                  className={`flex flex-wrap items-center gap-1 md:gap-2 text-xs md:text-sm mb-2 transition-all duration-400 ${
+                                    isDarkMode
+                                      ? "text-gray-400"
+                                      : "text-gray-600"
+                                  }`}
+                                >
                                   <MapPin className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0" />
                                   <span className="truncate">
                                     {college.location}
@@ -804,9 +1062,13 @@ export default function CollegePredictorResultPage() {
                             </div>
                           </div>
                           <Button
-                            variant="outline"
+                            variant="ghost"
                             size="sm"
-                            className="border-[#2a53e2] text-[#2a53e2] hover:bg-[#2a53e2]/5 w-full sm:w-auto text-xs"
+                            className={`w-full sm:w-auto text-xs transition-all duration-400 ${
+                              isDarkMode
+                                ? "text-white hover:text-amber-400 hover:bg-amber-950/30 border border-amber-600/30"
+                                : "text-[#2a53e2] hover:text-[#2a53e2]/80 border border-gray-600 "
+                            }`}
                             onClick={() =>
                               router.push(`/college/${college.slug}`)
                             }
@@ -815,17 +1077,29 @@ export default function CollegePredictorResultPage() {
                             <ArrowRight className="w-3 h-3 ml-1" />
                           </Button>
                         </div>
+
                         {/* College Meta */}
-                        <div className="flex flex-wrap items-center gap-2 mb-4">
+                        <div className="flex flex-wrap items-center gap-2 mb-4 ">
                           <Badge
                             variant="outline"
-                            className="text-xs border-[#2a53e2] text-[#2a53e2]"
+                            className={`text-xs transition-all duration-400 ${
+                              isDarkMode
+                                ? "border-amber-600/50 text-white bg-gray-200"
+                                : "border-[#2a53e2] text-[#2a53e2]"
+                            }`}
                           >
-                            NIRF #{college.nirf !== "-" ? college.nirf : "N/A"}
+                            NIRF #
+                            {college.nirfText !== "-"
+                              ? college.nirfText
+                              : "N/A"}
                           </Badge>
                           <Badge
                             variant="secondary"
-                            className="text-xs bg-blue-100 text-blue-700"
+                            className={`text-xs transition-all duration-400 ${
+                              isDarkMode
+                                ? "bg-gray-200 text-gray-400 border border-slate-700"
+                                : "bg-blue-100 text-blue-700"
+                            }`}
                           >
                             {college.quota === "OS"
                               ? "Other State"
@@ -839,7 +1113,7 @@ export default function CollegePredictorResultPage() {
                             <a
                               key={tag}
                               href={
-                                tag.toLowerCase() === ""
+                                tag.toLowerCase() === "cutoff"
                                   ? `/college/${college.slug}#cutoff`
                                   : `/college/${college.slug}#placements`
                               }
@@ -848,7 +1122,11 @@ export default function CollegePredictorResultPage() {
                             >
                               <Badge
                                 variant="secondary"
-                                className="text-xs bg-gray-100 cursor-pointer hover:bg-gray-200"
+                                className={`text-xs cursor-pointer transition-all duration-400 ${
+                                  isDarkMode
+                                    ? "bg-gray-200 text-gray-400  border border-slate-700"
+                                    : "bg-gray-100 hover:bg-gray-200"
+                                }`}
                               >
                                 {tag}
                               </Badge>
@@ -857,44 +1135,96 @@ export default function CollegePredictorResultPage() {
                         </div>
 
                         {/* Branch Info */}
-                        <div className="bg-gradient-to-r from-[#2a53e2]/5 to-[#7C5EFF]/5 rounded-lg p-3 md:p-4 mb-4">
-                          <p className="text-xs text-gray-600 mb-1">
+                        <div
+                          className={`rounded-lg p-3 md:p-4 mb-4 transition-all duration-400 ${
+                            isDarkMode
+                              ? "bg-gradient-to-r from-amber-950/20 to-slate-800/30 border border-amber-600/10"
+                              : "bg-gradient-to-r from-[#2a53e2]/5 to-[#7C5EFF]/5"
+                          }`}
+                        >
+                          <p
+                            className={`text-xs mb-1 transition-all duration-400 ${
+                              isDarkMode ? "text-gray-400" : "text-gray-600"
+                            }`}
+                          >
                             {college.course}
                           </p>
-                          <p className="text-slate-900 font-medium text-sm">
+                          <p
+                            className={`font-medium text-sm transition-all duration-400 ${
+                              isDarkMode ? "text-gray-200" : "text-slate-900"
+                            }`}
+                          >
                             {college.branch}
                           </p>
                         </div>
+
                         {/* Fees & Package */}
                         <div className="grid grid-cols-2 gap-4 mb-4">
                           <div className="text-xs md:text-sm">
-                            <span className="text-gray-600 block mb-1">
+                            <span
+                              className={`block mb-1 transition-all duration-400 ${
+                                isDarkMode ? "text-gray-400" : "text-gray-600"
+                              }`}
+                            >
                               Avg Package
                             </span>
-                            <span className="text-[#2a53e2] font-semibold">
+                            <span
+                              className={`font-semibold transition-all duration-400 ${
+                                isDarkMode ? "text-amber-500" : "text-[#2a53e2]"
+                              }`}
+                            >
                               {college.avgPackage}
                             </span>
                           </div>
                           <div className="text-xs md:text-sm">
-                            <span className="text-gray-600 block mb-1">
+                            <span
+                              className={`block mb-1 transition-all duration-400 ${
+                                isDarkMode ? "text-gray-400" : "text-gray-600"
+                              }`}
+                            >
                               Annual Fees
                             </span>
-                            <span className="text-[#2a53e2] font-semibold">
+                            <span
+                              className={`font-semibold transition-all duration-400 ${
+                                isDarkMode ? "text-amber-500" : "text-[#2a53e2]"
+                              }`}
+                            >
                               {college.fees.replace("/year", "")}
                             </span>
                           </div>
                         </div>
+
                         {/* Cutoff Table */}
                         <div>
-                          <h4 className="text-slate-600 mb-2 md:mb-3 text-xs md:text-base font-semibold ">
+                          <h4
+                            className={`mb-2 md:mb-3 text-xs md:text-base font-semibold transition-all duration-100 ${
+                              isDarkMode ? "text-gray-300" : "text-slate-600"
+                            }`}
+                          >
                             Closing Ranks ({college.SeatType} :{" "}
                             {college.SubCategory})
                           </h4>
-                          <div className="overflow-x-auto border border-gray-200 rounded-lg">
+                          <div
+                            className={`overflow-x-auto border rounded-lg transition-all duration-400 ${
+                              isDarkMode
+                                ? "border-slate-800"
+                                : "border-gray-200"
+                            }`}
+                          >
                             <table className="w-full text-xs md:text-sm">
-                              <thead className="bg-gray-50">
+                              <thead
+                                className={`transition-all duration-100 ${
+                                  isDarkMode ? "bg-slate-800/50" : "bg-gray-50"
+                                }`}
+                              >
                                 <tr>
-                                  <th className="text-left py-2 md:py-3 px-2 md:px-4 text-gray-700 whitespace-nowrap font-semibold">
+                                  <th
+                                    className={`text-left py-2 md:py-3 px-2 md:px-4 whitespace-nowrap font-semibold transition-all duration-400 ${
+                                      isDarkMode
+                                        ? "text-gray-300"
+                                        : "text-gray-700"
+                                    }`}
+                                  >
                                     Round
                                   </th>
                                   {Object.keys(college.cutoffs)
@@ -903,14 +1233,24 @@ export default function CollegePredictorResultPage() {
                                     .map((year) => (
                                       <th
                                         key={year}
-                                        className="text-center py-2 md:py-3 px-2 md:px-4 text-gray-700 whitespace-nowrap font-semibold"
+                                        className={`text-center py-2 md:py-3 px-2 md:px-4 whitespace-nowrap font-semibold transition-all duration-400 ${
+                                          isDarkMode
+                                            ? "text-gray-300"
+                                            : "text-gray-700"
+                                        }`}
                                       >
                                         {year}
                                       </th>
                                     ))}
                                 </tr>
                               </thead>
-                              <tbody className="divide-y divide-gray-200">
+                              <tbody
+                                className={`divide-y transition-all duration-400 ${
+                                  isDarkMode
+                                    ? "divide-slate-800"
+                                    : "divide-gray-200"
+                                }`}
+                              >
                                 {(() => {
                                   // Collect all unique round keys from all years
                                   const allRoundsSet = new Set<string>();
@@ -956,9 +1296,19 @@ export default function CollegePredictorResultPage() {
                                     return (
                                       <tr
                                         key={roundKey}
-                                        className="hover:bg-gray-50"
+                                        className={`transition-all duration-400 ${
+                                          isDarkMode
+                                            ? "hover:bg-gray-800"
+                                            : "hover:bg-gray-50"
+                                        }`}
                                       >
-                                        <td className="py-2 md:py-3 px-2 md:px-4 text-gray-900 whitespace-nowrap font-medium">
+                                        <td
+                                          className={`py-2 md:py-3 px-2 md:px-4 whitespace-nowrap font-medium transition-all duration-400 ${
+                                            isDarkMode
+                                              ? "text-gray-200"
+                                              : "text-gray-900"
+                                          }`}
+                                        >
                                           {roundKey}
                                         </td>
                                         {Object.keys(college.cutoffs)
@@ -970,7 +1320,11 @@ export default function CollegePredictorResultPage() {
                                             return (
                                               <td
                                                 key={year}
-                                                className="text-center py-2 md:py-3 px-2 md:px-4 text-gray-600 whitespace-nowrap"
+                                                className={`text-center py-2 md:py-3 px-2 md:px-4 whitespace-nowrap transition-all duration-400 ${
+                                                  isDarkMode
+                                                    ? "text-gray-400"
+                                                    : "text-gray-600"
+                                                }`}
                                               >
                                                 {cutoffValue
                                                   ? cutoffValue.toLocaleString()
@@ -985,21 +1339,12 @@ export default function CollegePredictorResultPage() {
                               </tbody>
                             </table>
                           </div>
-                          {/* <p className="text-xs text-gray-500 mt-2">
-                            Closest Round:{" "}
-                            <span className="font-semibold">
-                              {college.closestRound}
-                            </span>{" "}
-                            • Match Score:{" "}
-                            {(college.finalScore * 100).toFixed(1)}%
-                          </p> */}
                         </div>
                       </div>
                     </Card>
                   ))}
 
                   {/* Pagination */}
-
                   {totalPages > 1 && (
                     <div className="col-span-1 lg:col-span-2 flex flex-col items-center gap-4 mt-6">
                       <div className="flex flex-wrap items-center justify-center gap-2">
@@ -1008,7 +1353,11 @@ export default function CollegePredictorResultPage() {
                           size="sm"
                           onClick={() => handlePageChange(currentPage - 1)}
                           disabled={currentPage === 1 || isLoading}
-                          className="border-gray-300 min-w-[44px] h-[44px] sm:min-w-0 sm:h-auto"
+                          className={`min-w-[44px] h-[44px] sm:min-w-0 sm:h-auto transition-all duration-400 ${
+                            isDarkMode
+                              ? "border-slate-700 text-gray-300 hover:bg-slate-800/50 disabled:opacity-50"
+                              : "border-gray-300"
+                          }`}
                         >
                           <ChevronLeft className="w-4 h-4" />
                           <span className="hidden sm:inline ml-1">
@@ -1047,9 +1396,13 @@ export default function CollegePredictorResultPage() {
                                   size="sm"
                                   onClick={() => handlePageChange(pageNum)}
                                   disabled={isLoading}
-                                  className={`min-w-[44px] h-[44px] sm:min-w-[36px] sm:h-auto ${
+                                  className={`min-w-[44px] h-[44px] sm:min-w-[36px] sm:h-auto transition-all duration-400 ${
                                     currentPage === pageNum
-                                      ? "bg-[#2a53e2] text-white hover:bg-[#2a53e2]/90"
+                                      ? isDarkMode
+                                        ? "bg-amber-600/30 text-amber-400 hover:bg-amber-600/40 border-amber-600/50"
+                                        : "bg-[#2a53e2] text-white hover:bg-[#2a53e2]/90"
+                                      : isDarkMode
+                                      ? "border-slate-700 text-gray-300 hover:bg-slate-800/50"
                                       : "border-gray-300"
                                   }`}
                                 >
@@ -1061,7 +1414,11 @@ export default function CollegePredictorResultPage() {
 
                           {totalPages > 5 && currentPage < totalPages - 2 && (
                             <>
-                              <span className="hidden md:inline px-2 text-gray-500">
+                              <span
+                                className={`hidden md:inline px-2 transition-all duration-400 ${
+                                  isDarkMode ? "text-gray-500" : "text-gray-500"
+                                }`}
+                              >
                                 ...
                               </span>
                               <Button
@@ -1069,7 +1426,11 @@ export default function CollegePredictorResultPage() {
                                 size="sm"
                                 onClick={() => handlePageChange(totalPages)}
                                 disabled={isLoading}
-                                className="hidden md:inline-flex border-gray-300"
+                                className={`hidden md:inline-flex transition-all duration-400 ${
+                                  isDarkMode
+                                    ? "border-slate-700 text-gray-300 hover:bg-slate-800/50"
+                                    : "border-gray-300"
+                                }`}
                               >
                                 {totalPages}
                               </Button>
@@ -1082,14 +1443,22 @@ export default function CollegePredictorResultPage() {
                           size="sm"
                           onClick={() => handlePageChange(currentPage + 1)}
                           disabled={currentPage === totalPages || isLoading}
-                          className="border-gray-300 min-w-[44px] h-[44px] sm:min-w-0 sm:h-auto"
+                          className={`min-w-[44px] h-[44px] sm:min-w-0 sm:h-auto transition-all duration-400 ${
+                            isDarkMode
+                              ? "border-slate-700 text-gray-300 hover:bg-slate-800/50 disabled:opacity-50"
+                              : "border-gray-300"
+                          }`}
                         >
                           <span className="hidden sm:inline mr-1">Next</span>
                           <ChevronRight className="w-4 h-4" />
                         </Button>
                       </div>
 
-                      <p className="text-xs sm:text-sm text-gray-600 text-center px-4">
+                      <p
+                        className={`text-xs sm:text-sm text-center px-4 transition-all duration-400 ${
+                          isDarkMode ? "text-gray-400" : "text-gray-600"
+                        }`}
+                      >
                         Page {currentPage} of {totalPages} • Showing{" "}
                         {filteredColleges.length} of {totalResults} results
                       </p>
@@ -1097,12 +1466,30 @@ export default function CollegePredictorResultPage() {
                   )}
                 </>
               ) : (
-                <Card className="p-6 md:p-12 text-center bg-white border border-gray-200 col-span-1 lg:col-span-2">
-                  <Award className="w-12 h-12 md:w-16 md:h-16 text-gray-300 mx-auto mb-3 md:mb-4" />
-                  <h3 className="text-slate-900 mb-2 text-base md:text-lg font-semibold">
+                <Card
+                  className={`p-6 md:p-12 text-center col-span-1 lg:col-span-2 border transition-all duration-400 ${
+                    isDarkMode
+                      ? "bg-slate-900/50 border-slate-800 backdrop-blur-sm"
+                      : "bg-white border-gray-200"
+                  }`}
+                >
+                  <Award
+                    className={`w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 transition-all duration-400 ${
+                      isDarkMode ? "text-amber-900/50" : "text-gray-300"
+                    }`}
+                  />
+                  <h3
+                    className={`mb-2 text-base md:text-lg font-semibold transition-all duration-400 ${
+                      isDarkMode ? "text-gray-200" : "text-slate-900"
+                    }`}
+                  >
                     No Colleges Found
                   </h3>
-                  <p className="text-gray-600 mb-4 text-sm md:text-base">
+                  <p
+                    className={`mb-4 text-sm md:text-base transition-all duration-400 ${
+                      isDarkMode ? "text-gray-400" : "text-gray-600"
+                    }`}
+                  >
                     Try adjusting your filters to see more results
                   </p>
                   <Button
@@ -1120,7 +1507,11 @@ export default function CollegePredictorResultPage() {
                       });
                     }}
                     variant="outline"
-                    className="border-[#2a53e2] text-[#2a53e2] w-full sm:w-auto"
+                    className={`w-full sm:w-auto transition-all duration-400 ${
+                      isDarkMode
+                        ? "border-amber-600/50 text-amber-500 hover:bg-amber-950/30"
+                        : "border-[#2a53e2] text-[#2a53e2]"
+                    }`}
                   >
                     Clear Filters
                   </Button>
