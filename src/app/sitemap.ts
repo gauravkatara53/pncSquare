@@ -365,6 +365,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         url: `${baseUrl}/colleges?stream=Engineering&amp;tag=IIIT`,
         lastModified: new Date(),
       },
+      {
+        url: `${baseUrl}/college-predictor`,
+        lastModified: new Date(),
+      },
     ];
 
     const collegeSitemapRoutes = collegePaths.map((path) => ({
