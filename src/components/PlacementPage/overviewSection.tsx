@@ -43,10 +43,11 @@ export default function Overview({ college }: { college: College }) {
                     {college.fullNames || college.name}
                   </span>
                 </div>
+
                 {college.tag && (
                   <div className="flex justify-between items-center py-3 border-b border-slate-100">
                     <span className="text-slate-600">Also Known As</span>
-                    <span className="text-slate-900">
+                    <span className="text-slate-900 text-right max-w-xs">
                       {college.AlsoKnownAs}
                     </span>
                   </div>

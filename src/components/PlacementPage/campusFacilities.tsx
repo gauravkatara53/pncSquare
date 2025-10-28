@@ -32,24 +32,23 @@ export function CampusFacilities({
         </div>
 
         <Card className="border border-slate-200 shadow-sm">
-          <div className="py-8 px-4">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="py-8 px-2 sm:px-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {college.campusFacilities.map((facility, index) => (
                 <div
                   key={index}
-                  className="flex flex-col items-center justify-center gap-2 py-4 px-4 bg-slate-50 rounded-lg border border-slate-100"
+                  className="flex flex-col sm:flex-col items-center justify-center gap-2 py-4 px-2 sm:px-4 bg-slate-50 rounded-lg border border-slate-100"
                 >
-                  {facility.available ? (
-                    <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                  ) : (
-                    <XCircle className="h-5 w-5 text-red-500" />
-                  )}
-                  <span className="text-slate-700 font-medium">
-                    {facility.name}
-                  </span>
-                  <span className="text-xs text-slate-500">
-                    {facility.available ? "Available" : "Not Available"}
-                  </span>
+                  <div className="flex flex-row sm:flex-col items-center gap-2 w-full">
+                    {facility.available ? (
+                      <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                    ) : (
+                      <XCircle className="h-5 w-5 text-red-500" />
+                    )}
+                    <span className="text-slate-700 font-medium text-center">
+                      {facility.name}
+                    </span>
+                  </div>
                 </div>
               ))}
             </div>
