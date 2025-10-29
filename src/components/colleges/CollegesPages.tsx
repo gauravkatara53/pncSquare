@@ -14,7 +14,6 @@ import { apiService } from "../../ApiService/apiService";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import loadingAnimation from "../../../public/NoResultsFound.json";
-import LoadingDotsBlue from "../../../public/LoadingDotsBlue1.json";
 import dynamic from "next/dynamic";
 
 const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
