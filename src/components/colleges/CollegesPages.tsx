@@ -13,6 +13,11 @@ import Image from "next/image";
 import { apiService } from "../../ApiService/apiService";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import loadingAnimation from "../../../public/NoResultsFound.json";
+import LoadingDotsBlue from "../../../public/LoadingDotsBlue1.json";
+import dynamic from "next/dynamic";
+
+const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
 type College = {
   _id: number;
@@ -263,6 +268,11 @@ export default function CollegesMainPage() {
                   }
                   className="pl-10 border-0 focus:ring-0 text-base md:text-lg"
                   aria-label="Search colleges"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleSearchClick();
+                    }
+                  }}
                 />
                 <button
                   className="ml-2 px-4 py-2 bg-slate-900 text-white rounded-lg text-sm md:text-base hover:bg-slate-800 transition-colors"
@@ -329,8 +339,29 @@ export default function CollegesMainPage() {
                 <h2 className="text-xl md:text-2xl font-semibold text-slate-900 mb-1">
                   Colleges in India
                 </h2>
+
                 <p className="text-slate-600 text-sm md:text-base">
-                  Found {totalColleges} colleges matching your criteria
+                  {loading ? (
+                    <span className="text-sm text-slate-500 flex items-center gap-2">
+                      <span className="flex items-center gap-1">
+                        <span className="animate-[bounce_1s_ease-in-out_infinite] inline-block w-2 h-2 bg-blue-500 rounded-full"></span>
+                        <span
+                          className="animate-[bounce_1s_ease-in-out_infinite] inline-block w-2 h-2 bg-blue-500 rounded-full"
+                          style={{ animationDelay: "0.2s" }}
+                        ></span>
+                        <span
+                          className="animate-[bounce_1s_ease-in-out_infinite] inline-block w-2 h-2 bg-blue-500 rounded-full"
+                          style={{ animationDelay: "0.4s" }}
+                        ></span>
+                      </span>
+                    </span>
+                  ) : (
+                    <span className="text-sm text-slate-500">
+                      {totalColleges === 0
+                        ? "No colleges found matching your criteria."
+                        : `Found ${totalColleges} colleges matching your criteria.`}
+                    </span>
+                  )}
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -348,18 +379,48 @@ export default function CollegesMainPage() {
             </header>
 
             {/* College Cards Grid */}
-            <section
-              className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8"
-              aria-label="College results"
-            >
-              {loading
-                ? Array.from({ length: perPage }).map((_, idx) => (
-                    <SkeletonCard key={idx} />
-                  ))
-                : colleges.map((college) => (
-                    <CollegeCard key={college._id} college={college} />
-                  ))}
-            </section>
+            {loading ? (
+              <section
+                className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8"
+                aria-label="College results"
+              >
+                {Array.from({ length: perPage }).map((_, idx) => (
+                  <SkeletonCard key={idx} />
+                ))}
+              </section>
+            ) : colleges.length === 0 ? (
+              <div>
+                <section className="flex flex-col items-center justify-center ">
+                  <Lottie
+                    animationData={loadingAnimation}
+                    loop
+                    autoplay
+                    className=" w-80 h-80 "
+                  />
+                </section>
+                <p className="mt-6 text-lg text-slate-600 text-center">
+                  Can&#39;t find your college?{" "}
+                  <a
+                    href="https://linkly.link/2HYiw"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline"
+                  >
+                    Suggest it here
+                  </a>
+                  .
+                </p>
+              </div>
+            ) : (
+              <section
+                className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8"
+                aria-label="College results"
+              >
+                {colleges.map((college) => (
+                  <CollegeCard key={college._id} college={college} />
+                ))}
+              </section>
+            )}
 
             {/* Pagination UI */}
             {totalPages > 1 && (

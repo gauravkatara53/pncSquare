@@ -532,30 +532,61 @@ export default function CollegePredictorResultPage() {
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
             <div className="flex items-center gap-4">
               <p
-                className={`text-sm md:text-base transition-all duration-400 ${
+                className={`text-sm md:text-base flex items-center gap-2 transition-all duration-400 ${
                   isDarkMode ? "text-gray-200" : "text-gray-900"
                 }`}
               >
-                <span
-                  className={`transition-all duration-400 ${
-                    isDarkMode
-                      ? "text-amber-500 font-semibold"
-                      : "text-[#2a53e2]"
-                  }`}
-                >
-                  {totalResults} Results
-                </span>{" "}
-                found for Rank{" "}
-                <span
-                  className={`transition-all duration-400 ${
-                    isDarkMode
-                      ? "text-amber-500 font-semibold"
-                      : "text-[#2a53e2]"
-                  }`}
-                >
-                  {inputRank}
-                </span>{" "}
-                AIR ({seatType} Category)
+                {isLoading ? (
+                  <span className="flex items-center gap-2">
+                    <span className="flex items-center gap-1">
+                      <span className="animate-[bounce_1s_ease-in-out_infinite] inline-block w-2 h-2 bg-blue-500 rounded-full"></span>
+                      <span
+                        className="animate-[bounce_1s_ease-in-out_infinite] inline-block w-2 h-2 bg-blue-500 rounded-full"
+                        style={{ animationDelay: "0.2s" }}
+                      ></span>
+                      <span
+                        className="animate-[bounce_1s_ease-in-out_infinite] inline-block w-2 h-2 bg-blue-500 rounded-full"
+                        style={{ animationDelay: "0.4s" }}
+                      ></span>
+                    </span>
+                    <span className="text-sm text-slate-500">
+                      Loading results for Rank{" "}
+                      <span
+                        className={`transition-all duration-400 ${
+                          isDarkMode
+                            ? "text-amber-500 font-semibold"
+                            : "text-[#2a53e2]"
+                        }`}
+                      >
+                        {inputRank}
+                      </span>{" "}
+                      AIR ({seatType} Category)
+                    </span>
+                  </span>
+                ) : (
+                  <>
+                    <span
+                      className={`transition-all duration-400 ${
+                        isDarkMode
+                          ? "text-amber-500 font-semibold"
+                          : "text-[#2a53e2]"
+                      }`}
+                    >
+                      {totalResults} Results
+                    </span>
+                    found for Rank{" "}
+                    <span
+                      className={`transition-all duration-400 ${
+                        isDarkMode
+                          ? "text-amber-500 font-semibold"
+                          : "text-[#2a53e2]"
+                      }`}
+                    >
+                      {inputRank}
+                    </span>
+                    AIR ({seatType} Category)
+                  </>
+                )}
               </p>
             </div>
             <Tabs

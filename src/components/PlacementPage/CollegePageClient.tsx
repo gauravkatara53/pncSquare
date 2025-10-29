@@ -20,6 +20,7 @@ import { apiService } from "@/ApiService/apiService";
 import ScrollToTop from "@/components/ScrollToTop";
 import CollegeHeroSkeleton from "@/components/colleges/CollegeSkeleton";
 import { Button } from "../ui/button";
+import NotFound from "../common/collegeNotFound";
 
 interface Props {
   slug: string;
@@ -180,7 +181,8 @@ const CollegePageClient: React.FC<Props> = ({ slug }) => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <h1 className="text-2xl font-semibold text-gray-700">
-          {error ?? "College not found"}
+          {/* {error ?? "College not found"} */}
+          <NotFound />
         </h1>
       </div>
     );
