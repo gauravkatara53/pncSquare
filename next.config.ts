@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "http://13.203.80.218/api/:path*",
+        destination: "http://api.pncsquare.in/api/:path*",
       },
     ];
   },
