@@ -49,7 +49,7 @@ export const streams = [
 export const instituteTypes = ["Private", "Govt", "Deemed"];
 
 export const heroImages = [
-  "/nit-jsr.jpeg",
-  "/iit-roorke.jpg",
-  "/nit-srinagar.jpeg",
+  "https://ik.imagekit.io/ak2ol9uti/Pncsquare/nit-jsr.webp?updatedAt=1762156560657",
+  "https://ik.imagekit.io/ak2ol9uti/Pncsquare/iit-roorke.webp?updatedAt=1762156560785",
+  "https://ik.imagekit.io/ak2ol9uti/Pncsquare/nit-srinagar.webp?updatedAt=1762156560972",
 ];
