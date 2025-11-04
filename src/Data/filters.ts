@@ -49,7 +49,7 @@ export const streams = [
 export const instituteTypes = ["Private", "Govt", "Deemed"];
 
 export const heroImages = [
-  "https://ik.imagekit.io/ak2ol9uti/Pncsquare/nit-jsr.webp?updatedAt=1762156560657",
-  "https://ik.imagekit.io/ak2ol9uti/Pncsquare/iit-roorke.webp?updatedAt=1762156560785",
-  "https://ik.imagekit.io/ak2ol9uti/Pncsquare/nit-srinagar.webp?updatedAt=1762156560972",
+  "https://ik.imagekit.io/ak2ol9uti/Pncsquare/nit-jsr.webp?tr=w-1600,h-900,fo-auto,q-50,f-auto",
+  "https://ik.imagekit.io/ak2ol9uti/Pncsquare/iit-roorke.webp?tr=w-1600,h-900,fo-auto,q-80,f-auto",
+  "https://ik.imagekit.io/ak2ol9uti/Pncsquare/nit-srinagar.webp?tr=w-1600,h-900,fo-auto,q-80,f-auto",
 ];
