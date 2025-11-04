@@ -1,28 +1,34 @@
 "use client";
 
 import React from "react";
-import LottieAnimation from "@/components/common/LottieAnimation";
-import loadingAnimation from "../../../public/NoResultsFound.json";
+import Image from "next/image";
 
 export default function NotFound() {
   return (
     <main className="flex flex-col items-center justify-center  bg-gray-50">
-      <LottieAnimation
-        animationData={loadingAnimation}
-        className="w-84 h-84 -mt-20 sm:-mt-56"
-      />
-      <p className="text-gray-600 text-sm md:text-lg mb-10">
-        Can&#39;t find your college?{" "}
-        <a
-          href="https://forms.zohopublic.in/gauravkatara53zoho1/form/ProductFeedback/formperma/Xvd11RzQXqlj3t7KnzAU482GYGrll1oSK8V0NHLajqg"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 underline"
-        >
-          Suggest it here
-        </a>
-        .
-      </p>
+      <section className="flex flex-col items-center justify-center">
+        <Image
+          src="https://ik.imagekit.io/ak2ol9uti/PNC-MANUL/college-no-found.png"
+          alt="No college"
+          width={1200}
+          height={800}
+          quality={70}
+          sizes="(max-width:600px) 480px, (max-width:1200px) 800px, 1200px"
+          style={{ width: "70%", height: "auto" }}
+        />
+        <p className="mt-6 text-lg text-slate-600 text-center">
+          Can&#39;t find your college?{" "}
+          <a
+            href="https://linkly.link/2HYiw"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline"
+          >
+            Suggest it here
+          </a>
+          .
+        </p>
+      </section>
     </main>
   );
 }

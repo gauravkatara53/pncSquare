@@ -296,9 +296,11 @@ export default function HeroSection() {
                 src={img}
                 alt="College background"
                 fill
-                priority
+                priority={i === 0}
                 sizes="100vw"
                 className="object-cover object-center"
+                placeholder="blur"
+                blurDataURL={`https://ik.imagekit.io/your-id/${img}?tr=w-10,h-10,bl-6`}
               />
             ) : (
               <Image
@@ -314,7 +316,7 @@ export default function HeroSection() {
           </motion.div>
         ))}
       </div>
-        
+
       {/* Content */}
       <div className="relative z-10 w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24 text-center text-white">
         <h1 className="text-2xl sm:text-4xl md:text-6xl font-bold mb-6 leading-tight tracking-tight">
