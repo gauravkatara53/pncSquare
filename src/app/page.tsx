@@ -46,7 +46,7 @@ export default function HomePage() {
         <link
           rel="preload"
           as="image"
-          href="https://ik.imagekit.io/your-id/first-hero.webp?tr=w-1200,q-80,f-webp"
+          href="https://ik.imagekit.io/ak2ol9uti/Pncsquare/nit-jsr.webp?tr=w-1600,h-900,fo-auto,q-50,f-auto"
         />
       </Head>
       {/* Home Content */}
