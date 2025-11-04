@@ -286,24 +286,35 @@ export default function HeroSection() {
         {heroImages.map((img, i) => (
           <motion.div
             key={i}
-            initial={false} // ✅ prevent animation on first render
+            initial={false}
             animate={{ x: `${(i - index) * 100}%` }}
             transition={{ duration: 1, ease: "easeInOut" }}
             className="absolute inset-0 w-full h-full"
           >
-            <Image
-              src={img}
-              alt="College background"
-              fill
-              priority={i === 0}
-              sizes="100vw"
-              className="object-cover object-center"
-            />
+            {i === 0 ? (
+              <Image
+                src={img}
+                alt="College background"
+                fill
+                priority
+                sizes="100vw"
+                className="object-cover object-center"
+              />
+            ) : (
+              <Image
+                src={img}
+                alt="College background"
+                fill
+                loading="lazy"
+                sizes="100vw"
+                className="object-cover object-center"
+              />
+            )}
             <div className="absolute inset-0 bg-black/40" />
           </motion.div>
         ))}
       </div>
-
+        
       {/* Content */}
       <div className="relative z-10 w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24 text-center text-white">
         <h1 className="text-2xl sm:text-4xl md:text-6xl font-bold mb-6 leading-tight tracking-tight">

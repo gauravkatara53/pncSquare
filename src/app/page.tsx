@@ -8,6 +8,7 @@ import { Footer } from "@/components/common/footer";
 
 import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
+import Head from "next/head";
 
 export default function HomePage() {
   const { user, isLoaded } = useUser();
@@ -41,17 +42,22 @@ export default function HomePage() {
 
   return (
     <div>
+      <Head>
+        <link
+          rel="preload"
+          as="image"
+          href="https://ik.imagekit.io/your-id/first-hero.webp?tr=w-1200,q-80,f-webp"
+        />
+      </Head>
       {/* Home Content */}
       <Hero />
       <KeyFeatures />
       <CutoffTrends />
       <TopColleges />
       <Footer />
-
-      {/* Profile Completion Modal */}
       {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
-          <div className="bg-white p-8 rounded-xl shadow-lg w-[380px] relative border border-gray-200">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-sm">
             <h2 className="text-lg font-semibold text-gray-900 mb-6 text-center">
               Complete your profile
             </h2>
