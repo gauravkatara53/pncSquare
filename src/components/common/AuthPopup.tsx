@@ -37,13 +37,27 @@ export default function AuthPopup({ open, setOpen }: AuthPopupProps) {
   }, [open, setOpen]);
 
   // Auto-open every 30s if user not logged in
+  // useEffect(() => {
+  //   if (!isSignedIn) {
+  //     const interval = setInterval(() => {
+  //       setOpen(true);
+  //     }, 60000); // 60 sec
+
+  //     return () => clearInterval(interval);
+  //   }
+  // }, [isSignedIn, setOpen]);
+  // In AuthPopup.tsx
   useEffect(() => {
     if (!isSignedIn) {
-      const interval = setInterval(() => {
-        setOpen(true);
-      }, 60000); // 60 sec
+      const hasShown = sessionStorage.getItem("authPopupShown");
+      if (!hasShown) {
+        const timeout = setTimeout(() => {
+          setOpen(true);
+          sessionStorage.setItem("authPopupShown", "true");
+        }, 30000); // Show once after 30s
 
-      return () => clearInterval(interval);
+        return () => clearTimeout(timeout);
+      }
     }
   }, [isSignedIn, setOpen]);
 

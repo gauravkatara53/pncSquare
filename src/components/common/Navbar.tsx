@@ -22,7 +22,7 @@ export function Header() {
   >([]);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   const searchRef = useRef<HTMLDivElement>(null);
-  const { user } = useUser();
+  const { user, isSignedIn } = useUser();
   const navItems = [
     { name: "Colleges", id: "colleges", href: "/colleges?page=1&limit=9" },
     { name: "Courses", id: "courses", href: "/courses" },
@@ -35,10 +35,21 @@ export function Header() {
       id: "college-predictor",
       href: "/college-predictor",
     },
+    {
+      name: "Jee Rank Predictor",
+      id: "jee-rank-predictor",
+      href: "/jee-main-rank-predictor",
+    },
   ];
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<"signIn" | "signUp">("signIn");
+  const [showAuth, setShowAuth] = useState(false);
 
+  useEffect(() => {
+    // Initialize Clerk only after 2 seconds (after page is interactive)
+    const t = setTimeout(() => setShowAuth(true), 2000);
+    return () => clearTimeout(t);
+  }, []);
   // Handle search input changes and filter suggestions
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
