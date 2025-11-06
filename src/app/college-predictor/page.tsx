@@ -1,15 +1,14 @@
 import { Metadata } from "next";
 import CollegePredictorClientPage from "./college-predictorclient";
 
-
 export async function generateMetadata(): Promise<Metadata> {
   const baseUrl = "https://pncsquare.in/college-predictor";
 
   return {
     title:
-      "College Predictor 2025 - IIT, NIT, IIIT Branch Prediction | Pncsquare",
+      "College Predictor 2026 - IIT, NIT, IIIT Branch Prediction | Pncsquare",
     description:
-      "Use our College Predictor 2025 to find out which IIT, NIT, IIIT, and other top engineering colleges you can get based on your JEE Main, JEE Advanced, or other entrance exam ranks.",
+      "Use our College Predictor 2026 to find out which IIT, NIT, IIIT, and other top engineering colleges you can get based on your JEE Main, JEE Advanced, or other entrance exam ranks.",
     keywords: [
       "college predictor",
       "IIT branch predictor",
@@ -28,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
       "engineering admissions 2025",
     ],
     openGraph: {
-      title: "College Predictor 2025 - IIT, NIT, IIIT Branch Prediction",
+      title: "College Predictor 2026 - IIT, NIT, IIIT Branch Prediction",
       description:
         "Predict your chances of admission in top engineering colleges based on your rank. Get detailed insights about cutoffs, placement statistics, and more.",
       images: [

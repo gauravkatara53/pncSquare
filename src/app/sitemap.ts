@@ -54,6 +54,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       { url: `${baseUrl}/terms-of-service`, lastModified: new Date() },
       { url: `${baseUrl}/profile`, lastModified: new Date() },
       { url: `${baseUrl}/signin`, lastModified: new Date() },
+      { url: `${baseUrl}/jee-main-rank-predictor`, lastModified: new Date() },
 
       // College streams - Engineering
       {
