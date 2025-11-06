@@ -322,14 +322,14 @@ export default function JEERankPredictor1() {
                   className="space-y-6"
                 >
                   {/* Result Card with Light Theme */}
-                  <Card className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-6 sm:p-8 rounded-2xl shadow-2xl border-2 border-blue-200">
+                  <Card className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-4 sm:p-6 rounded-xl shadow-xl border border-blue-200 max-w-md mx-auto">
                     {/* Back Button */}
                     <Button
                       onClick={handleReset}
                       variant="ghost"
-                      className="mb-4 text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                      className="mb-3 text-gray-600 hover:text-gray-900 hover:bg-gray-100 text-sm"
                     >
-                      <ArrowLeft className="w-4 h-4 mr-2" />
+                      <ArrowLeft className="w-3.5 h-3.5 mr-1.5" />
                       Calculate Again
                     </Button>
 
@@ -338,25 +338,25 @@ export default function JEERankPredictor1() {
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{
-                        delay: 0.2,
+                        delay: 0.15,
                         type: "spring",
                         stiffness: 200,
                       }}
-                      className="inline-flex items-center gap-2 bg-green-100 border border-green-300 rounded-full px-4 py-2 mb-6"
+                      className="inline-flex items-center gap-1.5 bg-green-100 border border-green-300 rounded-full px-3 py-1.5 mb-4"
                     >
-                      <Sparkles className="w-4 h-4 text-green-600" />
-                      <span className="text-green-700 text-sm font-semibold">
+                      <Sparkles className="w-3.5 h-3.5 text-green-600" />
+                      <span className="text-green-700 text-xs font-semibold">
                         Rank Calculated Successfully!
                       </span>
                     </motion.div>
 
                     {/* Main Rank Display */}
-                    <div className="text-center mb-8">
+                    <div className="text-center mb-5">
                       <motion.p
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 }}
-                        className="text-gray-600 text-sm sm:text-base mb-3 uppercase tracking-wider font-medium"
+                        transition={{ delay: 0.25 }}
+                        className="text-gray-600 text-xs sm:text-sm mb-2 uppercase tracking-wide font-medium"
                       >
                         Your Predicted All India Rank
                       </motion.p>
@@ -364,37 +364,37 @@ export default function JEERankPredictor1() {
                         initial={{ scale: 0.8, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{
-                          delay: 0.4,
+                          delay: 0.3,
                           type: "spring",
                           stiffness: 100,
                         }}
                         className="relative inline-block"
                       >
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-400 blur-2xl opacity-30 rounded-full"></div>
-                        <p className="relative text-5xl sm:text-6xl md:text-7xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent tracking-tight py-2">
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-400 blur-xl opacity-30 rounded-full"></div>
+                        <p className="relative text-4xl sm:text-5xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent tracking-tight py-1">
                           {formatNumber(animatedRank)}
                         </p>
                       </motion.div>
                     </div>
 
                     {/* Rank Range Cards */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
                       <motion.div
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.6 }}
-                        className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-6 text-center"
+                        transition={{ delay: 0.4 }}
+                        className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 text-center"
                       >
-                        <div className="inline-flex items-center justify-center w-10 h-10 bg-green-100 rounded-full mb-3">
-                          <TrendingDown className="w-5 h-5 text-green-600" />
+                        <div className="inline-flex items-center justify-center w-8 h-8 bg-green-100 rounded-full mb-2">
+                          <TrendingDown className="w-4 h-4 text-green-600" />
                         </div>
-                        <p className="text-gray-600 text-xs mb-2 tracking-wide uppercase font-semibold">
-                          Best Case Scenario
+                        <p className="text-gray-600 text-xs mb-1 uppercase font-semibold">
+                          Best Case
                         </p>
-                        <p className="text-3xl sm:text-4xl text-gray-900 mb-1 font-bold">
+                        <p className="text-2xl sm:text-3xl text-gray-900 mb-0.5 font-bold">
                           {formatNumber(result.minRank)}
                         </p>
-                        <p className="text-green-600 text-sm font-medium">
+                        <p className="text-green-600 text-xs font-medium">
                           Optimistic Estimate
                         </p>
                       </motion.div>
@@ -402,19 +402,19 @@ export default function JEERankPredictor1() {
                       <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.7 }}
-                        className="bg-gradient-to-br from-orange-50 to-amber-50 border-2 border-orange-200 rounded-2xl p-6 text-center"
+                        transition={{ delay: 0.45 }}
+                        className="bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-200 rounded-xl p-4 text-center"
                       >
-                        <div className="inline-flex items-center justify-center w-10 h-10 bg-orange-100 rounded-full mb-3">
-                          <TrendingDown className="w-5 h-5 text-orange-600 rotate-180" />
+                        <div className="inline-flex items-center justify-center w-8 h-8 bg-orange-100 rounded-full mb-2">
+                          <TrendingDown className="w-4 h-4 text-orange-600 rotate-180" />
                         </div>
-                        <p className="text-gray-600 text-xs mb-2 tracking-wide uppercase font-semibold">
-                          Worst Case Scenario
+                        <p className="text-gray-600 text-xs mb-1 uppercase font-semibold">
+                          Worst Case
                         </p>
-                        <p className="text-3xl sm:text-4xl text-gray-900 mb-1 font-bold">
+                        <p className="text-2xl sm:text-3xl text-gray-900 mb-0.5 font-bold">
                           {formatNumber(result.maxRank)}
                         </p>
-                        <p className="text-orange-600 text-sm font-medium">
+                        <p className="text-orange-600 text-xs font-medium">
                           Conservative Estimate
                         </p>
                       </motion.div>
@@ -424,14 +424,14 @@ export default function JEERankPredictor1() {
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.9 }}
-                      className="mt-6"
+                      transition={{ delay: 0.6 }}
+                      className="mt-4"
                     >
                       <Button
                         onClick={() =>
                           (window.location.href = `/college-predictor-result?exam=JEE-Main&rank=${result.rank}&seatType=${category}&subCategory=${seatPool}&state=${domicileState}&mode=safe&page=1`)
                         }
-                        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl px-6 py-4 text-base font-semibold shadow-lg hover:shadow-xl transition-all"
+                        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg px-4 py-3 text-sm font-semibold shadow-md hover:shadow-lg transition-all"
                       >
                         🎓 Predict Colleges with AI
                       </Button>
