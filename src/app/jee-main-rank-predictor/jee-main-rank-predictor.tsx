@@ -192,7 +192,7 @@ export default function JEERankPredictor1() {
                           className="w-full mt-2 border border-gray-300 rounded-lg h-12 px-3 text-sm focus:ring-2 focus:ring-blue-600"
                         >
                           <option>Percentile</option>
-                          <option>Marks</option>
+                          {/* <option>Marks</option> */}
                         </select>
                       </div>
 
