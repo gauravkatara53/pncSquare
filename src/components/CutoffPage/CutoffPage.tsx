@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Head from "next/head";
 
@@ -14,9 +14,7 @@ import { examData } from "@/components/CutoffPage/data";
 import { apiService } from "@/ApiService/apiService";
 import { Footer } from "../common/footer";
 
-// Interfaces skipped for brevity ...
-
-// Define CutoffItem interface (adjust fields as per your API response)
+// Interfaces
 interface CutoffItem {
   _id: string;
   slug: string;
@@ -30,7 +28,6 @@ interface CutoffItem {
   round: string;
 }
 
-// Define FilteredCollege interface for use in reduce
 interface FilteredCollege {
   id: string;
   slug: string;
@@ -58,27 +55,27 @@ interface CutoffPageProps {
 export default function CutoffPage({ urlParams }: CutoffPageProps) {
   const router = useRouter();
 
-  // Staged filter states (controlled by dropdowns, not applied yet)
-  const [stagedExam, setStagedExam] = useState(() =>
+  // Initial filter states
+  const [stagedExam, setStagedExam] = useState(
     typeof urlParams.examType === "string" ? urlParams.examType : "JEE-Advanced"
   );
-  const [stagedYear, setStagedYear] = useState(() =>
+  const [stagedYear, setStagedYear] = useState(
     typeof urlParams.year === "string" ? urlParams.year : ""
   );
-  const [stagedCategory, setStagedCategory] = useState(() =>
+  const [stagedCategory, setStagedCategory] = useState(
     typeof urlParams.seatType === "string" ? urlParams.seatType : ""
   );
-  const [stagedQuota, setStagedQuota] = useState(() =>
+  const [stagedQuota, setStagedQuota] = useState(
     typeof urlParams.quota === "string" ? urlParams.quota : ""
   );
-  const [stagedRound, setStagedRound] = useState(() =>
+  const [stagedRound, setStagedRound] = useState(
     typeof urlParams.round === "string" ? urlParams.round : ""
   );
-  const [stagedSubCategory, setStagedSubCategory] = useState(() =>
+  const [stagedSubCategory, setStagedSubCategory] = useState(
     typeof urlParams.subCategory === "string" ? urlParams.subCategory : ""
   );
 
-  // Applied filters state: updated only on Apply click
+  // Applied filters
   const [appliedFilters, setAppliedFilters] = useState({
     exam: stagedExam,
     year: stagedYear,
@@ -97,28 +94,25 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
   const [cutoffData, setCutoffData] = useState<CutoffItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [filtersApplied, setFiltersApplied] = useState(false);
+  const [showResultsByHash, setShowResultsByHash] = useState(false);
 
-  // Effect to update document title and metadata on stagedExam change
+  const isNEET = stagedExam === "NEET-UG";
+
+  // Update page title and meta
   useEffect(() => {
     const currentExam = examData[stagedExam as keyof typeof examData];
     const examName = currentExam ? currentExam.name : stagedExam;
-
-    // Update document title
     document.title = `Cutoff Analysis - ${examName}`;
-
-    // Update meta description
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if (metaDescription) {
-      metaDescription.setAttribute(
+    const meta = document.querySelector('meta[name="description"]');
+    if (meta)
+      meta.setAttribute(
         "content",
         `Explore cutoff information for ${examName}. See trends, college-wise cutoffs, and more.`
       );
-    }
   }, [stagedExam]);
 
-  // Effect to update URL and metadata only on appliedFilters change
+  // ✅ Keep query params updated BUT preserve #result if it's already in URL
   useEffect(() => {
-    // Update URL query params
     const params = new URLSearchParams();
     if (appliedFilters.exam) params.set("examType", appliedFilters.exam);
     if (appliedFilters.year) params.set("year", appliedFilters.year);
@@ -129,73 +123,30 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
     if (appliedFilters.subCategory)
       params.set("subCategory", appliedFilters.subCategory);
 
-    router.replace(`/cutoff?${params.toString()}`);
+    const hashPart = window.location.hash; // 👈 preserve existing hash
+    router.replace(`/cutoff?${params.toString()}${hashPart}`);
   }, [appliedFilters, router]);
 
-  // Check if exam is NEET-UG
-  const isNEET = stagedExam === "NEET-UG";
+  // Detect if #result present
+  useEffect(() => {
+    const checkHash = () =>
+      setShowResultsByHash(window.location.hash === "#result");
+    checkHash();
+    window.addEventListener("hashchange", checkHash);
+    return () => window.removeEventListener("hashchange", checkHash);
+  }, []);
 
-  // Check if all filters are selected (use staged filters to enable/disable Apply button)
-  const areAllFiltersSelected = useCallback((): boolean => {
-    if (isNEET) {
-      // For NEET-UG, exam, year, category (seat type), and round are required
-      return (
-        stagedExam.trim() !== "" &&
-        stagedYear.trim() !== "" &&
-        stagedCategory.trim() !== "" &&
-        stagedRound.trim() !== ""
-      );
-    } else {
-      // For other exams, all filters are required
-      return (
-        stagedExam.trim() !== "" &&
-        stagedYear.trim() !== "" &&
-        stagedCategory.trim() !== "" &&
-        stagedQuota.trim() !== "" &&
-        stagedRound.trim() !== "" &&
-        stagedSubCategory.trim() !== ""
-      );
-    }
-  }, [
-    isNEET,
-    stagedExam,
-    stagedYear,
-    stagedCategory,
-    stagedQuota,
-    stagedRound,
-    stagedSubCategory,
-  ]);
-
-  // Check if any filter other than exam is selected (staged filters)
-  const isAnyFilterSelected = useCallback((): boolean => {
-    if (isNEET) {
-      // For NEET-UG, check year, category, and round
-      return (
-        stagedYear.trim() !== "" ||
-        stagedCategory.trim() !== "" ||
-        stagedRound.trim() !== ""
-      );
-    } else {
-      // For other exams, check all filters
-      return (
-        stagedYear.trim() !== "" ||
-        stagedCategory.trim() !== "" ||
-        stagedQuota.trim() !== "" ||
-        stagedRound.trim() !== "" ||
-        stagedSubCategory.trim() !== ""
-      );
-    }
-  }, [
-    isNEET,
-    stagedYear,
-    stagedCategory,
-    stagedQuota,
-    stagedRound,
-    stagedSubCategory,
-  ]);
-
-  // Fetch cutoff data on Apply clicked, with appliedFilters update
+  // ✅ Apply button click → fetch data + add #result manually
   const applyFilters = () => {
+    const isAnyFilterSelected = () =>
+      isNEET
+        ? stagedYear || stagedCategory || stagedRound
+        : stagedYear ||
+          stagedCategory ||
+          stagedQuota ||
+          stagedRound ||
+          stagedSubCategory;
+
     if (!isAnyFilterSelected()) return;
 
     setLoading(true);
@@ -209,19 +160,13 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
       subCategory: stagedSubCategory,
     };
 
-    // Prepare API parameters based on exam type
     const apiParams: Record<string, string | number | undefined> = {
       examType: newAppliedFilters.exam,
       year: newAppliedFilters.year ? Number(newAppliedFilters.year) : undefined,
       seatType: newAppliedFilters.category || undefined,
     };
-
-    if (isNEET) {
-      // For NEET-UG, send examType, year, seatType, and round
-      // Don't include quota or subCategory
-      apiParams.round = newAppliedFilters.round || undefined;
-    } else {
-      // For other exams, include all parameters
+    if (isNEET) apiParams.round = newAppliedFilters.round || undefined;
+    else {
       apiParams.quota = newAppliedFilters.quota || undefined;
       apiParams.round = newAppliedFilters.round || undefined;
       apiParams.subCategory = newAppliedFilters.subCategory || undefined;
@@ -235,17 +180,33 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
         success: boolean;
       }>("/cutoff/all", apiParams)
       .then((response) => {
-        if (response.success) {
-          setCutoffData(response.data);
-        } else {
-          setCutoffData([]);
-        }
+        setCutoffData(response.success ? response.data : []);
         setShowFilteredResults(true);
         setFiltersApplied(true);
-
         setAppliedFilters(newAppliedFilters);
-
         setLoading(false);
+
+        // ✅ Manually update hash only when user clicks Apply
+        const params = new URLSearchParams();
+        if (newAppliedFilters.exam)
+          params.set("examType", newAppliedFilters.exam);
+        if (newAppliedFilters.year) params.set("year", newAppliedFilters.year);
+        if (newAppliedFilters.category)
+          params.set("seatType", newAppliedFilters.category);
+        if (newAppliedFilters.quota)
+          params.set("quota", newAppliedFilters.quota);
+        if (newAppliedFilters.round)
+          params.set("round", newAppliedFilters.round);
+        if (newAppliedFilters.subCategory)
+          params.set("subCategory", newAppliedFilters.subCategory);
+
+        router.replace(`/cutoff?${params.toString()}#result`);
+        window.location.hash = "result"; // ensures immediate hash detection
+        setShowResultsByHash(true);
+
+        // Smooth scroll to results
+        const el = document.getElementById("result");
+        if (el) el.scrollIntoView({ behavior: "smooth" });
       })
       .catch(() => {
         setCutoffData([]);
@@ -255,86 +216,92 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
       });
   };
 
-  // Clear filters - reset staged and applied filters, cutoff data, metadata, and URL
-  const clearFiltersExceptExam = () => {
-    // Reset staged filters except exam to empty
-    setStagedYear("");
-    setStagedCategory("");
-    setStagedRound(""); // Reset round for both NEET and non-NEET
-    if (!isNEET) {
-      // Only reset these for non-NEET exams
-      setStagedQuota("");
-      setStagedSubCategory("");
+  // ✅ On refresh or shared link — keep #result and load data
+  useEffect(() => {
+    if (window.location.hash === "#result") {
+      const params = new URLSearchParams(window.location.search);
+      const examType = params.get("examType") || stagedExam;
+      const year = params.get("year") || stagedYear;
+      const seatType = params.get("seatType") || stagedCategory;
+      const quota = params.get("quota") || stagedQuota;
+      const round = params.get("round") || stagedRound;
+      const subCategory = params.get("subCategory") || stagedSubCategory;
+
+      const apiParams: Record<string, string | number | undefined> = {
+        examType,
+        year: year ? Number(year) : undefined,
+        seatType: seatType || undefined,
+      };
+      if (examType === "NEET-UG") apiParams.round = round || undefined;
+      else {
+        apiParams.quota = quota || undefined;
+        apiParams.round = round || undefined;
+        apiParams.subCategory = subCategory || undefined;
+      }
+
+      setLoading(true);
+      apiService
+        .get<{
+          statusCode: number;
+          data: CutoffItem[];
+          message: string;
+          success: boolean;
+        }>("/cutoff/all", apiParams)
+        .then((response) => {
+          setCutoffData(response.success ? response.data : []);
+          setShowFilteredResults(true);
+          setFiltersApplied(true);
+          setShowResultsByHash(true);
+          setAppliedFilters({
+            exam: examType,
+            year,
+            category: seatType,
+            quota,
+            round,
+            subCategory,
+          });
+          setLoading(false);
+        })
+        .catch(() => {
+          setCutoffData([]);
+          setShowFilteredResults(true);
+          setFiltersApplied(true);
+          setShowResultsByHash(true);
+          setLoading(false);
+        });
     }
+  }, []);
 
-    // Reset applied filters except exam to empty
-    setAppliedFilters((prev) => ({
-      ...prev,
-      year: "",
-      category: "",
-      round: "", // Reset round for both NEET and non-NEET
-      quota: isNEET ? "" : prev.quota,
-      subCategory: isNEET ? "" : prev.subCategory,
-    }));
-
-    setSearchQuery("");
-    setCutoffData([]);
-    setShowFilteredResults(false);
-    setFiltersApplied(false);
+  const clearFiltersExceptExam = () => {
+    router.replace("/cutoff");
   };
 
-  // Handle exam change: update staged exam and reset other filters
   const handleExamChange = (exam: string) => {
     setStagedExam(exam);
-    // Reset other filters when exam changes
     setStagedYear("");
     setStagedCategory("");
     setStagedQuota("");
     setStagedRound("");
     setStagedSubCategory("");
-
-    // Also reset applied filters for non-exam fields
-    setAppliedFilters((prev) => ({
-      ...prev,
+    setAppliedFilters({
       exam,
       year: "",
       category: "",
       quota: "",
       round: "",
       subCategory: "",
-    }));
-
-    // Reset data and UI state
+    });
     setCutoffData([]);
     setShowFilteredResults(false);
     setFiltersApplied(false);
   };
 
-  // Ref for scrolling to results section
-  const resultsSectionRef = useRef<HTMLDivElement | null>(null);
-
-  // Scroll to results on load
-  useEffect(() => {
-    if (!loading && showFilteredResults && filtersApplied) {
-      setTimeout(() => {
-        resultsSectionRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
-    }
-  }, [loading, showFilteredResults, filtersApplied]);
-
-  // Filter data based on search query
   const filteredColleges = cutoffData
     .filter((item) => {
-      const normalizedQuery = searchQuery.toLowerCase().replace(/[-\s]/g, "");
+      const q = searchQuery.toLowerCase().replace(/[-\s]/g, "");
       return (
-        item.slug
-          .toLowerCase()
-          .replace(/[-\s]/g, "")
-          .includes(normalizedQuery) ||
-        item.branch
-          .toLowerCase()
-          .replace(/[-\s]/g, "")
-          .includes(normalizedQuery)
+        item.slug.toLowerCase().replace(/[-\s]/g, "").includes(q) ||
+        item.branch.toLowerCase().replace(/[-\s]/g, "").includes(q)
       );
     })
     .reduce((acc: FilteredCollege[], curr) => {
@@ -350,9 +317,8 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
         quota: curr.quota,
         round: curr.round,
       };
-      if (existing) {
-        existing.branches.push(branchItem);
-      } else {
+      if (existing) existing.branches.push(branchItem);
+      else
         acc.push({
           id: curr._id,
           slug: curr.slug,
@@ -362,25 +328,14 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
           course: curr.course,
           branches: [branchItem],
         });
-      }
       return acc;
     }, []);
 
-  // Current exam details for display components from appliedFilters.exam
-  const allowedExams = Object.keys(examData) as Array<keyof typeof examData>;
-  const currentExam = allowedExams.includes(
-    appliedFilters.exam as keyof typeof examData
-  )
-    ? examData[appliedFilters.exam as keyof typeof examData]
-    : null;
+  const currentExam =
+    examData[appliedFilters.exam as keyof typeof examData] || null;
 
-  // Expand toggle
-  const toggleCollegeExpansion = (collegeSlug: string) => {
-    setExpandedColleges((prev) => ({
-      ...prev,
-      [collegeSlug]: !prev[collegeSlug],
-    }));
-  };
+  const toggleCollegeExpansion = (slug: string) =>
+    setExpandedColleges((prev) => ({ ...prev, [slug]: !prev[slug] }));
 
   return (
     <>
@@ -389,13 +344,8 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
           Cutoff Analysis -{" "}
           {examData[stagedExam as keyof typeof examData]?.name || stagedExam}
         </title>
-        <meta
-          name="description"
-          content={`Explore cutoff information for ${
-            examData[stagedExam as keyof typeof examData]?.name || stagedExam
-          }. See trends, college-wise cutoffs, and more.`}
-        />
       </Head>
+
       <div className="min-h-screen bg-white">
         <HeroSection
           selectedExam={stagedExam}
@@ -412,15 +362,22 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
           onSubCategoryChange={setStagedSubCategory}
           clearFilters={clearFiltersExceptExam}
           applyFilters={applyFilters}
-          isAnyFilterSelected={isAnyFilterSelected()}
+          isAnyFilterSelected={Boolean(
+            stagedYear ||
+              stagedCategory ||
+              stagedQuota ||
+              stagedRound ||
+              stagedSubCategory
+          )}
           loading={loading}
           isNEET={isNEET}
         />
+
         <div
-          ref={resultsSectionRef}
+          id="result"
           className="max-w-7xl mx-auto px-0 sm:px-6 lg:px-8 py-12"
         >
-          {currentExam && filtersApplied && (
+          {showResultsByHash && currentExam && filtersApplied && (
             <FilteredCollegeSearchResults
               showFilteredResults={showFilteredResults}
               searchQuery={searchQuery}
@@ -431,11 +388,12 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
               selectedCategory={appliedFilters.category}
               expandedColleges={expandedColleges}
               toggleCollegeExpansion={toggleCollegeExpansion}
-              allFiltersSelected={areAllFiltersSelected()}
+              allFiltersSelected={true}
               isNEET={isNEET}
             />
           )}
         </div>
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {currentExam && (
             <>
@@ -450,6 +408,7 @@ export default function CutoffPage({ urlParams }: CutoffPageProps) {
           )}
         </div>
       </div>
+
       <Footer />
     </>
   );
