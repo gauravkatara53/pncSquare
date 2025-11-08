@@ -292,6 +292,40 @@ export const INDIVIDUAL_COLLEGE_CONFIGS: Record<
     },
     fallbackTag: "University",
   },
+  "iitram-ahmedabad": {
+    slug: "iitram-ahmedabad",
+    examConfigs: {
+      "JEE-Main": {
+        name: "JEE Main",
+        requiresSubCategory: true,
+        requiresQuota: true,
+        years: ["2025", "2024"],
+        seatTypeOptions: [
+          "EWS",
+          "EWS-PwD",
+          "General",
+          "General-PwD",
+          "OBC-NCL",
+          "OBC-NCL-PwD",
+          "SC",
+          "SC-PwD",
+          "ST",
+        ],
+        quotaOptions: ["AI"],
+        subCategories: ["Gender Neutral"],
+      },
+      GUJCET: {
+        name: "GUJCET",
+        requiresSubCategory: true,
+        requiresQuota: false,
+        years: ["2025", "2024"],
+        seatTypeOptions: ["General", "EWS", "SEBC", "SC", "ST", "ESM"],
+        // quotaOptions: ["Gujarat State", "All India"],
+        subCategories: ["None", "Physically Handicapped", "Tuition Fee Waiver"],
+      },
+    },
+    fallbackTag: "University",
+  },
 };
 
 // College tag configurations

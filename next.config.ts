@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "http://api.pncsquare.in/api/:path*",
+        destination: "http://localhost:5002/api/:path*",
       },
     ];
   },
@@ -31,3 +31,4 @@ const bundleAnalyzer = withBundleAnalyzer({
 });
 
 export default bundleAnalyzer(nextConfig);
+//http://api.pncsquare.in

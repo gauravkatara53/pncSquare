@@ -540,7 +540,7 @@ const CollegePageClient: React.FC<Props> = ({ slug }) => {
             <div className="mt-10 bg-gradient-to-br from-teal-50 to-emerald-100 rounded-lg border border-teal-200 p-6 px-3 shadow-sm">
               <div className="mb-4">
                 <h3 className="font-semibold text-gray-800 mb-2">
-                  Featured Colleges
+                  Top Colleges
                 </h3>
               </div>
               <div className="space-y-3">
