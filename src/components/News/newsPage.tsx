@@ -233,7 +233,7 @@ export default function NewsMainPage() {
                             {news.title}
                           </h3>
                           <div className="flex items-center gap-3 text-xs text-slate-500">
-                            <span>
+                            <span className="hidden sm:inline">
                               {new Date(news.publishDate).toLocaleDateString()}
                             </span>
                             <span>{news.readTime} min read</span>
@@ -253,20 +253,20 @@ export default function NewsMainPage() {
       </section>
 
       {/* Main News With Pagination & Tabs */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-6xl mx-auto px-2 sm:px-6 lg:px-8 sm:py-12 py-8">
         <Tabs
           defaultValue="all"
           value={category}
           onValueChange={handleTabChange}
           className="w-full mb-12"
         >
-          <TabsContent value="all" className="mt-12">
+          <TabsContent value="all" className="sm:mt-12 mt-0">
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {newsData.map((news) => (
                 <Link key={news._id} href={`/newsarticle/${news.slug}`}>
                   <Card className="border border-slate-200 shadow-sm hover:shadow-md transition-shadow group cursor-pointer">
                     <div className="overflow-hidden">
-                      <div className="aspect-video w-full overflow-hidden">
+                      <div className="aspect-video w-full overflow-hidden rounded-t-lg">
                         <Image
                           src={news.coverImage}
                           alt={news.title}

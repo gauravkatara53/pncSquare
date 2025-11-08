@@ -1,5 +1,12 @@
 "use client";
-import { useState, useEffect, useMemo, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  useTransition,
+  useRef,
+} from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -50,10 +57,7 @@ const cities = [
 const collegeTags = [
   { id: "iit", name: "IIT" },
   { id: "nit", name: "NIT" },
-  {
-    id: "iiit",
-    name: "IIIT",
-  },
+  { id: "iiit", name: "IIIT" },
 ];
 
 const examOptions = [
@@ -115,10 +119,354 @@ interface PredictorAPIResponse {
   };
 }
 
+// ✅ OPTIMIZATION 1: Memoized College Card Component
+const CollegeCard = React.memo(
+  ({
+    college,
+    isDarkMode,
+    onViewDetails,
+  }: {
+    college: {
+      id: number;
+      name: string;
+      slug: string;
+      location: string;
+      branch: string;
+      course: string;
+      type: string;
+      SeatType: string;
+      SubCategory: string;
+      quota: string;
+      fees: string;
+      avgFees: number;
+      avgPackage: string;
+      avgSalaryNum: number;
+      nirf: string | number;
+      nirfText: string;
+      cutoffs: Record<string, Record<string, number>>;
+      closestRound: string;
+      branchWeight: number;
+      collegeWeight: number;
+      rankScore: number;
+      finalScore: number;
+      tags: string[];
+    };
+    isDarkMode: boolean;
+    onViewDetails: (slug: string) => void;
+  }) => {
+    return (
+      <Card
+        className={`border transition-colors duration-200 ${
+          isDarkMode
+            ? "bg-gradient-to-br from-slate-900/80 via-gray-900/80 to-slate-800/80 border-slate-800"
+            : "bg-white border-gray-200"
+        }`}
+      >
+        <div className="p-4 md:p-6">
+          {/* College Header */}
+          <div className="flex flex-col sm:flex-row items-start justify-between gap-3 mb-4">
+            <div className="flex-1 w-full">
+              <div className="flex items-start gap-3 mb-2">
+                <div
+                  className={`w-12 h-12 md:w-16 md:h-16 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors duration-200 ${
+                    isDarkMode
+                      ? "bg-gradient-to-br from-amber-950/30 to-slate-800/50 border border-amber-600/20"
+                      : "bg-gradient-to-br from-[#2a53e2]/10 to-[#7C5EFF]/10"
+                  }`}
+                >
+                  <GraduationCap
+                    className={`w-6 h-6 md:w-8 md:h-8 transition-colors duration-200 ${
+                      isDarkMode ? "text-amber-500" : "text-[#2a53e2]"
+                    }`}
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3
+                    className={`mb-1 text-base md:text-lg font-semibold transition-colors duration-200 ${
+                      isDarkMode ? "text-gray-100" : "text-slate-900"
+                    }`}
+                  >
+                    {college.name}
+                  </h3>
+                  <div
+                    className={`flex flex-wrap items-center gap-1 md:gap-2 text-xs md:text-sm mb-2 transition-colors duration-200 ${
+                      isDarkMode ? "text-gray-400" : "text-gray-600"
+                    }`}
+                  >
+                    <MapPin className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0" />
+                    <span className="truncate">{college.location}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`w-full sm:w-auto text-xs transition-colors duration-200 ${
+                isDarkMode
+                  ? "text-white hover:text-amber-400 hover:bg-amber-950/30 border border-amber-600/30"
+                  : "text-[#2a53e2] hover:text-[#2a53e2]/80 border border-gray-600"
+              }`}
+              onClick={() => onViewDetails(college.slug)}
+            >
+              View Details
+              <ArrowRight className="w-3 h-3 ml-1" />
+            </Button>
+          </div>
+
+          {/* College Meta */}
+          <div className="flex flex-wrap items-center gap-2 mb-4">
+            <Badge
+              variant="outline"
+              className={`text-xs transition-colors duration-200 ${
+                isDarkMode
+                  ? "border-amber-600/50 text-white bg-gray-200"
+                  : "border-[#2a53e2] text-[#2a53e2]"
+              }`}
+            >
+              NIRF #{college.nirfText !== "-" ? college.nirfText : "N/A"}
+            </Badge>
+            <Badge
+              variant="secondary"
+              className={`text-xs transition-colors duration-200 ${
+                isDarkMode
+                  ? "bg-gray-200 text-gray-400 border border-slate-700"
+                  : "bg-blue-100 text-blue-700"
+              }`}
+            >
+              {college.quota === "OS"
+                ? "Other State"
+                : college.quota === "HS"
+                ? "Home State"
+                : college.quota === "AI"
+                ? "All India"
+                : college.quota}
+            </Badge>
+            {college.tags.map((tag: string) => (
+              <a
+                key={tag}
+                href={
+                  tag.toLowerCase() === "cutoff"
+                    ? `/college/${college.slug}#cutoff`
+                    : `/college/${college.slug}#placements`
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Badge
+                  variant="secondary"
+                  className={`text-xs cursor-pointer transition-colors duration-200 ${
+                    isDarkMode
+                      ? "bg-gray-200 text-gray-400 border border-slate-700"
+                      : "bg-gray-100 hover:bg-gray-200"
+                  }`}
+                >
+                  {tag}
+                </Badge>
+              </a>
+            ))}
+          </div>
+
+          {/* Branch Info */}
+          <div
+            className={`rounded-lg p-3 md:p-4 mb-4 transition-colors duration-200 ${
+              isDarkMode
+                ? "bg-gradient-to-r from-amber-950/20 to-slate-800/30 border border-amber-600/10"
+                : "bg-gradient-to-r from-[#2a53e2]/5 to-[#7C5EFF]/5"
+            }`}
+          >
+            <p
+              className={`text-xs mb-1 transition-colors duration-200 ${
+                isDarkMode ? "text-gray-400" : "text-gray-600"
+              }`}
+            >
+              {college.course}
+            </p>
+            <p
+              className={`font-medium text-sm transition-colors duration-200 ${
+                isDarkMode ? "text-gray-200" : "text-slate-900"
+              }`}
+            >
+              {college.branch}
+            </p>
+          </div>
+
+          {/* Fees & Package */}
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="text-xs md:text-sm">
+              <span
+                className={`block mb-1 transition-colors duration-200 ${
+                  isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}
+              >
+                Avg Package
+              </span>
+              <span
+                className={`font-semibold transition-colors duration-200 ${
+                  isDarkMode ? "text-amber-500" : "text-[#2a53e2]"
+                }`}
+              >
+                {college.avgPackage}
+              </span>
+            </div>
+            <div className="text-xs md:text-sm">
+              <span
+                className={`block mb-1 transition-colors duration-200 ${
+                  isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}
+              >
+                Annual Fees
+              </span>
+              <span
+                className={`font-semibold transition-colors duration-200 ${
+                  isDarkMode ? "text-amber-500" : "text-[#2a53e2]"
+                }`}
+              >
+                {college.fees.replace("/year", "")}
+              </span>
+            </div>
+          </div>
+
+          {/* Cutoff Table */}
+          <div>
+            <h4
+              className={`mb-2 md:mb-3 text-xs md:text-base font-semibold transition-colors duration-200 ${
+                isDarkMode ? "text-gray-300" : "text-slate-600"
+              }`}
+            >
+              Closing Ranks ({college.SeatType} : {college.SubCategory})
+            </h4>
+            <div
+              className={`overflow-x-auto border rounded-lg transition-colors duration-200 ${
+                isDarkMode ? "border-slate-800" : "border-gray-200"
+              }`}
+            >
+              <table className="w-full text-xs md:text-sm">
+                <thead
+                  className={`transition-colors duration-200 ${
+                    isDarkMode ? "bg-slate-800/50" : "bg-gray-50"
+                  }`}
+                >
+                  <tr>
+                    <th
+                      className={`text-left py-2 md:py-3 px-2 md:px-4 whitespace-nowrap font-semibold transition-colors duration-200 ${
+                        isDarkMode ? "text-gray-300" : "text-gray-700"
+                      }`}
+                    >
+                      Round
+                    </th>
+                    {Object.keys(college.cutoffs)
+                      .sort()
+                      .reverse()
+                      .map((year: string) => (
+                        <th
+                          key={year}
+                          className={`text-center py-2 md:py-3 px-2 md:px-4 whitespace-nowrap font-semibold transition-colors duration-200 ${
+                            isDarkMode ? "text-gray-300" : "text-gray-700"
+                          }`}
+                        >
+                          {year}
+                        </th>
+                      ))}
+                  </tr>
+                </thead>
+                <tbody
+                  className={`divide-y transition-colors duration-200 ${
+                    isDarkMode ? "divide-slate-800" : "divide-gray-200"
+                  }`}
+                >
+                  {(() => {
+                    const allRoundsSet = new Set<string>();
+                    (
+                      Object.values(college.cutoffs) as Record<string, number>[]
+                    ).forEach((rounds) => {
+                      Object.keys(rounds).forEach((roundKey) => {
+                        allRoundsSet.add(roundKey);
+                      });
+                    });
+
+                    const roundPriority = [
+                      ...Array.from({ length: 6 }, (_, i) => `Round-${i + 1}`),
+                      ...Array.from({ length: 2 }, (_, i) => `CSAB-${i + 1}`),
+                      "Upgradation-Round",
+                      "Upgradation-Round-2",
+                      "Spot-Round",
+                      "Special-Spot-Round",
+                    ];
+
+                    const allRounds = Array.from(allRoundsSet);
+                    allRounds.sort((a, b) => {
+                      const aIndex = roundPriority.indexOf(a);
+                      const bIndex = roundPriority.indexOf(b);
+                      if (aIndex !== -1 && bIndex !== -1)
+                        return aIndex - bIndex;
+                      if (aIndex !== -1) return -1;
+                      if (bIndex !== -1) return 1;
+                      return a.localeCompare(b);
+                    });
+
+                    return allRounds.map((roundKey) => {
+                      return (
+                        <tr
+                          key={roundKey}
+                          className={`transition-colors duration-200 ${
+                            isDarkMode
+                              ? "hover:bg-gray-800"
+                              : "hover:bg-gray-50"
+                          }`}
+                        >
+                          <td
+                            className={`py-2 md:py-3 px-2 md:px-4 whitespace-nowrap font-medium transition-colors duration-200 ${
+                              isDarkMode ? "text-gray-200" : "text-gray-900"
+                            }`}
+                          >
+                            {roundKey}
+                          </td>
+                          {Object.keys(college.cutoffs)
+                            .sort()
+                            .reverse()
+                            .map((year) => {
+                              const cutoffValue =
+                                college.cutoffs[year]?.[roundKey];
+                              return (
+                                <td
+                                  key={year}
+                                  className={`text-center py-2 md:py-3 px-2 md:px-4 whitespace-nowrap transition-colors duration-200 ${
+                                    isDarkMode
+                                      ? "text-gray-400"
+                                      : "text-gray-600"
+                                  }`}
+                                >
+                                  {cutoffValue
+                                    ? cutoffValue.toLocaleString()
+                                    : "-"}
+                                </td>
+                              );
+                            })}
+                        </tr>
+                      );
+                    });
+                  })()}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </Card>
+    );
+  }
+);
+
+CollegeCard.displayName = "CollegeCard";
+
 export default function CollegePredictorResultPage() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
+
+  // ✅ OPTIMIZATION 2: Prevent unnecessary refetches with ref
+  const lastFetchParamsRef = useRef<string>("");
 
   // Initial form state from URL
   const [selectedExam, setSelectedExam] = useState("");
@@ -127,7 +475,6 @@ export default function CollegePredictorResultPage() {
   const [subCategory, setSubCategory] = useState("Gender-Neutral");
   const [userState, setUserState] = useState("");
 
-  // Initialize as empty array to prevent map errors
   const [predictedColleges, setPredictedColleges] = useState<
     PredictionResult[]
   >([]);
@@ -152,25 +499,27 @@ export default function CollegePredictorResultPage() {
 
   const [viewMode, setViewMode] = useState<"safe" | "risk">("safe");
 
-  // Function to update URL with current filters
+  // ✅ OPTIMIZATION 3: Debounced URL update
   const updateURL = useCallback(
     (updates: Record<string, string | number | null>) => {
-      const params = new URLSearchParams(searchParams.toString());
+      startTransition(() => {
+        const params = new URLSearchParams(searchParams.toString());
 
-      Object.entries(updates).forEach(([key, value]) => {
-        if (value === null || value === "" || value === undefined) {
-          params.delete(key);
-        } else {
-          params.set(key, String(value));
-        }
+        Object.entries(updates).forEach(([key, value]) => {
+          if (value === null || value === "" || value === undefined) {
+            params.delete(key);
+          } else {
+            params.set(key, String(value));
+          }
+        });
+
+        router.push(`${pathname}?${params.toString()}`, { scroll: false });
       });
-
-      router.push(`${pathname}?${params.toString()}`, { scroll: false });
     },
     [searchParams, pathname, router]
   );
 
-  // Initialize state from URL on mount
+  // ✅ OPTIMIZATION 4: Initialize state from URL once
   useEffect(() => {
     const exam = searchParams.get("exam") || "";
     const rank = searchParams.get("rank") || "";
@@ -179,7 +528,6 @@ export default function CollegePredictorResultPage() {
     const sub = searchParams.get("subCategory") || "Gender-Neutral";
     const modeParam = searchParams.get("mode");
     const mode: "safe" | "risk" = modeParam === "risk" ? "risk" : "safe";
-    setViewMode(mode);
     const page = parseInt(searchParams.get("page") || "1");
     const tags = searchParams.get("tag")?.split(",").filter(Boolean) || [];
     const fees = parseInt(searchParams.get("maxFees") || "5000000");
@@ -193,15 +541,29 @@ export default function CollegePredictorResultPage() {
     setCurrentPage(page);
     setSelectedTags(tags);
     setMaxFees(fees);
-  }, [searchParams]);
+  }, []); // Only run once on mount
 
-  // Fetch predictions when URL params change
+  // ✅ OPTIMIZATION 5: Optimized fetch with deduplication
   useEffect(() => {
     const exam = searchParams.get("exam");
     const rank = searchParams.get("rank");
     const state = searchParams.get("state");
     const seat = searchParams.get("seatType");
     const sub = searchParams.get("subCategory");
+    const mode = searchParams.get("mode") || "safe";
+    const page = searchParams.get("page") || "1";
+    const tags = searchParams.get("tag") || "";
+    const fees = searchParams.get("maxFees") || "";
+
+    // Create a unique key for these params
+    const fetchKey = `${exam}-${rank}-${state}-${seat}-${sub}-${mode}-${page}-${tags}-${fees}`;
+
+    // ✅ Prevent duplicate fetches
+    if (fetchKey === lastFetchParamsRef.current) {
+      return;
+    }
+
+    lastFetchParamsRef.current = fetchKey;
 
     async function fetchPredictions() {
       if (!exam || !rank || !state || !seat || !sub) {
@@ -213,7 +575,6 @@ export default function CollegePredictorResultPage() {
       setError(null);
 
       try {
-        // Map exam types to API format
         const examTypeMap: Record<string, string> = {
           "JEE-Main": "JEE-Main",
           "JEE-Advanced": "JEE-Advanced",
@@ -224,12 +585,8 @@ export default function CollegePredictorResultPage() {
         };
 
         const examType = examTypeMap[exam] || "JEE-Main";
-        const mode = searchParams.get("mode") || "safe";
-        const page = parseInt(searchParams.get("page") || "1");
-        const tags = searchParams.get("tag")?.split(",").filter(Boolean) || [];
-        const fees = searchParams.get("maxFees");
+        const tagsList = tags.split(",").filter(Boolean);
 
-        // Build query parameters for API
         const queryParams: Record<string, string | number> = {
           rank: rank,
           examType: examType,
@@ -237,41 +594,33 @@ export default function CollegePredictorResultPage() {
           subCategory: sub,
           homeState: state,
           mode: mode,
-          page: page,
+          page: parseInt(page),
           pageSize: 50,
         };
 
-        // Add optional filters if they exist
-        if (tags.length > 0) {
-          queryParams.tag = tags.join(",");
+        if (tagsList.length > 0) {
+          queryParams.tag = tagsList.join(",");
         }
 
         if (fees && parseInt(fees) < 5000000) {
           queryParams.maxFees = parseInt(fees);
         }
 
-        console.log("API Request Params:", queryParams);
-
-        // Call the API using apiService
         const response = await apiService.get<PredictorAPIResponse>(
           "/predictor/predict",
           queryParams
         );
-
-        console.log("API Response:", response);
 
         if (
           response.statusCode === 200 &&
           response.data &&
           response.data.colleges
         ) {
-          // Extract colleges array from nested structure
           const collegeData = Array.isArray(response.data.colleges)
             ? response.data.colleges
             : [];
 
           setPredictedColleges(collegeData);
-          // Update pagination info from response
           setTotalResults(response.data.totalResults || collegeData.length);
           setPageSize(response.data.pageSize || 20);
           setTotalPages(
@@ -321,66 +670,85 @@ export default function CollegePredictorResultPage() {
     fetchPredictions();
   }, [searchParams]);
 
-  const toggleCity = (city: string) => {
+  const toggleCity = useCallback((city: string) => {
     setSelectedCities((prev) =>
       prev.includes(city) ? prev.filter((c) => c !== city) : [...prev, city]
     );
-  };
+  }, []);
 
-  const toggleTag = (tagId: string) => {
-    const newTags = selectedTags.includes(tagId)
-      ? selectedTags.filter((t) => t !== tagId)
-      : [...selectedTags, tagId];
+  const toggleTag = useCallback(
+    (tagId: string) => {
+      setSelectedTags((prev) => {
+        const newTags = prev.includes(tagId)
+          ? prev.filter((t) => t !== tagId)
+          : [...prev, tagId];
 
-    setSelectedTags(newTags);
+        // Update URL with new tags and reset to page 1
+        startTransition(() => {
+          const params = new URLSearchParams(window.location.search);
+          if (newTags.length > 0) {
+            params.set("tag", newTags.join(","));
+          } else {
+            params.delete("tag");
+          }
+          params.set("page", "1");
+          router.push(`${pathname}?${params.toString()}`, { scroll: false });
+        });
 
-    // Update URL with new tags and reset to page 1
-    updateURL({
-      tag: newTags.length > 0 ? newTags.join(",") : null,
-      page: "1",
-    });
-  };
-
-  const handleMaxFeesChange = (value: number[]) => {
-    const newMaxFees = value[0];
-    setMaxFees(newMaxFees);
-
-    // Update URL with new max fees and reset to page 1
-    updateURL({
-      maxFees: newMaxFees < 5000000 ? newMaxFees.toString() : null,
-      page: "1",
-    });
-  };
-
-  const handleReset = () => {
-    router.push("/college-predictor");
-  };
-
-  const handleViewModeChange = (mode: "safe" | "risk") => {
-    setViewMode(mode);
-
-    // Update URL with new mode and reset to page 1
-    updateURL({
-      mode: mode,
-      page: "1",
-    });
-  };
-
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-
-      // Update URL with new page
-      updateURL({
-        page: page.toString(),
+        return newTags;
       });
+    },
+    [pathname, router]
+  );
 
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  };
+  // ✅ OPTIMIZATION 6: Debounced slider change
+  const handleMaxFeesChange = useMemo(() => {
+    let timeoutId: NodeJS.Timeout;
+    return (value: number[]) => {
+      const newMaxFees = value[0];
+      setMaxFees(newMaxFees);
 
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        updateURL({
+          maxFees: newMaxFees < 5000000 ? newMaxFees.toString() : null,
+          page: "1",
+        });
+      }, 300);
+    };
+  }, [updateURL]);
+
+  const handleReset = useCallback(() => {
+    router.push("/college-predictor");
+  }, [router]);
+
+  // ✅ OPTIMIZATION 7: Instant mode change without refetch
+  const handleViewModeChange = useCallback(
+    (mode: "safe" | "risk") => {
+      setViewMode(mode);
+      updateURL({
+        mode: mode,
+        page: "1",
+      });
+    },
+    [updateURL]
+  );
+
+  const handlePageChange = useCallback(
+    (page: number) => {
+      if (page >= 1 && page <= totalPages) {
+        setCurrentPage(page);
+        updateURL({
+          page: page.toString(),
+        });
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    },
+    [totalPages, updateURL]
+  );
+
+  // ✅ OPTIMIZATION 8: Memoized filtered colleges
   const filteredColleges = useMemo(() => {
-    // Always ensure we're working with an array
     if (!Array.isArray(predictedColleges) || predictedColleges.length === 0) {
       return [];
     }
@@ -417,9 +785,7 @@ export default function CollegePredictorResultPage() {
       };
     });
 
-    // Apply client-side filters
     const filtered = collegesToDisplay.filter((college) => {
-      // City filter
       if (selectedCities.length > 0) {
         const matchesCity = selectedCities.some((city) =>
           college.location
@@ -429,7 +795,6 @@ export default function CollegePredictorResultPage() {
         if (!matchesCity) return false;
       }
 
-      // Specialization filter
       if (
         selectedSpecializations.length > 0 &&
         !selectedSpecializations.some((spec) =>
@@ -439,7 +804,6 @@ export default function CollegePredictorResultPage() {
         return false;
       }
 
-      // Quota filter
       if (selectedQuota !== "All" && college.quota !== selectedQuota) {
         return false;
       }
@@ -455,16 +819,28 @@ export default function CollegePredictorResultPage() {
     selectedQuota,
   ]);
 
-  const filteredCities = cities.filter((city) =>
-    city.toLowerCase().includes(searchLocation.toLowerCase())
+  // ✅ OPTIMIZATION 9: Memoized filtered cities
+  const filteredCities = useMemo(
+    () =>
+      cities.filter((city) =>
+        city.toLowerCase().includes(searchLocation.toLowerCase())
+      ),
+    [searchLocation]
   );
 
-  // Dynamic theme classes based on viewMode
   const isDarkMode = viewMode === "risk";
+
+  // ✅ OPTIMIZATION 10: Memoized view details handler
+  const handleViewDetails = useCallback(
+    (slug: string) => {
+      router.push(`/college/${slug}`);
+    },
+    [router]
+  );
 
   return (
     <div
-      className={`min-h-screen transition-all duration-400 ease-in-out ${
+      className={`min-h-screen transition-colors duration-300 ${
         isDarkMode
           ? "bg-gradient-to-br from-slate-950 via-gray-900 to-slate-900"
           : "bg-[#F2F4F7]"
@@ -472,23 +848,24 @@ export default function CollegePredictorResultPage() {
     >
       {/* Header Section */}
       <div
-        className={`border-b transition-all duration-400 ease-in-out ${
+        className={`relative border-b transition-colors duration-300 ${
           isDarkMode
             ? "bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 border-amber-900/20"
             : "bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 border-gray-200"
         }`}
       >
-        <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-4 md:pt-10">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.05)_1px,transparent_1px)] bg-[size:48px_48px] pointer-events-none"></div>
+        <div className="relative max-w-[1400px] mx-auto px-4 md:px-6 py-4 md:pt-10">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4 md:mb-6">
             <div className="flex-1">
               <h1
-                className={`mb-1 md:mb-2 text-xl md:text-2xl transition-all duration-400 ${
+                className={`mb-1 md:mb-2 text-xl md:text-2xl transition-colors duration-300 ${
                   isDarkMode ? "text-amber-500" : "text-white"
                 }`}
               >
                 {examOptions.find((e) => e.id === selectedExam)?.name}{" "}
                 <span
-                  className={`transition-all duration-400 ${
+                  className={`transition-colors duration-300 ${
                     isDarkMode ? "text-white" : "text-yellow-400"
                   }`}
                 >
@@ -496,7 +873,7 @@ export default function CollegePredictorResultPage() {
                 </span>
               </h1>
               <p
-                className={`text-sm md:text-base transition-all duration-400 ${
+                className={`text-sm md:text-base transition-colors duration-300 ${
                   isDarkMode ? "text-gray-300" : "text-white"
                 }`}
               >
@@ -507,7 +884,7 @@ export default function CollegePredictorResultPage() {
             <Button
               onClick={handleReset}
               variant="outline"
-              className={`w-full sm:w-auto transition-all duration-400 ${
+              className={`w-full sm:w-auto transition-colors duration-300 ${
                 isDarkMode
                   ? "border-amber-600/50 text-white hover:bg-amber-950/30 hover:text-amber-400"
                   : "border-gray-300 text-white hover:bg-gray-50 hover:text-slate-900"
@@ -522,7 +899,7 @@ export default function CollegePredictorResultPage() {
 
       {/* Summary Bar */}
       <div
-        className={`border-b transition-all duration-400 ease-in-out ${
+        className={`border-b transition-colors duration-300 ${
           isDarkMode
             ? "bg-slate-900/50 border-slate-800 backdrop-blur-sm"
             : "bg-white border-gray-200"
@@ -532,7 +909,7 @@ export default function CollegePredictorResultPage() {
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
             <div className="flex items-center gap-4">
               <p
-                className={`text-sm md:text-base flex items-center gap-2 transition-all duration-400 ${
+                className={`text-sm md:text-base flex items-center gap-2 transition-colors duration-300 ${
                   isDarkMode ? "text-gray-200" : "text-gray-900"
                 }`}
               >
@@ -552,7 +929,7 @@ export default function CollegePredictorResultPage() {
                     <span className="text-sm text-slate-500">
                       Loading results for Rank{" "}
                       <span
-                        className={`transition-all duration-400 ${
+                        className={`transition-colors duration-300 ${
                           isDarkMode
                             ? "text-amber-500 font-semibold"
                             : "text-[#2a53e2]"
@@ -564,28 +941,31 @@ export default function CollegePredictorResultPage() {
                     </span>
                   </span>
                 ) : (
-                  <>
-                    <span
-                      className={`transition-all duration-400 ${
-                        isDarkMode
-                          ? "text-amber-500 font-semibold"
-                          : "text-[#2a53e2]"
-                      }`}
-                    >
-                      {totalResults} Results
+                  <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-start flex-wrap gap-1 sm:gap-2 text-center sm:text-left text-sm sm:text-base">
+                    <span className="block sm:hidden text-slate-600">
+                      <span className="font-semibold text-[#2a53e2]">
+                        {totalResults}
+                      </span>{" "}
+                      results found for you ({seatType} Category)
                     </span>
-                    found for Rank{" "}
-                    <span
-                      className={`transition-all duration-400 ${
-                        isDarkMode
-                          ? "text-amber-500 font-semibold"
-                          : "text-[#2a53e2]"
-                      }`}
-                    >
-                      {inputRank}
+
+                    <span className="hidden sm:flex flex-wrap items-center gap-2">
+                      <span className="text-[#2a53e2] font-semibold">
+                        {totalResults} Results
+                      </span>
+                      <span className="text-slate-500">found for Rank</span>
+                      <span
+                        className={`${
+                          isDarkMode ? "text-amber-500" : "text-[#2a53e2]"
+                        } font-semibold`}
+                      >
+                        {inputRank}
+                      </span>
+                      <span className="text-slate-500">
+                        AIR ({seatType} Category)
+                      </span>
                     </span>
-                    AIR ({seatType} Category)
-                  </>
+                  </div>
                 )}
               </p>
             </div>
@@ -595,13 +975,13 @@ export default function CollegePredictorResultPage() {
               className="w-full md:w-auto"
             >
               <TabsList
-                className={`w-full md:w-auto grid grid-cols-2 transition-all duration-400 ${
+                className={`w-full md:w-auto grid grid-cols-2 transition-colors duration-300 ${
                   isDarkMode ? "bg-slate-800/50" : "bg-gray-100"
                 }`}
               >
                 <TabsTrigger
                   value="safe"
-                  className={`text-xs md:text-sm transition-all duration-400 ${
+                  className={`text-xs md:text-sm transition-colors duration-300 ${
                     viewMode === "safe" && isDarkMode
                       ? "bg-slate-700 text-white"
                       : viewMode === "safe"
@@ -616,7 +996,7 @@ export default function CollegePredictorResultPage() {
                 </TabsTrigger>
                 <TabsTrigger
                   value="risk"
-                  className={`text-xs md:text-sm transition-all duration-400 ${
+                  className={`text-xs md:text-sm transition-colors duration-300 ${
                     viewMode === "risk"
                       ? isDarkMode
                         ? "bg-amber-600/20 text-amber-400 font-semibold shadow-lg shadow-amber-900/30 border border-amber-600/30"
@@ -643,7 +1023,7 @@ export default function CollegePredictorResultPage() {
             <SheetTrigger asChild>
               <Button
                 variant="outline"
-                className={`w-full transition-all duration-400 ${
+                className={`w-full transition-colors duration-300 ${
                   isDarkMode
                     ? "border-amber-600/50 text-amber-500 bg-slate-900/50 hover:bg-amber-950/30"
                     : "border-[#2a53e2] text-[#2a53e2]"
@@ -659,18 +1039,18 @@ export default function CollegePredictorResultPage() {
             </SheetTrigger>
             <SheetContent
               side="left"
-              className={`w-[85vw] sm:w-[350px] overflow-y-auto transition-all duration-400 ${
+              className={`w-[85vw] sm:w-[350px] overflow-y-auto transition-colors duration-300 ${
                 isDarkMode ? "bg-slate-900 border-slate-800" : ""
               }`}
             >
               <SheetHeader>
                 <SheetTitle
-                  className={`flex items-center gap-2 transition-all duration-400 ${
+                  className={`flex items-center gap-2 transition-colors duration-300 ${
                     isDarkMode ? "text-amber-500" : ""
                   }`}
                 >
                   <Filter
-                    className={`w-5 h-5 transition-all duration-400 ${
+                    className={`w-5 h-5 transition-colors duration-300 ${
                       isDarkMode ? "text-amber-500" : "text-[#2a53e2]"
                     }`}
                   />
@@ -681,7 +1061,7 @@ export default function CollegePredictorResultPage() {
                 {/* College Tags Filter */}
                 <div>
                   <h3
-                    className={`font-semibold mb-3 text-sm transition-all duration-400 ${
+                    className={`font-semibold mb-3 text-sm transition-colors duration-300 ${
                       isDarkMode ? "text-gray-200" : ""
                     }`}
                   >
@@ -700,7 +1080,7 @@ export default function CollegePredictorResultPage() {
                         />
                         <label
                           htmlFor={`mobile-tag-${tag.id}`}
-                          className={`text-sm cursor-pointer flex-1 transition-all duration-400 ${
+                          className={`text-sm cursor-pointer flex-1 transition-colors duration-300 ${
                             isDarkMode ? "text-gray-300" : ""
                           }`}
                         >
@@ -716,7 +1096,7 @@ export default function CollegePredictorResultPage() {
                 {/* Max Fees Filter */}
                 <div>
                   <h3
-                    className={`font-semibold mb-3 text-sm transition-all duration-400 ${
+                    className={`font-semibold mb-3 text-sm transition-colors duration-300 ${
                       isDarkMode ? "text-gray-200" : ""
                     }`}
                   >
@@ -734,7 +1114,7 @@ export default function CollegePredictorResultPage() {
                       ₹0L
                     </span>
                     <span
-                      className={`font-semibold transition-all duration-400 ${
+                      className={`font-semibold transition-colors duration-300 ${
                         isDarkMode ? "text-amber-500" : "text-[#2a53e2]"
                       }`}
                     >
@@ -746,7 +1126,7 @@ export default function CollegePredictorResultPage() {
                 {/* Location Filter */}
                 <div>
                   <h3
-                    className={`font-semibold mb-3 text-sm transition-all duration-400 ${
+                    className={`font-semibold mb-3 text-sm transition-colors duration-300 ${
                       isDarkMode ? "text-gray-200" : ""
                     }`}
                   >
@@ -754,7 +1134,7 @@ export default function CollegePredictorResultPage() {
                   </h3>
                   <div className="relative mb-3">
                     <Search
-                      className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 transition-all duration-400 ${
+                      className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 transition-colors duration-300 ${
                         isDarkMode ? "text-gray-500" : "text-gray-400"
                       }`}
                     />
@@ -762,7 +1142,7 @@ export default function CollegePredictorResultPage() {
                       placeholder="Search cities..."
                       value={searchLocation}
                       onChange={(e) => setSearchLocation(e.target.value)}
-                      className={`pl-10 transition-all duration-400 ${
+                      className={`pl-10 transition-colors duration-300 ${
                         isDarkMode
                           ? "bg-slate-800 border-slate-700 text-gray-200"
                           : ""
@@ -782,7 +1162,7 @@ export default function CollegePredictorResultPage() {
                         />
                         <label
                           htmlFor={`mobile-${city}`}
-                          className={`text-sm cursor-pointer transition-all duration-400 ${
+                          className={`text-sm cursor-pointer transition-colors duration-300 ${
                             isDarkMode ? "text-gray-300" : ""
                           }`}
                         >
@@ -801,7 +1181,7 @@ export default function CollegePredictorResultPage() {
           {/* Desktop Filter Sidebar */}
           <div className="hidden lg:block w-80 flex-shrink-0">
             <Card
-              className={`border sticky top-4 transition-all duration-400 ${
+              className={`border sticky top-4 transition-colors duration-300 ${
                 isDarkMode
                   ? "bg-slate-900/50 border-slate-800 backdrop-blur-sm"
                   : "bg-white border-gray-200"
@@ -810,12 +1190,12 @@ export default function CollegePredictorResultPage() {
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h2
-                    className={`text-lg font-semibold flex items-center gap-2 transition-all duration-400 ${
+                    className={`text-lg font-semibold flex items-center gap-2 transition-colors duration-300 ${
                       isDarkMode ? "text-gray-200" : ""
                     }`}
                   >
                     <Filter
-                      className={`w-5 h-5 transition-all duration-400 ${
+                      className={`w-5 h-5 transition-colors duration-300 ${
                         isDarkMode ? "text-amber-500" : "text-[#2a53e2]"
                       }`}
                     />
@@ -831,14 +1211,13 @@ export default function CollegePredictorResultPage() {
                       setSelectedTags([]);
                       setSelectedQuota("All");
 
-                      // Clear filters from URL
                       updateURL({
                         tag: null,
                         maxFees: null,
                         page: "1",
                       });
                     }}
-                    className={`transition-all duration-400 ${
+                    className={`transition-colors duration-300 ${
                       isDarkMode
                         ? "text-white hover:text-amber-400 hover:bg-amber-950/30 border border-amber-600/30"
                         : "text-[#2a53e2] hover:text-[#2a53e2]/80"
@@ -852,7 +1231,7 @@ export default function CollegePredictorResultPage() {
                   {/* College Tags Filter */}
                   <div>
                     <h3
-                      className={`font-semibold mb-3 text-sm transition-all duration-400 ${
+                      className={`font-semibold mb-3 text-sm transition-colors duration-300 ${
                         isDarkMode ? "text-gray-200" : ""
                       }`}
                     >
@@ -874,7 +1253,7 @@ export default function CollegePredictorResultPage() {
                           />
                           <label
                             htmlFor={`tag-${tag.id}`}
-                            className={`text-sm cursor-pointer flex-1 transition-all duration-400 ${
+                            className={`text-sm cursor-pointer flex-1 transition-colors duration-300 ${
                               isDarkMode ? "text-gray-300" : ""
                             }`}
                           >
@@ -890,7 +1269,7 @@ export default function CollegePredictorResultPage() {
                   {/* Max Fees Filter */}
                   <div>
                     <h3
-                      className={`font-semibold mb-3 text-sm transition-all duration-400 ${
+                      className={`font-semibold mb-3 text-sm transition-colors duration-300 ${
                         isDarkMode ? "text-gray-200" : ""
                       }`}
                     >
@@ -908,7 +1287,7 @@ export default function CollegePredictorResultPage() {
                         ₹0L
                       </span>
                       <span
-                        className={`font-semibold transition-all duration-400 ${
+                        className={`font-semibold transition-colors duration-300 ${
                           isDarkMode ? "text-amber-500" : "text-[#2a53e2]"
                         }`}
                       >
@@ -920,7 +1299,7 @@ export default function CollegePredictorResultPage() {
                   {/* Location Filter */}
                   <div>
                     <h3
-                      className={`font-semibold mb-3 text-sm transition-all duration-400 ${
+                      className={`font-semibold mb-3 text-sm transition-colors duration-300 ${
                         isDarkMode ? "text-gray-200" : ""
                       }`}
                     >
@@ -928,7 +1307,7 @@ export default function CollegePredictorResultPage() {
                     </h3>
                     <div className="relative mb-3">
                       <Search
-                        className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 transition-all duration-400 ${
+                        className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 transition-colors duration-300 ${
                           isDarkMode ? "text-gray-500" : "text-gray-400"
                         }`}
                       />
@@ -936,14 +1315,28 @@ export default function CollegePredictorResultPage() {
                         placeholder="Search cities..."
                         value={searchLocation}
                         onChange={(e) => setSearchLocation(e.target.value)}
-                        className={`pl-10 transition-all duration-400 ${
+                        className={`pl-10 transition-colors duration-300 ${
                           isDarkMode
                             ? "bg-slate-800 border-slate-700 text-gray-200 placeholder:text-gray-500"
                             : ""
                         }`}
                       />
                     </div>
-                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                    <div
+                      className={`space-y-2 max-h-48 overflow-y-auto transition-colors duration-300 ${
+                        isDarkMode
+                          ? "bg-slate-900 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-slate-900"
+                          : ""
+                      }`}
+                      style={
+                        isDarkMode
+                          ? {
+                              scrollbarColor: "#1e293b #0f172a",
+                              scrollbarWidth: "thin",
+                            }
+                          : undefined
+                      }
+                    >
                       {filteredCities.map((city) => (
                         <div key={city} className="flex items-center space-x-2">
                           <Checkbox
@@ -956,7 +1349,7 @@ export default function CollegePredictorResultPage() {
                           />
                           <label
                             htmlFor={city}
-                            className={`text-sm cursor-pointer transition-all duration-400 ${
+                            className={`text-sm cursor-pointer transition-colors duration-300 ${
                               isDarkMode ? "text-gray-300" : ""
                             }`}
                           >
@@ -976,19 +1369,19 @@ export default function CollegePredictorResultPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {isLoading ? (
                 <Card
-                  className={`p-12 text-center col-span-1 lg:col-span-2 border transition-all duration-400 ${
+                  className={`p-12 text-center col-span-1 lg:col-span-2 border transition-colors duration-300 ${
                     isDarkMode
                       ? "bg-slate-900/50 border-slate-800 backdrop-blur-sm"
                       : "bg-white border-gray-200"
                   }`}
                 >
                   <div
-                    className={`animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4 transition-all duration-400 ${
+                    className={`animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4 transition-colors duration-300 ${
                       isDarkMode ? "border-amber-500" : "border-[#2a53e2]"
                     }`}
                   ></div>
                   <p
-                    className={`text-sm font-mono rounded px-3 py-2 transition-all duration-400 ${
+                    className={`text-sm font-mono rounded px-3 py-2 transition-colors duration-300 ${
                       isDarkMode
                         ? "text-gray-300 bg-slate-800/50"
                         : "text-gray-600 bg-gray-50"
@@ -999,26 +1392,26 @@ export default function CollegePredictorResultPage() {
                 </Card>
               ) : error ? (
                 <Card
-                  className={`p-12 text-center col-span-1 lg:col-span-2 border transition-all duration-400 ${
+                  className={`p-12 text-center col-span-1 lg:col-span-2 border transition-colors duration-300 ${
                     isDarkMode
                       ? "bg-slate-900/50 border-slate-800 backdrop-blur-sm"
                       : "bg-white border-gray-200"
                   }`}
                 >
                   <Award
-                    className={`w-16 h-16 mx-auto mb-4 transition-all duration-400 ${
+                    className={`w-16 h-16 mx-auto mb-4 transition-colors duration-300 ${
                       isDarkMode ? "text-amber-900/50" : "text-red-300"
                     }`}
                   />
                   <h3
-                    className={`mb-2 font-semibold transition-all duration-400 ${
+                    className={`mb-2 font-semibold transition-colors duration-300 ${
                       isDarkMode ? "text-gray-200" : "text-slate-900"
                     }`}
                   >
                     Error Loading Data
                   </h3>
                   <p
-                    className={`mb-4 transition-all duration-400 ${
+                    className={`mb-4 transition-colors duration-300 ${
                       isDarkMode ? "text-gray-400" : "text-gray-600"
                     }`}
                   >
@@ -1027,7 +1420,7 @@ export default function CollegePredictorResultPage() {
                   <Button
                     onClick={handleReset}
                     variant="outline"
-                    className={`transition-all duration-400 ${
+                    className={`transition-colors duration-300 ${
                       isDarkMode
                         ? "border-amber-600/50 text-amber-500 hover:bg-amber-950/30"
                         : "border-[#2a53e2] text-[#2a53e2]"
@@ -1039,340 +1432,12 @@ export default function CollegePredictorResultPage() {
               ) : filteredColleges.length > 0 ? (
                 <>
                   {filteredColleges.map((college) => (
-                    <Card
+                    <CollegeCard
                       key={college.id}
-                      className={`border   ${
-                        isDarkMode
-                          ? "bg-gradient-to-br from-slate-900/80 via-gray-900/80 to-slate-800/80 border-slate-800  "
-                          : "bg-white border-gray-200"
-                      }`}
-                    >
-                      <div className="p-4 md:p-6">
-                        {/* College Header */}
-                        <div className="flex flex-col sm:flex-row items-start justify-between gap-3 mb-4">
-                          <div className="flex-1 w-full">
-                            <div className="flex items-start gap-3 mb-2">
-                              <div
-                                className={`w-12 h-12 md:w-16 md:h-16 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-400 ${
-                                  isDarkMode
-                                    ? "bg-gradient-to-br from-amber-950/30 to-slate-800/50 border border-amber-600/20"
-                                    : "bg-gradient-to-br from-[#2a53e2]/10 to-[#7C5EFF]/10"
-                                }`}
-                              >
-                                <GraduationCap
-                                  className={`w-6 h-6 md:w-8 md:h-8 transition-all duration-400 ${
-                                    isDarkMode
-                                      ? "text-amber-500"
-                                      : "text-[#2a53e2]"
-                                  }`}
-                                />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <h3
-                                  className={`mb-1 text-base md:text-lg font-semibold transition-all duration-400 ${
-                                    isDarkMode
-                                      ? "text-gray-100"
-                                      : "text-slate-900"
-                                  }`}
-                                >
-                                  {college.name}
-                                </h3>
-                                <div
-                                  className={`flex flex-wrap items-center gap-1 md:gap-2 text-xs md:text-sm mb-2 transition-all duration-400 ${
-                                    isDarkMode
-                                      ? "text-gray-400"
-                                      : "text-gray-600"
-                                  }`}
-                                >
-                                  <MapPin className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0" />
-                                  <span className="truncate">
-                                    {college.location}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className={`w-full sm:w-auto text-xs transition-all duration-400 ${
-                              isDarkMode
-                                ? "text-white hover:text-amber-400 hover:bg-amber-950/30 border border-amber-600/30"
-                                : "text-[#2a53e2] hover:text-[#2a53e2]/80 border border-gray-600 "
-                            }`}
-                            onClick={() =>
-                              router.push(`/college/${college.slug}`)
-                            }
-                          >
-                            View Details
-                            <ArrowRight className="w-3 h-3 ml-1" />
-                          </Button>
-                        </div>
-
-                        {/* College Meta */}
-                        <div className="flex flex-wrap items-center gap-2 mb-4 ">
-                          <Badge
-                            variant="outline"
-                            className={`text-xs transition-all duration-400 ${
-                              isDarkMode
-                                ? "border-amber-600/50 text-white bg-gray-200"
-                                : "border-[#2a53e2] text-[#2a53e2]"
-                            }`}
-                          >
-                            NIRF #
-                            {college.nirfText !== "-"
-                              ? college.nirfText
-                              : "N/A"}
-                          </Badge>
-                          <Badge
-                            variant="secondary"
-                            className={`text-xs transition-all duration-400 ${
-                              isDarkMode
-                                ? "bg-gray-200 text-gray-400 border border-slate-700"
-                                : "bg-blue-100 text-blue-700"
-                            }`}
-                          >
-                            {college.quota === "OS"
-                              ? "Other State"
-                              : college.quota === "HS"
-                              ? "Home State"
-                              : college.quota === "AI"
-                              ? "All India"
-                              : college.quota}
-                          </Badge>
-                          {college.tags.map((tag) => (
-                            <a
-                              key={tag}
-                              href={
-                                tag.toLowerCase() === "cutoff"
-                                  ? `/college/${college.slug}#cutoff`
-                                  : `/college/${college.slug}#placements`
-                              }
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <Badge
-                                variant="secondary"
-                                className={`text-xs cursor-pointer transition-all duration-400 ${
-                                  isDarkMode
-                                    ? "bg-gray-200 text-gray-400  border border-slate-700"
-                                    : "bg-gray-100 hover:bg-gray-200"
-                                }`}
-                              >
-                                {tag}
-                              </Badge>
-                            </a>
-                          ))}
-                        </div>
-
-                        {/* Branch Info */}
-                        <div
-                          className={`rounded-lg p-3 md:p-4 mb-4 transition-all duration-400 ${
-                            isDarkMode
-                              ? "bg-gradient-to-r from-amber-950/20 to-slate-800/30 border border-amber-600/10"
-                              : "bg-gradient-to-r from-[#2a53e2]/5 to-[#7C5EFF]/5"
-                          }`}
-                        >
-                          <p
-                            className={`text-xs mb-1 transition-all duration-400 ${
-                              isDarkMode ? "text-gray-400" : "text-gray-600"
-                            }`}
-                          >
-                            {college.course}
-                          </p>
-                          <p
-                            className={`font-medium text-sm transition-all duration-400 ${
-                              isDarkMode ? "text-gray-200" : "text-slate-900"
-                            }`}
-                          >
-                            {college.branch}
-                          </p>
-                        </div>
-
-                        {/* Fees & Package */}
-                        <div className="grid grid-cols-2 gap-4 mb-4">
-                          <div className="text-xs md:text-sm">
-                            <span
-                              className={`block mb-1 transition-all duration-400 ${
-                                isDarkMode ? "text-gray-400" : "text-gray-600"
-                              }`}
-                            >
-                              Avg Package
-                            </span>
-                            <span
-                              className={`font-semibold transition-all duration-400 ${
-                                isDarkMode ? "text-amber-500" : "text-[#2a53e2]"
-                              }`}
-                            >
-                              {college.avgPackage}
-                            </span>
-                          </div>
-                          <div className="text-xs md:text-sm">
-                            <span
-                              className={`block mb-1 transition-all duration-400 ${
-                                isDarkMode ? "text-gray-400" : "text-gray-600"
-                              }`}
-                            >
-                              Annual Fees
-                            </span>
-                            <span
-                              className={`font-semibold transition-all duration-400 ${
-                                isDarkMode ? "text-amber-500" : "text-[#2a53e2]"
-                              }`}
-                            >
-                              {college.fees.replace("/year", "")}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Cutoff Table */}
-                        <div>
-                          <h4
-                            className={`mb-2 md:mb-3 text-xs md:text-base font-semibold transition-all duration-100 ${
-                              isDarkMode ? "text-gray-300" : "text-slate-600"
-                            }`}
-                          >
-                            Closing Ranks ({college.SeatType} :{" "}
-                            {college.SubCategory})
-                          </h4>
-                          <div
-                            className={`overflow-x-auto border rounded-lg transition-all duration-400 ${
-                              isDarkMode
-                                ? "border-slate-800"
-                                : "border-gray-200"
-                            }`}
-                          >
-                            <table className="w-full text-xs md:text-sm">
-                              <thead
-                                className={`transition-all duration-100 ${
-                                  isDarkMode ? "bg-slate-800/50" : "bg-gray-50"
-                                }`}
-                              >
-                                <tr>
-                                  <th
-                                    className={`text-left py-2 md:py-3 px-2 md:px-4 whitespace-nowrap font-semibold transition-all duration-400 ${
-                                      isDarkMode
-                                        ? "text-gray-300"
-                                        : "text-gray-700"
-                                    }`}
-                                  >
-                                    Round
-                                  </th>
-                                  {Object.keys(college.cutoffs)
-                                    .sort()
-                                    .reverse()
-                                    .map((year) => (
-                                      <th
-                                        key={year}
-                                        className={`text-center py-2 md:py-3 px-2 md:px-4 whitespace-nowrap font-semibold transition-all duration-400 ${
-                                          isDarkMode
-                                            ? "text-gray-300"
-                                            : "text-gray-700"
-                                        }`}
-                                      >
-                                        {year}
-                                      </th>
-                                    ))}
-                                </tr>
-                              </thead>
-                              <tbody
-                                className={`divide-y transition-all duration-400 ${
-                                  isDarkMode
-                                    ? "divide-slate-800"
-                                    : "divide-gray-200"
-                                }`}
-                              >
-                                {(() => {
-                                  // Collect all unique round keys from all years
-                                  const allRoundsSet = new Set<string>();
-                                  Object.values(college.cutoffs).forEach(
-                                    (rounds) => {
-                                      Object.keys(rounds).forEach(
-                                        (roundKey) => {
-                                          allRoundsSet.add(roundKey);
-                                        }
-                                      );
-                                    }
-                                  );
-
-                                  // Priority order for rounds
-                                  const roundPriority = [
-                                    ...Array.from(
-                                      { length: 6 },
-                                      (_, i) => `Round-${i + 1}`
-                                    ),
-                                    ...Array.from(
-                                      { length: 2 },
-                                      (_, i) => `CSAB-${i + 1}`
-                                    ),
-                                    "Upgradation-Round",
-                                    "Upgradation-Round-2",
-                                    "Spot-Round",
-                                    "Special-Spot-Round",
-                                  ];
-
-                                  // Sort rounds by priority, then alphabetically for any others
-                                  const allRounds = Array.from(allRoundsSet);
-                                  allRounds.sort((a, b) => {
-                                    const aIndex = roundPriority.indexOf(a);
-                                    const bIndex = roundPriority.indexOf(b);
-                                    if (aIndex !== -1 && bIndex !== -1)
-                                      return aIndex - bIndex;
-                                    if (aIndex !== -1) return -1;
-                                    if (bIndex !== -1) return 1;
-                                    return a.localeCompare(b);
-                                  });
-
-                                  return allRounds.map((roundKey) => {
-                                    return (
-                                      <tr
-                                        key={roundKey}
-                                        className={`transition-all duration-400 ${
-                                          isDarkMode
-                                            ? "hover:bg-gray-800"
-                                            : "hover:bg-gray-50"
-                                        }`}
-                                      >
-                                        <td
-                                          className={`py-2 md:py-3 px-2 md:px-4 whitespace-nowrap font-medium transition-all duration-400 ${
-                                            isDarkMode
-                                              ? "text-gray-200"
-                                              : "text-gray-900"
-                                          }`}
-                                        >
-                                          {roundKey}
-                                        </td>
-                                        {Object.keys(college.cutoffs)
-                                          .sort()
-                                          .reverse()
-                                          .map((year) => {
-                                            const cutoffValue =
-                                              college.cutoffs[year]?.[roundKey];
-                                            return (
-                                              <td
-                                                key={year}
-                                                className={`text-center py-2 md:py-3 px-2 md:px-4 whitespace-nowrap transition-all duration-400 ${
-                                                  isDarkMode
-                                                    ? "text-gray-400"
-                                                    : "text-gray-600"
-                                                }`}
-                                              >
-                                                {cutoffValue
-                                                  ? cutoffValue.toLocaleString()
-                                                  : "-"}
-                                              </td>
-                                            );
-                                          })}
-                                      </tr>
-                                    );
-                                  });
-                                })()}
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
+                      college={college}
+                      isDarkMode={isDarkMode}
+                      onViewDetails={handleViewDetails}
+                    />
                   ))}
 
                   {/* Pagination */}
@@ -1384,7 +1449,7 @@ export default function CollegePredictorResultPage() {
                           size="sm"
                           onClick={() => handlePageChange(currentPage - 1)}
                           disabled={currentPage === 1 || isLoading}
-                          className={`min-w-[44px] h-[44px] sm:min-w-0 sm:h-auto transition-all duration-400 ${
+                          className={`min-w-[44px] h-[44px] sm:min-w-0 sm:h-auto transition-colors duration-300 ${
                             isDarkMode
                               ? "border-slate-700 text-gray-300 hover:bg-slate-800/50 disabled:opacity-50"
                               : "border-gray-300"
@@ -1427,7 +1492,7 @@ export default function CollegePredictorResultPage() {
                                   size="sm"
                                   onClick={() => handlePageChange(pageNum)}
                                   disabled={isLoading}
-                                  className={`min-w-[44px] h-[44px] sm:min-w-[36px] sm:h-auto transition-all duration-400 ${
+                                  className={`min-w-[44px] h-[44px] sm:min-w-[36px] sm:h-auto transition-colors duration-300 ${
                                     currentPage === pageNum
                                       ? isDarkMode
                                         ? "bg-amber-600/30 text-amber-400 hover:bg-amber-600/40 border-amber-600/50"
@@ -1446,7 +1511,7 @@ export default function CollegePredictorResultPage() {
                           {totalPages > 5 && currentPage < totalPages - 2 && (
                             <>
                               <span
-                                className={`hidden md:inline px-2 transition-all duration-400 ${
+                                className={`hidden md:inline px-2 transition-colors duration-300 ${
                                   isDarkMode ? "text-gray-500" : "text-gray-500"
                                 }`}
                               >
@@ -1457,7 +1522,7 @@ export default function CollegePredictorResultPage() {
                                 size="sm"
                                 onClick={() => handlePageChange(totalPages)}
                                 disabled={isLoading}
-                                className={`hidden md:inline-flex transition-all duration-400 ${
+                                className={`hidden md:inline-flex transition-colors duration-300 ${
                                   isDarkMode
                                     ? "border-slate-700 text-gray-300 hover:bg-slate-800/50"
                                     : "border-gray-300"
@@ -1474,7 +1539,7 @@ export default function CollegePredictorResultPage() {
                           size="sm"
                           onClick={() => handlePageChange(currentPage + 1)}
                           disabled={currentPage === totalPages || isLoading}
-                          className={`min-w-[44px] h-[44px] sm:min-w-0 sm:h-auto transition-all duration-400 ${
+                          className={`min-w-[44px] h-[44px] sm:min-w-0 sm:h-auto transition-colors duration-300 ${
                             isDarkMode
                               ? "border-slate-700 text-gray-300 hover:bg-slate-800/50 disabled:opacity-50"
                               : "border-gray-300"
@@ -1486,7 +1551,7 @@ export default function CollegePredictorResultPage() {
                       </div>
 
                       <p
-                        className={`text-xs sm:text-sm text-center px-4 transition-all duration-400 ${
+                        className={`text-xs sm:text-sm text-center px-4 transition-colors duration-300 ${
                           isDarkMode ? "text-gray-400" : "text-gray-600"
                         }`}
                       >
@@ -1498,26 +1563,26 @@ export default function CollegePredictorResultPage() {
                 </>
               ) : (
                 <Card
-                  className={`p-6 md:p-12 text-center col-span-1 lg:col-span-2 border transition-all duration-400 ${
+                  className={`p-6 md:p-12 text-center col-span-1 lg:col-span-2 border transition-colors duration-300 ${
                     isDarkMode
                       ? "bg-slate-900/50 border-slate-800 backdrop-blur-sm"
                       : "bg-white border-gray-200"
                   }`}
                 >
                   <Award
-                    className={`w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 transition-all duration-400 ${
+                    className={`w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 transition-colors duration-300 ${
                       isDarkMode ? "text-amber-900/50" : "text-gray-300"
                     }`}
                   />
                   <h3
-                    className={`mb-2 text-base md:text-lg font-semibold transition-all duration-400 ${
+                    className={`mb-2 text-base md:text-lg font-semibold transition-colors duration-300 ${
                       isDarkMode ? "text-gray-200" : "text-slate-900"
                     }`}
                   >
                     No Colleges Found
                   </h3>
                   <p
-                    className={`mb-4 text-sm md:text-base transition-all duration-400 ${
+                    className={`mb-4 text-sm md:text-base transition-colors duration-300 ${
                       isDarkMode ? "text-gray-400" : "text-gray-600"
                     }`}
                   >
@@ -1538,7 +1603,7 @@ export default function CollegePredictorResultPage() {
                       });
                     }}
                     variant="outline"
-                    className={`w-full sm:w-auto transition-all duration-400 ${
+                    className={`w-full sm:w-auto transition-colors duration-300 ${
                       isDarkMode
                         ? "border-amber-600/50 text-amber-500 hover:bg-amber-950/30"
                         : "border-[#2a53e2] text-[#2a53e2]"
