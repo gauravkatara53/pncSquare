@@ -326,6 +326,116 @@ export const INDIVIDUAL_COLLEGE_CONFIGS: Record<
     },
     fallbackTag: "University",
   },
+  "biet-jhansi": {
+    slug: "biet-jhansi",
+    examConfigs: {
+      "JEE-Main": {
+        name: "JEE Main",
+        requiresSubCategory: true,
+        requiresQuota: true,
+        years: ["2025", "2024"],
+        seatTypeOptions: ["EWS", "General", "OBC", "SC", "ST"],
+        quotaOptions: ["AI", "HS"],
+        subCategories: [
+          "None",
+          "Defence",
+          "Fee Waiver",
+          "Female Only",
+          "Freedom Fighter",
+          "PwD",
+        ],
+      },
+    },
+    fallbackTag: "University",
+  },
+  "hbtu-kanpur": {
+    slug: "hbtu-kanpur",
+    examConfigs: {
+      "JEE-Main": {
+        name: "JEE Main",
+        requiresSubCategory: true,
+        requiresQuota: true,
+        years: ["2025", "2024"],
+        seatTypeOptions: ["EWS", "General", "OBC", "SC", "ST"],
+        quotaOptions: ["AI", "HS"],
+        subCategories: [
+          "None",
+          "Defence",
+          "Fee Waiver",
+          "Female Only",
+          "Freedom Fighter",
+          "PwD",
+        ],
+      },
+    },
+    fallbackTag: "University",
+  },
+  "iet-lucknow": {
+    slug: "iet-lucknow",
+    examConfigs: {
+      "JEE-Main": {
+        name: "JEE Main",
+        requiresSubCategory: true,
+        requiresQuota: true,
+        years: ["2025", "2024"],
+        seatTypeOptions: ["EWS", "General", "OBC", "SC", "ST"],
+        quotaOptions: ["AI", "HS"],
+        subCategories: [
+          "None",
+          "Defence",
+          "Fee Waiver",
+          "Female Only",
+          "Freedom Fighter",
+          "PwD",
+        ],
+      },
+    },
+    fallbackTag: "University",
+  },
+  "knit-sultanpuri": {
+    slug: "knit-sultanpuri",
+    examConfigs: {
+      "JEE-Main": {
+        name: "JEE Main",
+        requiresSubCategory: true,
+        requiresQuota: true,
+        years: ["2025", "2024"],
+        seatTypeOptions: ["EWS", "General", "OBC", "SC", "ST"],
+        quotaOptions: ["AI", "HS"],
+        subCategories: [
+          "None",
+          "Defence",
+          "Fee Waiver",
+          "Female Only",
+          "Freedom Fighter",
+          "PwD",
+        ],
+      },
+    },
+    fallbackTag: "University",
+  },
+  "mmmut-gorakhpur": {
+    slug: "mmmut-gorakhpur",
+    examConfigs: {
+      "JEE-Main": {
+        name: "JEE Main",
+        requiresSubCategory: true,
+        requiresQuota: true,
+        years: ["2025", "2024"],
+        seatTypeOptions: ["EWS", "General", "OBC", "SC", "ST"],
+        quotaOptions: ["AI", "HS"],
+        subCategories: [
+          "None",
+          "Defence",
+          "Fee Waiver",
+          "Female Only",
+          "Freedom Fighter",
+          "PwD",
+        ],
+      },
+    },
+    fallbackTag: "University",
+  },
 };
 
 // College tag configurations

@@ -31,4 +31,4 @@ const bundleAnalyzer = withBundleAnalyzer({
 });
 
 export default bundleAnalyzer(nextConfig);
-//http://api.pncsquare.in 
+//http://api.pncsquare.in
