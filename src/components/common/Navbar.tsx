@@ -7,7 +7,9 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-import { useUser } from "@clerk/nextjs";
+
+import { useUser } from "@clerk/nextjs"; // ✅ normal import
+
 import AuthPopup from "./AuthPopup";
 import { collegeSearchSuggestions } from "../../Data/searchSuggestion";
 
@@ -22,7 +24,8 @@ export function Header() {
   >([]);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   const searchRef = useRef<HTMLDivElement>(null);
-  const { user, isSignedIn } = useUser();
+  const { user, isSignedIn } = useUser?.() || { user: null, isSignedIn: false };
+
   const navItems = [
     { name: "Colleges", id: "colleges", href: "/colleges?page=1&limit=9" },
     { name: "Courses", id: "courses", href: "/courses" },
