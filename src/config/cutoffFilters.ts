@@ -436,6 +436,153 @@ export const INDIVIDUAL_COLLEGE_CONFIGS: Record<
     },
     fallbackTag: "University",
   },
+  "bpit-delhi": {
+    slug: "bpit-delhi",
+    examConfigs: {
+      "JEE-Main": {
+        name: "JEE Main",
+        requiresSubCategory: true,
+        requiresQuota: true,
+        years: ["2025", "2024"],
+        seatTypeOptions: ["General", "EWS", "OBC", "SC", "ST"],
+        quotaOptions: ["Delhi Region", "All India Region"],
+        subCategories: [
+          "None",
+          "Defence",
+          "Kashmiri Migrant",
+          "Person with Disabilities",
+          "Sports",
+        ],
+      },
+    },
+    fallbackTag: "University",
+  },
+  "bvcoe-delhi": {
+    slug: "bvcoe-delhi",
+    examConfigs: {
+      "JEE-Main": {
+        name: "JEE Main",
+        requiresSubCategory: true,
+        requiresQuota: true,
+        years: ["2025", "2024"],
+        seatTypeOptions: ["General", "EWS", "OBC", "SC", "ST"],
+        quotaOptions: ["Delhi Region", "All India Region"],
+        subCategories: [
+          "None",
+          "Defence",
+          "Kashmiri Migrant",
+          "Person with Disabilities",
+          "Sports",
+        ],
+      },
+    },
+    fallbackTag: "University",
+  },
+  "mait-delhi": {
+    slug: "mait-delhi",
+    examConfigs: {
+      "JEE-Main": {
+        name: "JEE Main",
+        requiresSubCategory: true,
+        requiresQuota: true,
+        years: ["2025", "2024"],
+        seatTypeOptions: ["General", "EWS", "OBC", "SC", "ST"],
+        quotaOptions: ["Delhi Region", "All India Region"],
+        subCategories: [
+          "None",
+          "Defence",
+          "Kashmiri Migrant",
+          "Person with Disabilities",
+          "Sports",
+        ],
+      },
+    },
+    fallbackTag: "University",
+  },
+  "msit-delhi": {
+    slug: "msit-delhi",
+    examConfigs: {
+      "JEE-Main": {
+        name: "JEE Main",
+        requiresSubCategory: true,
+        requiresQuota: true,
+        years: ["2025", "2024"],
+        seatTypeOptions: ["General", "EWS", "OBC", "SC", "ST"],
+        quotaOptions: ["Delhi Region", "All India Region"],
+        subCategories: [
+          "None",
+          "Defence",
+          "Kashmiri Migrant",
+          "Person with Disabilities",
+          "Sports",
+        ],
+      },
+    },
+    fallbackTag: "University",
+  },
+  "usar-delhi": {
+    slug: "msit-delhi",
+    examConfigs: {
+      "JEE-Main": {
+        name: "JEE Main",
+        requiresSubCategory: true,
+        requiresQuota: true,
+        years: ["2025", "2024"],
+        seatTypeOptions: ["General", "EWS", "OBC", "SC", "ST"],
+        quotaOptions: ["Delhi Region", "All India Region"],
+        subCategories: [
+          "None",
+          "Defence",
+          "Kashmiri Migrant",
+          "Person with Disabilities",
+          "Sports",
+        ],
+      },
+    },
+    fallbackTag: "University",
+  },
+  "usct-gg-delhi": {
+    slug: "usct-gg-delhi",
+    examConfigs: {
+      "JEE-Main": {
+        name: "JEE Main",
+        requiresSubCategory: true,
+        requiresQuota: true,
+        years: ["2025", "2024"],
+        seatTypeOptions: ["General", "EWS", "OBC", "SC", "ST"],
+        quotaOptions: ["Delhi Region", "All India Region"],
+        subCategories: [
+          "None",
+          "Defence",
+          "Kashmiri Migrant",
+          "Person with Disabilities",
+          "Sports",
+        ],
+      },
+    },
+    fallbackTag: "University",
+  },
+  "usict-gg-delhi": {
+    slug: "usict-gg-delhi",
+    examConfigs: {
+      "JEE-Main": {
+        name: "JEE Main",
+        requiresSubCategory: true,
+        requiresQuota: true,
+        years: ["2025", "2024"],
+        seatTypeOptions: ["General", "EWS", "OBC", "SC", "ST"],
+        quotaOptions: ["Delhi Region", "All India Region"],
+        subCategories: [
+          "None",
+          "Defence",
+          "Kashmiri Migrant",
+          "Person with Disabilities",
+          "Sports",
+        ],
+      },
+    },
+    fallbackTag: "University",
+  },
 };
 
 // College tag configurations
