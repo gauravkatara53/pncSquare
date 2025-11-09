@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 
 const SignIn = dynamic(() => import("@clerk/nextjs").then((m) => m.SignIn), {
   ssr: false,
-  loading: () => <p>Loading...</p>,
+  loading: () => <p>connect to Pncsquare...</p>,
 });
 
 const DynamicUserStatus = dynamic(() => import("./UserStatus"), {
@@ -59,10 +59,7 @@ export default function AuthPopup({ open, setOpen }: AuthPopupProps) {
     <>
       <DynamicUserStatus onAuthChange={handleAuthChange} />
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div
-          ref={popupRef}
-          className="p-6 rounded-xl w-[400px] relative bg-white"
-        >
+        <div ref={popupRef} className="p-6 rounded-xl w-[400px] relative ">
           <SignIn routing="hash" afterSignInUrl="/" />
         </div>
       </div>
