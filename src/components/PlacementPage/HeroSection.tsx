@@ -103,12 +103,15 @@ export default function CollegeHeader({ college }: CollegeHeaderProps) {
           <div className="relative">
             <div className="relative z-10 bg-white/10 backdrop-blur-lg rounded-2xl p-4 sm:p-6 border border-white/20">
               <Image
-                src={college.image_url}
+                src={`${college.image_url}?tr=w-400,h-256,fo-auto,q-80`}
                 alt={`${college.name} Campus`}
                 width={400}
                 height={256}
-                className="w-full h-64 object-cover rounded-xl "
+                className="w-full h-64 object-cover rounded-xl"
+                loading="lazy"
+                decoding="async"
               />
+
               <div className="mt-4 grid grid-cols-2 gap-4">
                 <div className="text-center">
                   <div className="sm:text-3xl text-xl font-bold text-white">

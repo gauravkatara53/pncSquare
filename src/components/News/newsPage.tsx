@@ -221,22 +221,27 @@ export default function NewsMainPage() {
                     <div className="p-4">
                       <div className="flex items-start gap-4">
                         <Image
-                          src={news.coverImage}
+                          src={`${news.coverImage}?tr=w-80,h-80,fo-auto,q-80`}
                           alt={news.title}
                           width={80}
                           height={80}
                           className="rounded-lg object-cover flex-shrink-0"
+                          loading="lazy"
+                          decoding="async"
                           style={{ width: "80px", height: "80px" }}
                         />
+
                         <div className="flex-1 min-w-0">
                           <h3 className="font-medium text-slate-900 line-clamp-2 mb-2">
                             {news.title}
                           </h3>
                           <div className="flex items-center gap-3 text-xs text-slate-500">
-                            <span className="hidden sm:inline">
+                            <span className=" sm:inline">
                               {new Date(news.publishDate).toLocaleDateString()}
                             </span>
-                            <span>{news.readTime} min read</span>
+                            <span className="hidden sm:inline">
+                              {news.readTime} min read
+                            </span>
                             <Badge variant="secondary" className="text-xs">
                               {news.category}
                             </Badge>

@@ -601,12 +601,13 @@ export default function NewsArticleClient({ slug }: Props) {
               {/* Featured Image */}
               <div className="mb-8">
                 <Image
-                  src={article.coverImage}
+                  src={`${article.coverImage}?tr=w-800,h-400,fo-auto,q-85`}
                   alt={article.title}
                   width={800}
                   height={400}
-                  className="w-full h-96 sm:-mt-0 sm:-mb-0 -mt-28 -mb-20  object-contain rounded-lg  bg-white"
+                  className="w-full h-96 sm:-mt-0 sm:-mb-0 -mt-28 -mb-20 object-contain rounded-lg bg-white"
                   priority
+                  decoding="async"
                 />
               </div>
 
