@@ -110,7 +110,7 @@ export default function JEERankPredictor1() {
             <div className="inline-flex items-center gap-2 bg-yellow-400/10 border border-yellow-400/20 rounded-full px-4 py-2 self-center lg:self-start mb-6">
               <div className="w-2 h-2 bg-yellow-400 rounded-full animate-ping"></div>
               <span className="text-yellow-400 text-sm font-medium">
-                Session 2025
+                Session 2026
               </span>
             </div>
 
@@ -643,7 +643,7 @@ export default function JEERankPredictor1() {
                 AI-Based Prediction
               </h3>
               <p className="text-sm text-gray-700 leading-relaxed">
-                AI models trained on 2025 cut-offs, JoSAA data and real
+                AI models trained on 2026 cut-offs, JoSAA data and real
                 admission trends deliver accurate forecasts.
               </p>
             </div>

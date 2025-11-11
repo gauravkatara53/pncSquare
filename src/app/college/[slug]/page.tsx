@@ -46,10 +46,10 @@ export async function generateMetadata({
     }
 
     return {
-      title: `${college.name} – Admission, Cutoff, Fees, Courses & Placements 2025 |Pncsquare`,
+      title: `${college.name} – Admission, Cutoff, Fees, Courses & Placements 2026 |Pncsquare`,
       description:
         college.bio ||
-        `Explore ${college.name} - Admission, Cutoff, Fees, Courses & Placements 2025 | Pncsquare`,
+        `Explore ${college.name} - Admission, Cutoff, Fees, Courses & Placements 2026 | Pncsquare`,
       keywords: [
         college.name,
         `${college.name} placements`,
@@ -71,7 +71,7 @@ export async function generateMetadata({
         title: `${college.name} – Placements, Cutoff, Fees & Courses`,
         description:
           college.bio ||
-          `Explore ${college.name} - Admission, Cutoff, Fees, Courses & Placements 2025 | Pncsquare`,
+          `Explore ${college.name} - Admission, Cutoff, Fees, Courses & Placements 2026 | Pncsquare`,
         images: [
           {
             url: college.image_url,

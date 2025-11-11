@@ -43,13 +43,13 @@ export default function CollegeHeader({ college }: CollegeHeaderProps) {
             <div className="flex items-center gap-2 mb-4">
               <GraduationCap className="w-8 h-8 text-yellow-400" />
               <Badge className="bg-yellow-400 text-yellow-900 px-3 py-1 hover:bg-yellow-400">
-                Report 2025
+                Report 2026
               </Badge>
             </div>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
               {college.name}
-              <span className="block text-yellow-400">Statistics 2025</span>
+              <span className="block text-yellow-400">Statistics 2026</span>
             </h1>
 
             {college.bio && (

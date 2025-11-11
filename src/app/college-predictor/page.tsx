@@ -24,7 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
       "college cutoff predictor",
       "Pncsquare",
       "JEE counselling",
-      "engineering admissions 2025",
+      "engineering admissions 2026",
     ],
     openGraph: {
       title: "College Predictor 2026 - IIT, NIT, IIIT Branch Prediction",

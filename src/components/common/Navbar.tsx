@@ -30,7 +30,7 @@ export function Header() {
     { name: "Colleges", id: "colleges", href: "/colleges?page=1&limit=9" },
     { name: "Courses", id: "courses", href: "/courses" },
     { name: "Exams", id: "exams", href: "/exam" },
-    { name: "Reviews", id: "reviews", href: "/review" },
+    // { name: "Reviews", id: "reviews", href: "/review" },
     { name: "Cutoffs", id: "cutoff", href: "/cutoff" },
     { name: "News", id: "news", href: "/news" },
     {

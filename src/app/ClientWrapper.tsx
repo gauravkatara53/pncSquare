@@ -1,12 +1,17 @@
 "use client";
-import { useState, useEffect } from "react";
-import dynamic from "next/dynamic";
-import { ClerkProvider } from "@clerk/nextjs"; // ✅ load ClerkProvider immediately
-import { Header as Navbar } from "@/components/common/Navbar";
 
-// ✅ Lazy load AuthPopup only (ClerkProvider must not be lazy)
+import { useState, useEffect, Suspense } from "react";
+import dynamic from "next/dynamic";
+import Script from "next/script";
+import { ClerkProvider } from "@clerk/nextjs";
+import { Header as Navbar } from "@/components/common/Navbar";
+import { Analytics } from "@vercel/analytics/react";
+import { GA_TRACKING_ID } from "@/lib/gtag";
+
+// ✅ Lazy-load heavy components only after hydration
 const AuthPopup = dynamic(() => import("@/components/common/AuthPopup"), {
   ssr: false,
+  loading: () => null,
 });
 
 export default function ClientLayout({
@@ -14,25 +19,58 @@ export default function ClientLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [isReady, setIsReady] = useState(false);
+  // useEffect ensures all browser-only features load post-hydration
+  const [isHydrated, setIsHydrated] = useState(false);
 
-  // Use this if you need to defer heavy browser-only logic
   useEffect(() => {
-    setIsReady(true);
+    setIsHydrated(true);
   }, []);
 
   return (
     <ClerkProvider>
       <Navbar />
-      {children}
-      {/* Lazy features can wait until after hydration */}
-      {isReady && (
+      <main suppressHydrationWarning>{children}</main>
+
+      {/* ✅ Lazy feature after hydration */}
+      {isHydrated && (
         <AuthPopup
           open={false}
           setOpen={() => {}}
           mode="signIn"
           setMode={() => {}}
         />
+      )}
+
+      {/* ✅ Safe Analytics (Suspense ensures async loading) */}
+      <Suspense fallback={null}>
+        <Analytics />
+      </Suspense>
+
+      {/* ✅ Google Analytics — only if ID exists */}
+      {GA_TRACKING_ID && (
+        <>
+          <Script
+            id="ga-loader"
+            src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
+            strategy="afterInteractive"
+          />
+          <Script
+            id="ga-init"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                if (typeof window !== 'undefined') {
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${GA_TRACKING_ID}', {
+                    page_path: window.location.pathname,
+                  });
+                }
+              `,
+            }}
+          />
+        </>
       )}
     </ClerkProvider>
   );
