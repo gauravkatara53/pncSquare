@@ -47,6 +47,9 @@ export const metadata: Metadata = {
     images: ["https://ik.imagekit.io/ak2ol9uti/PNC-MANUL/og-image.jpg"],
   },
   metadataBase: new URL("https://pncsquare.in"),
+  alternates: {
+    canonical: "https://pncsquare.in",
+  },
 };
 
 export default function RootLayout({
