@@ -19,7 +19,7 @@ export default function NotFound() {
         <p className="mt-6 text-lg text-slate-600 text-center">
           Can&#39;t find your college?{" "}
           <a
-            href="https://linkly.link/2HYiw"
+            href="https://forms.gle/L7MySn3PDZvj2QtY6"
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-600 underline"

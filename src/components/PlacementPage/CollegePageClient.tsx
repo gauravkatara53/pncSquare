@@ -904,12 +904,12 @@ const CollegePageClient: React.FC<Props> = ({ slug }) => {
                   </div>
                 </div>
 
-                {/* MNNIT Allahabad */}
+                {/* nit Allahabad */}
                 <div
                   className="flex items-center gap-4 p-3 bg-white rounded-lg border border-teal-200 hover:shadow-md transition-all cursor-pointer"
                   onClick={() =>
                     window.open(
-                      "https://pncsquare.in/college/mnnit-allahabad",
+                      "https://pncsquare.in/college/nit-allahabad",
                       "_blank"
                     )
                   }

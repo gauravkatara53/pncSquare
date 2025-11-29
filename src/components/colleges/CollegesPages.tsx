@@ -388,26 +388,26 @@ export default function CollegesMainPage() {
               <div>
                 <section className="flex flex-col items-center justify-center">
                   <Image
-                  src="https://ik.imagekit.io/ak2ol9uti/PNC-MANUL/college-no-found.png"
-                  alt="No college"
-                  width={1200}
-                  height={800}
-                  quality={70}
-                  sizes="(max-width:600px) 480px, (max-width:1200px) 800px, 1200px"
-                  style={{ width: "30%", height: "auto" }}
-                  loading="lazy"
+                    src="https://ik.imagekit.io/ak2ol9uti/PNC-MANUL/college-no-found.png"
+                    alt="No college"
+                    width={1200}
+                    height={800}
+                    quality={70}
+                    sizes="(max-width:600px) 480px, (max-width:1200px) 800px, 1200px"
+                    style={{ width: "30%", height: "auto" }}
+                    loading="lazy"
                   />
                   <p className="mt-6 text-lg text-slate-600 text-center">
-                  Can&#39;t find your college?{" "}
-                  <a
-                    href="https://linkly.link/2HYiw"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 underline"
-                  >
-                    Suggest it here
-                  </a>
-                  .
+                    Can&#39;t find your college?{" "}
+                    <a
+                      href="https://forms.gle/L7MySn3PDZvj2QtY6"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 underline"
+                    >
+                      Suggest it here
+                    </a>
+                    .
                   </p>
                 </section>
               </div>
