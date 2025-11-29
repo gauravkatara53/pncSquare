@@ -741,7 +741,7 @@ const CollegePageClient: React.FC<Props> = ({ slug }) => {
                   className="flex items-center gap-4 p-3 bg-white rounded-lg border border-teal-200 hover:shadow-md transition-all cursor-pointer"
                   onClick={() =>
                     window.open(
-                      "https://pncsquare.in/college/iit-bhu",
+                      "https://pncsquare.in/college/iit-varanasi",
                       "_blank"
                     )
                   }
