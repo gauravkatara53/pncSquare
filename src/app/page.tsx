@@ -22,7 +22,7 @@ const Footer = dynamic(
   () => import("@/components/common/footer").then((m) => m.Footer),
   { ssr: false }
 );
-
+//1wff
 export default function HomePage() {
   const { user, isLoaded } = useUser();
   const [showModal, setShowModal] = useState(false);
